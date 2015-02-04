@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  This xml schema defines simplified schema of
+  the sql db2 statements.
+
+  $Id$
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://www.bphx.com/basic-sql/2008-12-11/db2"
+  xmlns:db2="http://www.bphx.com/basic-sql/2008-12-11/db2"
+  xmlns:sql="http://www.bphx.com/basic-sql/2008-12-11"
+  targetNamespace="http://www.bphx.com/basic-sql/2008-12-11"
+  elementFormDefault="qualified">
+
+  <xs:import namespace="http://www.bphx.com/basic-sql/2008-12-11/db2"
+    schemaLocation="db2-sql-ext.xsd"/>
+
+  <xs:redefine schemaLocation="../basic-sql.xsd">
+    <xs:group name="statement">
+      <xs:choice>
+        <xs:group ref="sql:statement"/>
+        <xs:element ref="db2:scope"/>
+        <xs:element ref="db2:if"/>
+        <xs:element ref="db2:while"/>
+        <xs:element ref="db2:for"/>
+        <xs:element ref="db2:signal"/>
+        <xs:element ref="db2:goto"/>
+        <xs:element ref="db2:leave"/>
+        <xs:element ref="db2:declare-var"/>
+        <xs:element ref="db2:set-var"/>
+        <xs:element ref="db2:get-diagnostics"/>
+        <xs:element ref="db2:call"/>
+        <xs:element ref="db2:declare-cursor"/>
+        <xs:element ref="db2:open"/>
+        <xs:element ref="db2:close"/>
+        <xs:element ref="db2:fetch"/>
+        <xs:element ref="db2:create-procedure"/>
+      </xs:choice>
+    </xs:group>
+
+    <xs:group name="expression">
+      <xs:choice>
+        <xs:group ref="sql:expression"/>
+        <xs:element ref="db2:days"/>
+        <xs:element ref="db2:months"/>
+        <xs:element ref="db2:years"/>
+        <xs:element ref="db2:hours"/>
+        <xs:element ref="db2:minutes"/>
+        <xs:element ref="db2:seconds"/>
+        <xs:element ref="db2:microseconds"/>
+        <xs:element ref="db2:simple-case"/>
+        <xs:element ref="db2:search-case"/>
+      </xs:choice>
+    </xs:group>
+
+    <xs:group name="subselect-clauses">
+      <xs:sequence>
+        <xs:group ref="sql:subselect-clauses"/>
+        <xs:group ref="db2:fetch-first-clause" minOccurs="0"/>
+      </xs:sequence>
+    </xs:group>
+
+    <xs:attributeGroup name="type-attributes">
+      <xs:attributeGroup ref="sql:type-attributes"/>
+      <xs:attribute name="for" type="db2:for-type" use="optional"/>
+    </xs:attributeGroup>
+  </xs:redefine>
+
+</xs:schema>

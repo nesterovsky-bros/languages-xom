@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  This xml schema defines simplified schema of the tsql statements.
+
+  $Id$
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://www.bphx.com/basic-sql/2008-12-11/tsql"
+  xmlns:tsql="http://www.bphx.com/basic-sql/2008-12-11/tsql"
+  xmlns:sql="http://www.bphx.com/basic-sql/2008-12-11"
+  targetNamespace="http://www.bphx.com/basic-sql/2008-12-11"
+  elementFormDefault="qualified">
+
+  <xs:import namespace="http://www.bphx.com/basic-sql/2008-12-11/tsql"
+    schemaLocation="tsql-sql-ext.xsd"/>
+
+  <xs:redefine schemaLocation="../basic-sql.xsd">
+    <xs:group name="statement">
+      <xs:choice>
+        <xs:group ref="sql:statement"/>
+        <xs:element ref="tsql:label"/>
+        <xs:element ref="tsql:block"/>
+        <xs:element ref="tsql:try"/>
+        <xs:element ref="tsql:if"/>
+        <xs:element ref="tsql:while"/>
+        <xs:element ref="tsql:break"/>
+        <xs:element ref="tsql:continue"/>
+        <xs:element ref="tsql:goto"/>
+        <xs:element ref="tsql:declare-var"/>
+        <xs:element ref="tsql:set-var"/>
+        <xs:element ref="tsql:set-property"/>
+        <xs:element ref="tsql:set-method"/>
+        <xs:element ref="tsql:set-ansi-defaults"/>
+        <xs:element ref="tsql:set-ansi-null-dflt-off"/>
+        <xs:element ref="tsql:set-ansi-null-dflt-on"/>
+        <xs:element ref="tsql:set-ansi-nulls"/>
+        <xs:element ref="tsql:set-ansi-padding"/>
+        <xs:element ref="tsql:set-ansi-warnings"/>
+        <xs:element ref="tsql:set-arithabort"/>
+        <xs:element ref="tsql:set-arithignore"/>
+        <xs:element ref="tsql:set-concat-null-yields-null"/>
+        <xs:element ref="tsql:set-context-info"/>
+        <xs:element ref="tsql:set-cursor-close-on-commit"/>
+        <xs:element ref="tsql:set-datefirst"/>
+        <xs:element ref="tsql:set-dateformat"/>
+        <xs:element ref="tsql:set-deadlock-priority"/>
+        <xs:element ref="tsql:set-fips-flagger"/>
+        <xs:element ref="tsql:set-fmtonly"/>
+        <xs:element ref="tsql:set-forceplan"/>
+        <xs:element ref="tsql:set-identity-insert"/>
+        <xs:element ref="tsql:set-implicit-transactions"/>
+        <xs:element ref="tsql:set-language"/>
+        <xs:element ref="tsql:set-lock-timeout"/>
+        <xs:element ref="tsql:set-nocount"/>
+        <xs:element ref="tsql:set-noexec"/>
+        <xs:element ref="tsql:set-numeric-roundabort"/>
+        <xs:element ref="tsql:set-offsets"/>
+        <xs:element ref="tsql:set-parseonly"/>
+        <xs:element ref="tsql:set-query-governor-cost-limit"/>
+        <xs:element ref="tsql:set-quoted-identifier"/>
+        <xs:element ref="tsql:set-remote-proc-transactions"/>
+        <xs:element ref="tsql:set-rowcount"/>
+        <xs:element ref="tsql:set-showplan-all"/>
+        <xs:element ref="tsql:set-showplan-text"/>
+        <xs:element ref="tsql:set-showplan-xml"/>
+        <xs:element ref="tsql:set-statistics-io"/>
+        <xs:element ref="tsql:set-statistics-profile"/>
+        <xs:element ref="tsql:set-statistics-time"/>
+        <xs:element ref="tsql:set-statistics-xml"/>
+        <xs:element ref="tsql:set-textsize"/>
+        <xs:element ref="tsql:set-transaction-isolation-level"/>
+        <xs:element ref="tsql:set-xact-abort"/>
+        <xs:element ref="tsql:print"/>
+        <xs:element ref="tsql:raiserror"/>
+        <xs:element ref="tsql:throw"/>
+        <xs:element ref="tsql:declare-cursor"/>
+        <xs:element ref="tsql:open"/>
+        <xs:element ref="tsql:close"/>
+        <xs:element ref="tsql:fetch"/>
+        <xs:element ref="tsql:deallocate"/>
+        <xs:element ref="tsql:execute"/>
+        <xs:element ref="tsql:begin-transaction"/>
+        <xs:element ref="tsql:commit"/>
+        <xs:element ref="tsql:rollback"/>
+        <xs:element ref="tsql:save-transaction"/>
+      </xs:choice>
+    </xs:group>
+
+    <xs:group name="expression">
+      <xs:choice>
+        <xs:group ref="sql:expression"/>
+        <xs:element ref="tsql:name"/>
+        <xs:element ref="tsql:next-value-for"/>
+        <xs:element ref="tsql:convert"/>
+        <xs:element ref="tsql:try-convert"/>
+        <xs:element ref="tsql:try-cast"/>
+        <xs:element ref="tsql:parse"/>
+        <xs:element ref="tsql:try-parse"/>
+        <xs:element ref="tsql:collation"/>
+        <xs:element ref="tsql:system-var"/>
+        <xs:element ref="tsql:iif"/>
+        <xs:element ref="tsql:simple-case"/>
+        <xs:element ref="tsql:search-case"/>
+        <xs:element ref="tsql:method"/>
+        <xs:element ref="tsql:property"/>
+      </xs:choice>
+    </xs:group>
+
+    <xs:group name="subselect-clauses">
+      <xs:sequence>
+        <xs:group ref="tsql:top-clause" minOccurs="0"/>
+        <xs:group ref="sql:subselect-clauses"/>
+      </xs:sequence>
+    </xs:group>
+
+    <xs:group name="insert-clauses">
+      <xs:sequence>
+        <xs:group ref="tsql:top-clause" minOccurs="0"/>
+        <xs:group ref="sql:insert-clauses"/>
+      </xs:sequence>
+    </xs:group>
+
+    <xs:group name="update-clauses">
+      <xs:sequence>
+        <xs:group ref="tsql:top-clause" minOccurs="0"/>
+        <xs:group ref="sql:update-clauses"/>
+      </xs:sequence>
+    </xs:group>
+
+    <xs:group name="delete-clauses">
+      <xs:sequence>
+        <xs:group ref="tsql:top-clause" minOccurs="0"/>
+        <xs:group ref="sql:delete-clauses"/>
+      </xs:sequence>
+    </xs:group>
+
+    <xs:group name="select-clauses">
+      <xs:sequence>
+        <xs:group ref="sql:select-clauses"/>
+        
+        <xs:choice minOccurs="0">
+          <xs:group ref="tsql:for-browse-clause"/>
+          <xs:group ref="tsql:for-xml-clause"/>
+        </xs:choice>
+
+        <xs:group ref="tsql:query-option-clause"
+          minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:group>
+
+
+    <xs:group name="source">
+      <xs:choice>
+        <xs:group ref="sql:source"/>
+        <xs:group ref="tsql:source"/>
+      </xs:choice>
+    </xs:group>
+
+    <xs:group name="update-set-clause">
+      <xs:choice>
+        <xs:group ref="sql:update-set-clause"/>
+        <xs:group ref="tsql:update-set-clause"/>
+      </xs:choice>
+    </xs:group>
+
+    <xs:attributeGroup name="join-attributes">
+      <xs:attributeGroup ref="sql:join-attributes"/>
+      <xs:attributeGroup ref="tsql:join-attributes"/>
+    </xs:attributeGroup>
+
+    <xs:complexType name="table-source">
+      <xs:complexContent>
+        <xs:extension base="sql:table-source">
+          <xs:group ref="tsql:table-with-clause" 
+            minOccurs="0" maxOccurs="unbounded"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+
+  </xs:redefine>
+
+</xs:schema>

@@ -1,0 +1,214 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://www.bphx.com/aspx/2010-06-20"
+  targetNamespace="http://www.bphx.com/aspx/2010-06-20"
+  elementFormDefault="qualified">
+
+  <xs:annotation>
+    <xs:documentation>
+      An xml schema to generate aspx pages as well formed xml documents.
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:attribute name="space">
+    <xs:annotation>
+      <xs:documentation>
+        An alias for xml:space attribute.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:NCName">
+        <xs:enumeration value="default"/>
+        <xs:enumeration value="preserve"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+
+  <xs:element name="declared-prefix">
+    <xs:annotation>
+      <xs:documentation>
+        Defines declared namespace prefix, thus a declaration is not required.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="prefix" type="xs:NCName" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            A prefix name.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="namespace" type="xs:anyURI" use="optional">
+        <xs:annotation>
+          <xs:documentation>
+            A namespace.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="directive">
+    <xs:annotation>
+      <xs:documentation>
+        A directive definition.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="name" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            Directive name.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##any" processContents="skip"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="content">
+    <xs:annotation>
+      <xs:documentation>
+        A markup content.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:any namespace="##any" processContents="lax"
+          minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+
+      <xs:attribute ref="space"/>
+      <xs:anyAttribute namespace="##any" processContents="skip"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="meta">
+    <xs:annotation>
+      <xs:documentation>
+        A markup meta information.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:any namespace="##any" processContents="lax"
+          minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+
+      <xs:anyAttribute namespace="##any" processContents="skip"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="entity">
+    <xs:annotation>
+      <xs:documentation>
+        An entity reference.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="value" type="xs:NMTOKEN" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            An entity value.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="expression">
+    <xs:annotation>
+      <xs:documentation>
+        A data binding expression.
+        An ASPX expression enclosed into &lt;% and %> markers.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="entity"/>
+        <xs:any namespace="##other" processContents="lax"/>
+      </xs:choice>
+      <xs:attribute name="type" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            A type of expression.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="data-binding">
+              <xs:annotation>
+                <xs:documentation>
+                  A data binding expression.
+                  Those using #.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="encoded-data-binding">
+              <xs:annotation>
+                <xs:documentation>
+                  A data binding expression.
+                  Those using :.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="declarative-expression">
+              <xs:annotation>
+                <xs:documentation>
+                  A declarative expression.
+                  Those using $.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="output-expression">
+              <xs:annotation>
+                <xs:documentation>
+                  An output expression.
+                  Those using =.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="output-statement">
+              <xs:annotation>
+                <xs:documentation>
+                  An output statement.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="comment">
+              <xs:annotation>
+                <xs:documentation>
+                  An ASPX comment.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:enumeration>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="attribute">
+    <xs:annotation>
+      <xs:documentation>
+        An attribute definition containing either literal text or
+        nested expressions.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="expression"/>
+        <xs:element ref="entity"/>
+        <xs:any namespace="##other" processContents="lax"/>
+      </xs:choice>
+      <xs:attribute name="name" type="xs:QName" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            An attribute name.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

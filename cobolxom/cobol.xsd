@@ -1,0 +1,5457 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://www.bphx.com/cobol/2009-12-15"
+  targetNamespace="http://www.bphx.com/cobol/2009-12-15"
+  elementFormDefault="qualified">
+
+  <xs:annotation>
+    <xs:documentation>
+      $Id$
+
+      This xml schema is based on the COBOL grammar defined in cobol.html,
+      which also can be found at:
+      http://www.few.vu.nl/~x/grammars/vs-cobol-ii/index.html
+
+      Function calls are implemented also.
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:simpleType name="ids">
+    <xs:annotation>
+      <xs:documentation>
+        A list of ids.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:list itemType="xs:string"/>
+  </xs:simpleType>
+  
+  <xs:complexType name="base-element">
+    <xs:annotation>
+      <xs:documentation>
+        Base element of the COBOL xml object model.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="meta"/>
+      <xs:element ref="comment"/>
+    </xs:choice>
+    <xs:attribute name="id" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="skip"/>
+  </xs:complexType>
+
+  <xs:element name="meta">
+    <xs:annotation>
+      <xs:documentation>
+        A meta information holder.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="bookmark">
+          <xs:annotation>
+            <xs:documentation>
+              Used to bookmark position in tree.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+
+        <xs:element name="complex">
+          <xs:annotation>
+            <xs:documentation>
+              This is for the complex element refactoring.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:complexContent>
+              <xs:extension base="base-element">
+                <xs:sequence>
+                  <xs:element ref="data-division" minOccurs="0" maxOccurs="unbounded"/>
+                  <xs:element ref="scope-statement" minOccurs="0" maxOccurs="unbounded"/>
+                  <xs:element name="result" type="unary-arithmetic-expression"
+                    minOccurs="0"/>
+                </xs:sequence>
+              </xs:extension>
+            </xs:complexContent>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="escape">
+          <xs:annotation>
+            <xs:documentation>
+              This is for the ESCAPE pseudo statement.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:complexContent>
+              <xs:extension base="base-element">
+                <xs:attribute name="name" type="data-name" use="required"/>
+                <xs:attribute name="name-ref" type="xs:string" use="required"/>
+              </xs:extension>
+            </xs:complexContent>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="finally">
+          <xs:annotation>
+            <xs:documentation>
+              A finally marker. Used to execute code during escape.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+
+        <xs:element name="label">
+          <xs:annotation>
+            <xs:documentation>
+              This is to label a statement.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:complexContent>
+              <xs:extension base="base-element">
+                <xs:attribute name="name" type="data-name" use="required"/>
+                <xs:attribute name="name-id" type="ids" use="required"/>
+              </xs:extension>
+            </xs:complexContent>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="block">
+          <xs:annotation>
+            <xs:documentation>
+              This is a block marker for the rafactoring
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:complexContent>
+              <xs:extension base="base-element">
+                <xs:group ref="range-ref"/>
+
+                <xs:attribute name="name" type="xs:string" use="optional">
+                  <xs:annotation>
+                    <xs:documentation>
+                      A group name is used to recognize a repeated statements
+                      during refactoring.
+                    </xs:documentation>
+                  </xs:annotation>
+                </xs:attribute>
+
+                <xs:attribute name="priority" type="priority-number"
+                  use="optional">
+                  <xs:annotation>
+                    <xs:documentation>
+                      Optional section priority number in case of
+                      statement refactoring.
+                    </xs:documentation>
+                  </xs:annotation>
+                </xs:attribute>
+
+                <xs:attribute name="position" use="optional">
+                  <xs:annotation>
+                    <xs:documentation>
+                      A position of refactored section.
+                    </xs:documentation>
+                  </xs:annotation>
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:enumeration value="default"/>
+                      <xs:enumeration value="top"/>
+                      <xs:enumeration value="bottom"/>
+                      <xs:enumeration value="above"/>
+                      <xs:enumeration value="below"/>
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+
+                <xs:attribute name="position-priority" type="xs:decimal"
+                  use="optional">
+                  <xs:annotation>
+                    <xs:documentation>
+                      Optional position priority (usually from 0 to 1)
+                    </xs:documentation>
+                  </xs:annotation>
+                </xs:attribute>
+
+                <xs:attribute name="statement-count-threshold"
+                  type="xs:integer" use="optional">
+                  <xs:annotation>
+                    <xs:documentation>
+                      Optional total nested statement count threshold
+                      for refactoring to happen.
+                    </xs:documentation>
+                  </xs:annotation>
+                </xs:attribute>
+              </xs:extension>
+            </xs:complexContent>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="import-section" type="base-element">
+          <xs:annotation>
+            <xs:documentation>
+              Marker to import a section.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+
+        <xs:any namespace="##other" processContents="skip"/>
+        <xs:any namespace="##local" processContents="skip"/>
+      </xs:choice>
+
+      <xs:attribute name="id" type="xs:ID" use="optional"/>
+
+      <xs:anyAttribute processContents="skip"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="comment">
+    <xs:annotation>
+      <xs:documentation>
+        A comment line.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="meta"/>
+
+        <xs:element name="code">
+          <xs:complexType>
+            <xs:complexContent>
+              <xs:extension base="base-element">
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element ref="program"/>
+                  <xs:group ref="data-content-without-preprocessor"/>
+                  <xs:group ref="file-and-sort-description-entry"/>
+                  <xs:element ref="section"/>
+                  <xs:element ref="paragraph"/>
+                </xs:choice>
+              </xs:extension>
+            </xs:complexContent>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:any namespace="##other" processContents="skip"/>
+        <xs:any namespace="##local" processContents="skip"/>
+      </xs:choice>
+      <xs:attribute name="id" type="xs:ID" use="optional"/>
+
+      <xs:attribute name="indent" type="xs:integer"
+        use="optional" default="1">
+        <xs:annotation>
+          <xs:documentation>
+            A comment indentation.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:anyAttribute processContents="skip"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="copy">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+copy-statement="COPY" ( text-name | literal ) 
+  [ ( "OF" | "IN" ) ( library-name | literal ) ]
+  [ "SUPPRESS" ][ "REPLACING" { copy-operand "BY" copy-operand }+ ] "."
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="source-ref"/>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="source-ref">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:sequence>
+          <xs:group ref="literal" minOccurs="0"/>
+
+          <xs:element name="in" minOccurs="0">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="base-element">
+                  <xs:group ref="literal" minOccurs="0"/>
+                  <xs:attribute name="name" type="text-name" use="optional"/>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="name" type="text-name" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="exec-sql">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="base-element">
+          <xs:choice>
+            <xs:element name="value">
+              <xs:annotation>
+                <xs:documentation>
+                  An sql goes directly in text of value element,
+                  interspersed with host variables.
+                </xs:documentation>
+              </xs:annotation>
+              <xs:complexType mixed="true">
+                <xs:choice>
+                  <xs:group ref="data-ref"
+                    minOccurs="0" maxOccurs="unbounded"/>
+                </xs:choice>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="include">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="source-ref"/>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:choice>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="exec-sql-declare-section" type="data-content"/>
+
+  <xs:element name="program">
+    <xs:complexType>
+      <xs:annotation>
+        <xs:documentation>
+          <![CDATA[
+cobol-source-program = ( "IDENTIFICATION" | "ID" ) "DIVISION" "."
+  program-id-cobol-source-program
+  [ identification-division-content ]
+  [ "ENVIRONMENT" "DIVISION" "." environment-division-content ]
+  [ "DATA" "DIVISION" "." data-division-content ]
+  [ procedure-division ]
+  [ { nested-cobol-source-program }* "END" "PROGRAM" program-name "." ]
+
+program-id-cobol-source-program = "PROGRAM-ID" [ "." ] program-name
+  [ [ "IS" ] "INITIAL" [ "PROGRAM" ] ] [ "." ]
+
+identification-division-content = ( [ "AUTHOR" [ "." ] { comment-entry }* ]
+  || [ "INSTALLATION" [ "." ] { comment-entry }* ]
+  || [ "DATE-WRITTEN" [ "." ] { comment-entry }* ]
+  || [ "DATE-COMPILED" [ "." ] { comment-entry }* ]
+  || [ "SECURITY" [ "." ] { comment-entry }* ] )
+
+nested-cobol-source-program=( "IDENTIFICATION" | "ID" ) "DIVISION" "." 
+  program-id-nested-cobol-source-program[ identification-division-content ]
+  [ "ENVIRONMENT" "DIVISION" "." environment-division-content ]
+  [ "DATA" "DIVISION" "." data-division-content ]
+  [ procedure-division ]
+  { nested-cobol-source-program }* "END" "PROGRAM" program-name "."
+
+program-id-nested-cobol-source-program="PROGRAM-ID" [ "." ]
+  program-name[ [ "IS" ] ( "COMMON" [ "INITIAL" ] | "INITIAL" [ "COMMON" ] ) 
+  [ "PROGRAM" ] ] [ "." ]
+          ]]>
+        </xs:documentation>
+      </xs:annotation>
+      <xs:complexContent>
+        <xs:extension base="base-element">
+          <xs:sequence>
+            <xs:group ref="environment-division" minOccurs="0"/>
+            <xs:group ref="data-division" minOccurs="0"/>
+            <xs:group ref="procedure-division" minOccurs="0"/>
+            <xs:element ref="program" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+
+          <xs:attribute name="name" type="program-name" use="required"/>
+
+          <xs:attribute name="initial" type="xs:boolean" use="optional"/>
+          <xs:attribute name="recursive" type="xs:boolean" use="optional"/>
+
+          <xs:attribute name="author" type="comment-entry" use="optional"/>
+          <xs:attribute name="installation"
+            type="comment-entry" use="optional"/>
+          <xs:attribute name="date-written"
+            type="comment-entry" use="optional"/>
+          <xs:attribute name="date-compiled"
+            type="comment-entry" use="optional"/>
+          <xs:attribute name="security"
+            type="comment-entry" use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="environment-division">
+    <xs:sequence>
+      <xs:element ref="environment-division"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="environment-division">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+environment-division-content=[ configuration-section ] [ input-output-section ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="base-element">
+          <xs:sequence>
+            <xs:group ref="configuration-section" minOccurs="0"/>
+            <xs:group ref="input-output-section" minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="configuration-section">
+    <xs:sequence>
+      <xs:element ref="configuration-section"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="configuration-section">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+configuration-section="CONFIGURATION" "SECTION" "." 
+  configuration-section-paragraphs
+
+configuration-section-paragraphs = [ source-computer-paragraph ]
+  [ object-computer-paragraph ]
+  [ special-names-paragraph ]
+
+source-computer-paragraph="SOURCE-COMPUTER" "."
+  [ computer-name [ [ "WITH" ] "DEBUGGING" "MODE" ] "." ]
+
+object-computer-paragraph="OBJECT-COMPUTER" "."
+  [ computer-name [ "MEMORY" [ "SIZE" ] integer 
+  ( "WORDS" | "CHARACTERS" | "MODULES" ) ] 
+  object-computer-paragraph-sequence-phrase "." ]
+
+object-computer-paragraph-sequence-phrase=
+  [ [ "PROGRAM" ] [ "COLLATING" ] "SEQUENCE" [ "IS" ] alphabet-name ]
+  [ "SEGMENT-LIMIT" [ "IS" ] priority-number ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="base-element">
+          <xs:sequence>
+            <xs:element name="source-computer" minOccurs="0">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:attribute name="name"
+                      type="computer-name" use="optional"/>
+                    <xs:attribute name="debugging"
+                      type="xs:boolean" use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="object-computer" minOccurs="0">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:attribute name="name"
+                      type="computer-name" use="optional"/>
+                    <xs:attribute name="memory-size"
+                      type="xs:int" use="optional"/>
+                    <xs:attribute name="memory-dimension"
+                      use="optional">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="words"/>
+                          <xs:enumeration value="characters"/>
+                          <xs:enumeration value="modules"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+
+                    <xs:attribute name="collation"
+                      type="alphabet-name" use="optional"/>
+                    <xs:attribute name="segment-limit"
+                      type="priority-number" use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:group ref="special-names-paragraph" minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="input-output-section">
+    <xs:sequence>
+      <xs:element ref="input-output-section"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="input-output-section">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+input-output-section="INPUT-OUTPUT" "SECTION" "." [ file-control-paragraph ]
+  [ i-o-control-paragraph ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="base-element">
+          <xs:sequence>
+            <xs:group ref="file-control-paragraph" minOccurs="0"/>
+            <xs:group ref="io-control-paragraph" minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="file-control-paragraph">
+    <xs:sequence>
+      <xs:element ref="file-control" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="file-control">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+file-control-paragraph="FILE-CONTROL" "."{ file-control-entry }*
+
+file-control-entry=select-clause assign-clause( [ reserve-clause ]|| 
+  [ [ "ORGANIZATION" [ "IS" ] ] "SEQUENTIAL" ]|| 
+  [ padding-character-clause ]|| 
+  [ record-delimiter-clause ]|| 
+  [ "ACCESS" [ "MODE" ] [ "IS" ] "SEQUENTIAL" ]|| 
+  [ password-clause ]|| [ file-status-clause ] ) "."
+
+record-delimiter-clause="RECORD" "DELIMITER" [ "IS" ]
+  ( "STANDARD-1" | assignment-name )
+
+file-control-entry=select-clause assign-clause
+  ( [ reserve-clause ]|| 
+  [ "ORGANIZATION" [ "IS" ] ] "RELATIVE"|| 
+  [ "ACCESS" [ "MODE" ] [ "IS" ] 
+  ( "SEQUENTIAL" [ relative-key-clause ] | 
+  ( "RANDOM" | "DYNAMIC" ) relative-key-clause ) ]|| 
+  [ password-clause ]|| [ file-status-clause ] ) "."
+
+file-control-entry=select-clause assign-clause
+  ( [ reserve-clause ]|| [ "ORGANIZATION" [ "IS" ] ] "INDEXED"|| 
+  [ "ACCESS" [ "MODE" ] [ "IS" ] ( "SEQUENTIAL" | "RANDOM" | "DYNAMIC" ) ]||
+  record-key-clause|| [ password-clause ]|| 
+  { alternate-record-key-clause }*|| [ file-status-clause ] ) "."
+
+select-clause="SELECT" [ "OPTIONAL" ] file-name
+
+assign-clause="ASSIGN" [ "TO" ] { ( assignment-name | literal ) }+
+
+reserve-clause="RESERVE" integer [ ( "AREA" | "AREAS" ) ]
+
+relative-key-clause="RELATIVE" [ "KEY" ] [ "IS" ] qualified-data-name
+
+record-key-clause="RECORD" [ "KEY" ] [ "IS" ] qualified-data-name
+
+padding-character-clause="PADDING" [ "CHARACTER" ] [ "IS" ] 
+  ( qualified-data-name | literal )
+
+password-clause="PASSWORD" [ "IS" ] data-name
+
+alternate-record-key-clause="ALTERNATE" [ "RECORD" ] [ "KEY" ] [ "IS" ]
+  qualified-data-name[ password-clause ] [ [ "WITH" ] "DUPLICATES" ]
+
+file-status-clause=[ "FILE" ] "STATUS" [ "IS" ] qualified-data-name
+  [ qualified-data-name ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="base-element">
+          <xs:sequence>
+            <xs:element name="select">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="file-ref-wrapper">
+                    <xs:attribute name="optional" type="xs:boolean"
+                      use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="assign" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="literal" minOccurs="0"/>
+                    <xs:attribute name="assignment" type="assignment-name"
+                      use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="reserve-area" minOccurs="0">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:sequence>
+                      <xs:element ref="integer"/>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="padding-character" minOccurs="0">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:choice>
+                      <xs:group ref="qualified-data-name"/>
+                      <xs:group ref="literal"/>
+                    </xs:choice>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="relative-key" type="qualified-data-name-wrapper"
+              minOccurs="0"/>
+
+            <xs:element name="record-key" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="qualified-data-name-wrapper">
+                    <xs:sequence>
+                      <xs:element name="password"
+                        type="data-ref-wrapper" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute name="duplicates" type="xs:boolean"
+                      use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="file-status" minOccurs="0">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="qualified-data-name-wrapper">
+                    <xs:group ref="qualified-data-name" minOccurs="0"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="password"
+              type="data-ref-wrapper" minOccurs="0"/>
+          </xs:sequence>
+
+          <xs:attribute name="organization" use="optional">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="sequential"/>
+                <xs:enumeration value="relative"/>
+                <xs:enumeration value="indexed"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+
+          <xs:attribute name="access-mode" use="optional">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="sequential"/>
+                <xs:enumeration value="random"/>
+                <xs:enumeration value="dynamic"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+
+          <xs:attribute name="record-delimiter-type"
+            use="optional" default="assignment">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="standard-1"/>
+                <xs:enumeration value="assignment"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+
+          <xs:attribute name="record-delimiter" type="assignment-name"
+            use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="io-control-paragraph">
+    <xs:sequence>
+      <xs:element ref="io-control" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="io-control">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+i-o-control-paragraph="I-O-CONTROL" "." [ { ( qsam-or-sam-i-o-control-entries |
+  vsam-i-o-control-entries ) }+ "." ][ sort-merge-i-o-control-entries "." ]
+
+qsam-or-sam-i-o-control-entries=( "RERUN" "ON" ( assignment-name | file-name )
+  [ "EVERY" ] ( integer "RECORDS" | "END" [ "OF" ] ( "REEL" | "UNIT" ) ) 
+  [ "OF" ] file-name | "SAME" [ "RECORD" ] [ "AREA" ] [ "FOR" ] file-name 
+  { file-name }+ | "MULTIPLE" "FILE" [ "TAPE" ] [ "CONTAINS" ] { file-name 
+  [ "POSITION" integer ] }+ | "APPLY" "WRITE-ONLY" [ "ON" ] { file-name }+ )
+
+vsam-i-o-control-entries=( "RERUN" "ON" ( assignment-name | file-name ) 
+  [ "EVERY" ] integer "RECORDS" [ "OF" ] file-name | 
+  "SAME" [ "RECORD" ] [ "AREA" ] [ "FOR" ] file-name { file-name }+ )
+
+sort-merge-i-o-control-entries=[ "RERUN" "ON" assignment-name ]
+  { "SAME" ( "RECORD" | "SORT" | "SORT-MERGE" ) [ "AREA" ] 
+  [ "FOR" ] file-name { file-name }+ }+
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="base-element">
+          <xs:choice>
+            <xs:element name="rerun-on">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:sequence>
+                      <xs:group ref="file-ref" minOccurs="0"/>
+
+                      <xs:element name="every" minOccurs="0">
+                        <xs:complexType>
+                          <xs:complexContent>
+                            <xs:extension base="base-element">
+                              <xs:sequence>
+                                <xs:choice>
+                                  <xs:element name="records" minOccurs="0">
+                                    <xs:complexType>
+                                      <xs:complexContent>
+                                        <xs:extension base="base-element">
+                                          <xs:sequence>
+                                            <xs:element ref="integer"/>
+                                          </xs:sequence>
+                                        </xs:extension>
+                                      </xs:complexContent>
+                                    </xs:complexType>
+                                  </xs:element>
+
+                                  <xs:element name="end-of-reel"
+                                    type="base-element"/>
+                                  <xs:element name="end-of-unit"
+                                    type="base-element"/>
+                                </xs:choice>
+
+                                <xs:group ref="file-ref"/>
+                              </xs:sequence>
+                            </xs:extension>
+                          </xs:complexContent>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+
+                    <xs:attribute name="assignement" type="assignment-name"
+                      use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="same">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:sequence>
+                      <xs:group ref="file-ref" minOccurs="2" 
+                        maxOccurs="unbounded"/>
+                    </xs:sequence>
+                    <xs:attribute name="type" use="required">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="record"/>
+                          <xs:enumeration value="sort"/>
+                          <xs:enumeration value="sort-merge"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="multiple-file-contains">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:sequence>
+                      <xs:group ref="file-ref"/>
+
+                      <xs:element name="position">
+                        <xs:complexType>
+                          <xs:complexContent>
+                            <xs:extension base="base-element">
+                              <xs:sequence>
+                                <xs:element ref="integer"/>
+                              </xs:sequence>
+                            </xs:extension>
+                          </xs:complexContent>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="apply-write-only">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:sequence>
+                      <xs:group ref="file-ref"/>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:choice>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="special-names-paragraph">
+    <xs:sequence>
+      <xs:element ref="special-names"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="special-names">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+special-names-paragraph="SPECIAL-NAMES" "." 
+  { ( environment-name [ "IS" ] mnemonic-name |
+  environment-name ( [ "IS" ] mnemonic-name
+  [ special-names-paragraph-status-phrase ] | 
+  special-names-paragraph-status-phrase ) ) }*
+  special-names-paragraph-clauses [ "." ]
+
+special-names-paragraph-status-phrase=( "ON" [ "STATUS" ] [ "IS" ] condition 
+  [ "OFF" [ "STATUS" ] [ "IS" ] condition ] | 
+  "OFF" [ "STATUS" ] [ "IS" ] condition 
+  [ "ON" [ "STATUS" ] [ "IS" ] condition ] )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="base-element">
+          <xs:sequence>
+            <xs:element name="environment" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:sequence>
+                      <xs:element name="on-status" type="unary-condition"
+                        minOccurs="0"/>
+                      <xs:element name="off-status" type="unary-condition"
+                        minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute name="name"
+                      type="environment-name" use="required"/>
+                    <xs:attribute name="mnemonic"
+                      type="mnemonic-name" use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:group ref="special-names-paragraph-clauses"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="special-names-paragraph-clauses">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+special-names-paragraph-clauses=( { alphabet-clause }*|| 
+  { symbolic-characters-clause }*|| { class-clause }*|| 
+  [ currency-sign-clause ]|| [ decimal-point-clause ] )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:group ref="alphabet-clause"
+        minOccurs="0" maxOccurs="unbounded"/>
+      <xs:group ref="symbolic-characters-clause"
+        minOccurs="0" maxOccurs="unbounded"/>
+      <xs:group ref="class-clause"
+        minOccurs="0" maxOccurs="unbounded"/>
+      <xs:group ref="currency-sign-clause" minOccurs="0"/>
+      <xs:group ref="decimal-point-clause" minOccurs="0"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="alphabet-clause">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+alphabet-clause="ALPHABET" alphabet-name [ "IS" ] 
+  ( "STANDARD-1" | "STANDARD-2" | "NATIVE" | "EBCDIC" | 
+  { literal [ ( ( "THROUGH" | "THRU" ) literal | { "ALSO" literal }+ ) ] }+ )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="alphabet">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="base-element">
+              <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="literal"/>
+                <xs:element ref="literal-range"/>
+              </xs:choice>
+              <xs:attribute name="name" type="alphabet-name" use="required"/>
+              <xs:attribute name="type" use="optional" default="literals">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="standard-1"/>
+                    <xs:enumeration value="standard-2"/>
+                    <xs:enumeration value="native"/>
+                    <xs:enumeration value="ebcdic"/>
+                    <xs:enumeration value="literals"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="symbolic-characters-clause">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+symbolic-characters-clause="SYMBOLIC" [ "CHARACTERS" ] { { symbolic-character }+ 
+  [ ( "ARE" | "IS" ) ] { integer }+ }+ [ "IN" alphabet-name ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="symbolic-characters">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="base-element">
+              <xs:sequence>
+                <xs:element name="character" maxOccurs="unbounded">
+                  <xs:complexType>
+                    <xs:complexContent>
+                      <xs:extension base="base-element">
+                        <xs:sequence>
+                          <xs:element ref="integer"/>
+                        </xs:sequence>
+                        <xs:attribute name="name" use="required"
+                          type="symbolic-character"/>
+                      </xs:extension>
+                    </xs:complexContent>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="alphabet" type="alphabet-name"
+                use="optional"/>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="class-clause">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+class-clause="CLASS" class-name [ "IS" ] 
+  { literal [ ( "THROUGH" | "THRU" ) literal ] }+
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="class">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="base-element">
+              <xs:choice maxOccurs="unbounded">
+                <xs:group ref="literal"/>
+                <xs:element ref="literal-range"/>
+              </xs:choice>
+              <xs:attribute name="name" type="class-name" use="required"/>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="currency-sign-clause">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+currency-sign-clause="CURRENCY" [ "SIGN" ] [ "IS" ] literal
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="currency-sign">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="base-element">
+              <xs:group ref="literal"/>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="decimal-point-clause">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+decimal-point-clause="DECIMAL-POINT" [ "IS" ] "COMMA"
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="decimal-point">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="base-element">
+              <xs:sequence>
+                <xs:element name="comma" type="base-element"/>
+              </xs:sequence>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="data-division">
+    <xs:sequence>
+      <xs:element ref="data-division"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="data-division">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+data-division-content=[ "FILE" "SECTION" "." 
+  { file-and-sort-description-entry { record-description-entry }+ }* ]
+  [ "WORKING-STORAGE" "SECTION" "." { ( record-description-entry |
+  data-item-description-entry ) }* ]
+  [ "LINKAGE" "SECTION" "." { ( record-description-entry |
+  data-item-description-entry ) }* ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="base-element">
+          <xs:sequence>
+            <xs:element ref="file-section" minOccurs="0"/>
+            <xs:element ref="working-storage-section" minOccurs="0"/>
+            <xs:element ref="local-storage-section" minOccurs="0"/>
+            <xs:element ref="linkage-section" minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="file-section">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="base-element">
+          <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="entry">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:sequence>
+                      <xs:group ref="file-and-sort-description-entry"/>
+                      <xs:group ref="data-content" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="file-and-sort-description-entry">
+    <xs:choice>
+      <xs:element name="file-description" type="file-and-sort-description"/>
+      <xs:element name="sort-description" type="file-and-sort-description"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="file-and-sort-description">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+file-and-sort-description-entry=( "FD" | "SD" ) file-name 
+  file-and-sort-description-entry-clauses "."
+
+file-and-sort-description-entry-clauses=( 
+  [ external-clause ]|| 
+  [ global-clause ]|| [ block-contains-clause ]|| 
+  [ record-clause ]|| [ label-records-clause ]|| 
+  [ value-of-clause ]|| [ data-records-clause ]|| 
+  [ linage-clause ]|| [ recording-mode-clause ]|| 
+  [ code-set-clause ] )
+
+external-clause=[ "IS" ] "EXTERNAL"
+
+global-clause=[ "IS" ] "GLOBAL"
+
+block-contains-clause="BLOCK" [ "CONTAINS" ] 
+  [ ( integer | zero ) "TO" ] ( integer | zero ) 
+  [ ( "CHARACTERS" | "RECORDS" ) ]
+
+record-clause="RECORD"( [ "CONTAINS" ] ( integer | zero ) 
+  [ "CHARACTERS" ]| [ "CONTAINS" ] ( integer | zero ) 
+  "TO" ( integer | zero ) [ "CHARACTERS" ]| 
+  record-varying-phrase [ "DEPENDING" [ "ON" ] data-name ])
+
+record-varying-phrase=[ "IS" ] "VARYING" [ "IN" ] [ "SIZE" ] 
+  [ [ "FROM" ] integer ] [ "TO" integer ] [ "CHARACTERS" ]
+
+label-records-clause="LABEL" ( "RECORD" [ "IS" ] | "RECORDS" [ "ARE" ] ) 
+  ( "STANDARD" | "OMITTED" | { data-name }+ )
+
+value-of-clause="VALUE" "OF" { system-name [ "IS" ] 
+  ( qualified-data-name | literal ) }+
+
+data-records-clause="DATA" ( "RECORD" [ "IS" ] | "RECORDS" [ "ARE" ] )
+  { data-name }+
+
+linage-clause="LINAGE" [ "IS" ] ( data-name | integer ) 
+  [ "LINES" ] linage-footing-phrase
+
+linage-footing-phrase=[ [ "WITH" ] "FOOTING" [ "AT" ] 
+  ( data-name | integer ) ] 
+  [ [ "LINES" ] [ "AT" ] "TOP" ( data-name | integer ) ]
+  [ [ "LINES" ] [ "AT" ] "BOTTOM" ( data-name | integer ) ]
+
+recording-mode-clause="RECORDING" [ "MODE" ] [ "IS" ] mode
+
+mode=( "F" | "V" | "U" | "S" )
+
+code-set-clause="CODE-SET" [ "IS" ] alphabet-name
+      ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:sequence>
+          <xs:element name="block-contains" minOccurs="0">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="base-element">
+                  <xs:sequence>
+                    <xs:element ref="integer"/>
+                    <xs:element ref="integer" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute name="item-type" use="optional">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="character"/>
+                        <xs:enumeration value="record"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+
+          <xs:element name="record-contains" minOccurs="0">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="base-element">
+                  <xs:sequence>
+                    <xs:element ref="integer"/>
+                    <xs:element ref="integer" minOccurs="0"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+
+          <xs:element name="record-varying" minOccurs="0">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="base-element">
+                  <xs:sequence>
+                    <xs:element ref="integer"/>
+                    <xs:element ref="integer" minOccurs="0"/>
+                    <xs:element name="depending-on"
+                      type="data-ref-wrapper" minOccurs="0"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+
+          <xs:element name="label-record" minOccurs="0">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="base-element">
+                  <xs:group ref="data-ref"
+                    minOccurs="0" maxOccurs="unbounded"/>
+
+                  <xs:attribute name="type" use="optional" default="data-ref">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="standard"/>
+                        <xs:enumeration value="omitted"/>
+                        <xs:enumeration value="data-ref"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+
+          <xs:element name="value-of" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="base-element">
+                  <xs:choice>
+                    <xs:group ref="qualified-data-name"/>
+                    <xs:group ref="literal"/>
+                  </xs:choice>
+                  <xs:attribute name="name" type="system-name" use="required"/>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+
+          <xs:element name="linage" minOccurs="0">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="base-element">
+                  <xs:sequence>
+                    <xs:element name="value"
+                      type="data-name-or-integer"/>
+                    <xs:element name="footing"
+                      type="data-name-or-integer" minOccurs="0"/>
+                    <xs:element name="top"
+                      type="data-name-or-integer" minOccurs="0"/>
+                    <xs:element name="bottom"
+                      type="data-name-or-integer" minOccurs="0"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+
+          <xs:element name="data-records" minOccurs="0">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="base-element">
+                  <xs:group ref="data-ref" maxOccurs="unbounded"/>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+
+        <xs:attribute name="name" type="file-name" use="required"/>
+        <xs:attribute name="name-id" type="ids" use="optional"/>
+
+        <xs:attribute name="external" type="xs:boolean" use="optional"/>
+        <xs:attribute name="global" type="xs:boolean" use="optional"/>
+
+        <xs:attribute name="mode" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="F"/>
+              <xs:enumeration value="V"/>
+              <xs:enumeration value="U"/>
+              <xs:enumeration value="S"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+
+        <xs:attribute name="code-set" type="alphabet-name" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="data-name-or-integer">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:choice>
+          <xs:group ref="qualified-data-name"/>
+          <xs:element ref="integer" minOccurs="0"/>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="working-storage-section" type="data-content"/>
+  <xs:element name="local-storage-section" type="data-content"/>
+  <xs:element name="linkage-section" type="data-content"/>
+
+  <xs:group name="data-content-without-preprocessor">
+    <xs:choice>
+      <xs:element ref="data-scope"/>
+      <xs:element ref="snippet-data-scope"/>
+
+      <xs:element ref="data"/>
+      <xs:element ref="data-filler"/>
+      <xs:element ref="data-rename"/>
+      <xs:element ref="data-condition"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="data-content">
+    <xs:choice>
+      <xs:group ref="data-content-without-preprocessor"/>
+      <xs:element ref="copy"/>
+      <xs:element ref="exec-sql"/>
+      <xs:element ref="exec-sql-declare-section"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="data-content">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+record-description-entry | data-item-description-entry
+
+record-description-entry=data-description-entry
+
+data-item-description-entry=data-description-entry
+
+data-description-entry=level-number [ ( data-name | "FILLER" ) ] 
+  data-description-entry-clauses "."
+data-description-entry="66" data-name renames-clause "."
+data-description-entry="88" condition-name condition-value-clause "."
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:group ref="data-content" minOccurs="0" maxOccurs="unbounded"/>
+
+        <xs:attribute name="name" type="data-name" use="optional"/>
+        <xs:attribute name="name-id" type="ids" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="data-scope">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="data-content">
+          <xs:attribute name="level" type="level-number" use="optional"/>
+
+          <xs:attribute name="level-increment" type="level-number" use="optional"
+            default="2">
+            <xs:annotation>
+              <xs:documentation>
+                If level is not specified then level-increment is used
+                to calculate actual level.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="snippet-data-scope">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="data-content">
+          <xs:attribute name="text" type="xs:string" use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="data" type="named-data"/>
+  <xs:element name="data-filler" type="data"/>
+
+  <xs:complexType name="data">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+data-description-entry=level-number [ ( data-name | "FILLER" ) ] 
+data-description-entry-clauses "."
+
+data-description-entry-clauses=( [ redefines-clause ]|| 
+[ blank-when-zero-clause ]|| 
+[ external-clause ]|| 
+[ global-clause ]|| 
+[ justified-clause ]|| 
+[ occurs-clause ]|| 
+[ picture-clause ]|| 
+[ sign-clause ]|| 
+[ synchronized-clause ]|| 
+[ usage-clause ]|| 
+[ data-value-clause ] )
+
+redefines-clause="REDEFINES" data-name
+
+blank-when-zero-clause="BLANK" [ "WHEN" ] ( "ZERO" | "ZEROS" | "ZEROES" )
+
+external-clause=[ "IS" ] "EXTERNAL"
+
+global-clause=[ "IS" ] "GLOBAL"
+
+justified-clause=( "JUSTIFIED" | "JUST" ) [ "RIGHT" ]
+
+occurs-clause="OCCURS" integer [ "TIMES" ]
+{ ( "ASCENDING" | "DESCENDING" ) [ "KEY" ] [ "IS" ] 
+{ qualified-data-name }+ }*[ "INDEXED" [ "BY" ] { index-name }+ ]
+
+occurs-clause="OCCURS" [ ( integer | zero ) "TO" ] integer [ "TIMES" ] 
+"DEPENDING"[ "ON" ] qualified-data-name{ ( "ASCENDING" | "DESCENDING" ) 
+[ "KEY" ] [ "IS" ] { qualified-data-name }+ }*
+[ "INDEXED" [ "BY" ] { index-name }+ ]
+
+picture-clause=( "PICTURE" | "PIC" ) [ "IS" ] picture-string
+
+sign-clause=[ "SIGN" [ "IS" ] ] ( "LEADING" | "TRAILING" ) 
+[ "SEPARATE" [ "CHARACTER" ] ]
+
+synchronized-clause=( "SYNCHRONIZED" | "SYNC" ) [ ( "LEFT" | "RIGHT" ) ]
+
+usage-clause=[ "USAGE" [ "IS" ] ] 
+( "BINARY" | "COMP" | "COMP-1" | "COMP-2" | "COMP-3" | 
+"COMP-4" | "COMPUTATIONAL" | "COMPUTATIONAL-1" | 
+"COMPUTATIONAL-2" | "COMPUTATIONAL-3" | "COMPUTATIONAL-4" | 
+"DISPLAY" | "DISPLAY-1" | "INDEX" | "PACKED-DECIMAL" | "POINTER" )
+
+data-value-clause="VALUE" [ "IS" ] literal
+      ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:sequence>
+          <xs:element name="depending-on" type="qualified-data-name-wrapper"
+            minOccurs="0"/>
+
+          <xs:element name="order-by" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="base-element">
+                  <xs:group ref="qualified-data-name"/>
+                  <xs:attribute name="direction" type="order-direction"
+                    use="required"/>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+
+          <xs:element name="indexed-by" minOccurs="0">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="base-element">
+                  <xs:sequence>
+                    <xs:element ref="index-ref" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+
+          <xs:element ref="picture" minOccurs="0"/>
+
+          <xs:element name="value" minOccurs="0">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="base-element">
+                  <xs:group ref="literal"/>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+
+          <xs:element name="redefines" type="data-ref-wrapper"
+            minOccurs="0"/>
+
+          <xs:group ref="data-content" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+
+        <xs:attribute name="level" type="level-number" use="optional"/>
+
+        <xs:attribute name="level-increment" type="level-number" use="optional"
+          default="2">
+          <xs:annotation>
+            <xs:documentation>
+              If level is not specified then level-increment is used
+              to calculate actual level.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+
+        <xs:attribute name="blank-when-zero" type="xs:boolean"
+          use="optional"/>
+        <xs:attribute name="external" type="xs:boolean" use="optional"/>
+        <xs:attribute name="global" type="xs:boolean" use="optional"/>
+
+        <xs:attribute name="justified" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="left"/>
+              <xs:enumeration value="right"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+
+        <xs:attribute name="min-occurs" type="xs:int" use="optional"/>
+        <xs:attribute name="max-occurs" type="xs:int" use="optional"/>
+
+        <xs:attribute name="sign" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="leading"/>
+              <xs:enumeration value="trailing"/>
+              <xs:enumeration value="separate-leading"/>
+              <xs:enumeration value="separate-trailing"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+
+        <xs:attribute name="synchronized" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="default"/>
+              <xs:enumeration value="left"/>
+              <xs:enumeration value="right"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+
+        <xs:attribute name="usage" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="binary"/>
+              <xs:enumeration value="comp"/>
+              <xs:enumeration value="comp-1"/>
+              <xs:enumeration value="comp-2"/>
+              <xs:enumeration value="comp-3"/>
+              <xs:enumeration value="comp-4"/>
+              <xs:enumeration value="comp-5"/>
+              <xs:enumeration value="display"/>
+              <xs:enumeration value="display-1"/>
+              <xs:enumeration value="index"/>
+              <xs:enumeration value="packed-decimal"/>
+              <xs:enumeration value="pointer"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="named-data">
+    <xs:complexContent>
+      <xs:extension base="data">
+        <xs:attribute name="name" type="data-name" use="required"/>
+        <xs:attribute name="name-id" type="ids" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="picture">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+/*
+ From the reference:
+;  A PICTURE character-string is composed of the currency symbol and certain
+;  combinations of characters in the COBOL character set.  PICTURE
+;  character-strings are delimited only by the separator space, separator
+;  comma, separator semicolon, or separator period.
+
+;  Any punctuation character that appears as part of the specification of a
+;  PICTURE character-string is not considered as a punctuation character, but
+;  rather as a symbol used in the specification of that PICTURE
+;  character-string.
+ There are various rules on the order and the valid combination of
+ characters. We do not enforce these constraints in the following
+ simplified definition. The definition of picture character-strings is
+ definitely subject to improvement.
+*/
+
+picture-string = currency? 
+  (picchar+ repeat?)+ (punctuation (picchar+ repeat?)+)*
+auxiliaries
+ begin
+  currency = ~[0-9ABCDPRSVXZa-z\*\+\-\/\,\.\;\(\)\=\'\"\ \n]
+  picchar = 
+   ( [ABEGPSVXZabegpsvxz90\+\-\*\$]
+   | "CR"
+   | "DB" )
+  repeat = "(" [0-9]+ ")"
+  punctuation = [\/\,\.\:]
+ end
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="base-element">
+          <xs:sequence>
+            <xs:element name="part" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:attribute name="char" type="xs:string" use="required"/>
+                    <xs:attribute name="occurs" type="xs:int" use="optional"/>
+                    <xs:attribute name="punctuation" type="xs:string"
+                      use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="currency" type="xs:string" use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="data-rename">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+data-description-entry="66" data-name renames-clause "."
+
+renames-clause="RENAMES" qualified-data-name 
+  [ ( "THROUGH" | "THRU" ) qualified-data-name ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="qualified-data-name-wrapper">
+          <xs:group ref="qualified-data-name" minOccurs="0"/>
+
+          <xs:attribute name="name" type="data-name" use="required"/>
+          <xs:attribute name="name-id" type="ids" use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="data-condition">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+data-description-entry="88" condition-name condition-value-clause "."
+
+condition-value-clause=( "VALUE" [ "IS" ] | "VALUES" [ "ARE" ] ) 
+  { literal [ ( "THROUGH" | "THRU" ) literal ] }+
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="base-element">
+          <xs:sequence>
+            <xs:element name="value" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:choice>
+                      <xs:group ref="literal"/>
+                      <xs:element ref="literal-range"/>
+                    </xs:choice>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+
+          <xs:attribute name="name" type="condition-name" use="required"/>
+          <xs:attribute name="name-id" type="ids" use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="procedure-division">
+    <xs:sequence>
+      <xs:element ref="procedure-division"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="procedure-division">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+procedure-division="PROCEDURE" "DIVISION" [ "USING" { data-name }+ ] "."
+  [ "DECLARATIVES" "." 
+  { section-header "." use-statement "." paragraphs }+ 
+  "END" "DECLARATIVES" "." ]sections
+
+section-header=section-name "SECTION" [ priority-number ]
+
+sections=paragraphs { section-header "." paragraphs }*
+
+procedure-division="PROCEDURE" "DIVISION" [ "USING" { data-name }+ ] "."
+  paragraphs
+
+paragraphs={ sentence }* { paragraph }*
+
+paragraph=paragraph-name "." { sentence }*
+paragraph=altered-goto
+
+altered-goto=paragraph-name "." "GO" [ "TO" ] "."
+
+sentence=statement-list "."
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="base-element">
+          <xs:sequence>
+            <xs:element name="using" minOccurs="0">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:choice maxOccurs="unbounded">
+                      <xs:group ref="data-ref"/>
+                      <xs:element name="by-ref" type="data-ref-wrapper"/>
+                      <xs:element name="by-value" type="data-ref-wrapper"/>
+                    </xs:choice>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="returning" type="data-ref-wrapper"
+              minOccurs="0"/>
+
+            <xs:element name="declarative"
+              minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:sequence>
+                      <xs:group ref="use-statement"/>
+                      <xs:element ref="section"/>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element ref="section" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="section" type="section"/>
+
+  <xs:complexType name="section">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:sequence>
+          <xs:element ref="paragraph" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+
+        <xs:attribute name="name" type="section-name" use="optional"/>
+        <xs:attribute name="name-id" type="ids" use="optional"/>
+        <xs:attribute name="priority" type="priority-number" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="paragraph" type="paragraph"/>
+
+  <xs:complexType name="paragraph">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:choice minOccurs="0">
+          <xs:group ref="statement-list"/>
+          <xs:element ref="sentence" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:choice>
+
+        <xs:attribute name="name" type="paragraph-name" use="optional"/>
+        <xs:attribute name="name-id" type="ids" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="sentence" type="sentence"/>
+
+  <xs:complexType name="sentence">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:group ref="statement-list" minOccurs="0"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="use-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+use-statement="USE" [ "GLOBAL" ] "AFTER" [ "STANDARD" ] 
+  ( "EXCEPTION" | "ERROR" ) "PROCEDURE"[ "ON" ] 
+  ( { file-name }+ | "INPUT" | "OUTPUT" | "I-O" | "EXTEND" )
+
+use-statement="USE" [ "GLOBAL" ] "AFTER" [ "STANDARD" ] 
+  [ ( "BEGINNING" | "ENDING" ) ][ ( "FILE" | "REEL" | "UNIT" ) ] 
+  "LABEL" "PROCEDURE" [ "ON" ] ( { file-name }+ | "INPUT" | 
+  "OUTPUT" | "I-O" | "EXTEND" )
+
+use-statement="USE" [ "FOR" ] "DEGUGGING" [ "ON" ] 
+  ( { procedure-name }+ | "ALL" "PROCEDURES" )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element name="after-error">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="base-element">
+              <xs:sequence>
+                <xs:group ref="file-ref"
+                  minOccurs="0" maxOccurs="unbounded"/>
+              </xs:sequence>
+              <xs:attribute name="operation" type="use-handler-operation"
+                use="optional"/>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="after-beginning" type="use-after-state"/>
+      <xs:element name="after-ending" type="use-after-state"/>
+      <xs:element name="for-debugging">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="base-element">
+              <xs:annotation>
+                <xs:documentation>
+                  Either there should be all = "true",
+                  or at lease one procedure element, but not both.
+                </xs:documentation>
+              </xs:annotation>
+              <xs:sequence>
+                <xs:group ref="procedure-ref"
+                  minOccurs="0" maxOccurs="unbounded"/>
+              </xs:sequence>
+              <xs:attribute name="all" type="xs:boolean"
+                use="optional"/>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+  </xs:group>
+
+  <xs:simpleType name="use-handler-operation">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="default"/>
+      <xs:enumeration value="input"/>
+      <xs:enumeration value="output"/>
+      <xs:enumeration value="io"/>
+      <xs:enumeration value="extend"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="use-after-state">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:sequence>
+          <xs:group ref="file-ref" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+
+        <xs:attribute name="operation" type="use-handler-operation"
+          use="optional"/>
+
+        <xs:attribute name="source" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="file"/>
+              <xs:enumeration value="reel"/>
+              <xs:enumeration value="unit"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="statement-list">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+statement-list={ statement }+
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:group ref="statement" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="statement-list-or-next-sentence">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+          { statement }+ | "NEXT" "SENTENCE"
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:group ref="statement-list"/>
+      <xs:element name="next-sentence" type="statement"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="statement-without-preprocessor">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+statement=( accept-statement| add-statement| alter-statement| call-statement|
+  cancel-statement| close-statement| compute-statement| continue-statement| 
+  delete-statement| display-statement| divide-statement| entry-statement| 
+  evaluate-statement| exit-statement| exit-program-statement| goback-statement|
+  go-to-statement| if-statement| initialize-statement| inspect-statement|
+  merge-statement| move-statement| multiply-statement| open-statement|
+  perform-statement| read-statement| release-statement| return-statement|
+  rewrite-statement| search-statement| set-statement| sort-statement|
+  start-statement| stop-statement| string-statement| subtract-statement|
+  unstring-statement| write-statement )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element ref="scope-statement"/>
+      <xs:element ref="snippet-statement"/>
+
+      <xs:element ref="accept-statement"/>
+      <xs:element ref="add-statement"/>
+      <xs:element ref="alter-statement"/>
+      <xs:element ref="call-statement"/>
+      <xs:element ref="cancel-statement"/>
+      <xs:element ref="close-statement"/>
+      <xs:element ref="compute-statement"/>
+      <xs:element ref="continue-statement"/>
+      <xs:element ref="delete-statement"/>
+      <xs:element ref="display-statement"/>
+      <xs:element ref="divide-statement"/>
+      <xs:element ref="entry-statement"/>
+      <xs:element ref="evaluate-statement"/>
+      <xs:element ref="exit-statement"/>
+      <xs:element ref="exit-program-statement"/>
+      <xs:element ref="goback-statement"/>
+      <xs:element ref="go-to-statement"/>
+      <xs:element ref="if-statement"/>
+      <xs:element ref="initialize-statement"/>
+      <xs:element ref="inspect-statement"/>
+      <xs:element ref="merge-statement"/>
+      <xs:element ref="move-statement"/>
+      <xs:element ref="multiply-statement"/>
+      <xs:element ref="open-statement"/>
+      <xs:element ref="perform-statement"/>
+      <xs:element ref="read-statement"/>
+      <xs:element ref="release-statement"/>
+      <xs:element ref="return-statement"/>
+      <xs:element ref="rewrite-statement"/>
+      <xs:element ref="search-statement"/>
+      <xs:element ref="set-statement"/>
+      <xs:element ref="sort-statement"/>
+      <xs:element ref="start-statement"/>
+      <xs:element ref="stop-statement"/>
+      <xs:element ref="string-statement"/>
+      <xs:element ref="subtract-statement"/>
+      <xs:element ref="unstring-statement"/>
+      <xs:element ref="write-statement"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="statement">
+    <xs:choice>
+      <xs:group ref="statement-without-preprocessor"/>
+      <xs:element ref="copy"/>
+      <xs:element ref="exec-sql"/>
+      <xs:element ref="expression-statement"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="statement">
+    <xs:complexContent>
+      <xs:extension base="base-element"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="scope-statement">
+    <xs:annotation>
+      <xs:documentation>
+        A statement for a logical grouping of other statement.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:group ref="statement-list-or-next-sentence" minOccurs="0"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="expression-statement">
+    <xs:annotation>
+      <xs:documentation>
+        A statement to group expression.
+        Does not appear in the generated code.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:group ref="arithmetic-expression"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="scope-statement" type="scope-statement"/>
+
+  <xs:element name="snippet-statement">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:attribute name="value" type="xs:string" use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="accept-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+accept-statement="ACCEPT" identifier 
+  [ "FROM" ( mnemonic-name | environment-name ) ]
+accept-statement="ACCEPT" identifier 
+  "FROM" ( "DATE" | "DAY" | "DAY-OF-WEEK" | "TIME" )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:group ref="identifier"/>
+
+          <xs:attribute name="source" use="optional">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="date"/>
+                <xs:enumeration value="date-yyyymmdd"/>
+                <xs:enumeration value="day"/>
+                <xs:enumeration value="day-yyyyddd"/>
+                <xs:enumeration value="day-of-week"/>
+                <xs:enumeration value="time"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="mnemonic"
+            type="mnemonic-name" use="optional"/>
+          <xs:attribute name="environment"
+            type="environment-name" use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="add-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+add-statement="ADD" { ( identifier | literal ) }+ 
+  "TO" { identifier [ "ROUNDED" ] }+
+  [ [ "ON" ] "SIZE" "ERROR" statement-list ]
+  [ "NOT" [ "ON" ] "SIZE" "ERROR" statement-list ][ "END-ADD" ]
+
+add-statement="ADD" { ( identifier | literal ) }+ 
+  [ "TO" ] ( identifier | literal )
+  "GIVING" { identifier [ "ROUNDED" ] }+
+  [ [ "ON" ] "SIZE" "ERROR" statement-list ]
+  [ "NOT" [ "ON" ] "SIZE" "ERROR" statement-list ][ "END-ADD" ]
+
+add-statement="ADD" ( "CORRESPONDING" | "CORR" ) identifier "
+  TO" identifier[ "ROUNDED" ] 
+  [ [ "ON" ] "SIZE" "ERROR" statement-list ]
+  [ "NOT" [ "ON" ] "SIZE" "ERROR" statement-list ][ "END-ADD" ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="identifier-or-literal" maxOccurs="unbounded"/>
+
+            <xs:element name="to" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>
+                  Literal is permitted in case of giving only.
+                  In which case "to" should occur exactly once,
+                  and rounded should not be used.
+                </xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="identifier-or-literal"/>
+                    <xs:attribute name="rounded" type="xs:boolean"
+                      use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="giving" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="identifier"/>
+                    <xs:attribute name="rounded" type="xs:boolean"
+                      use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="on-size-error" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="on-succeed" type="scope-statement"
+              minOccurs="0"/>
+          </xs:sequence>
+
+          <xs:attribute name="corresponding" type="xs:boolean" use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="alter-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+alter-statement="ALTER"
+  { procedure-name "TO" [ "PROCEED" "TO" ] procedure-name }+
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence maxOccurs="unbounded">
+            <xs:group ref="procedure-ref"/>
+            <xs:element name="to" type="procedure-ref-wrapper"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="call-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+call-statement="CALL" ( identifier | literal )
+  [ "USING" { ( [ [ "BY" ] "REFERENCE" ] 
+  { ( identifier | "ADDRESS" "OF" identifier | file-name ) }+ | 
+  [ "BY" ] "CONTENT" { ( [ "LENGTH" "OF" ] identifier | 
+  "ADDRESS" "OF" identifier | literal ) }+ ) }+ ]
+  [ [ "ON" ] "OVERFLOW" statement-list ] [ "END-CALL" ]
+
+call-statement="CALL" ( identifier | literal )
+  [ "USING" { ( [ [ "BY" ] "REFERENCE" ] 
+  { ( identifier | "ADDRESS" "OF" identifier | file-name ) }+ | 
+  [ "BY" ] "CONTENT" { ( [ "LENGTH" "OF" ] identifier | 
+  "ADDRESS" "OF" identifier | literal ) }+ ) }+ ]
+  [ [ "ON" ] "EXCEPTION" statement-list ]
+  [ "NOT" [ "ON" ] "EXCEPTION" statement-list ] [ "END-CALL" ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="identifier-or-literal"/>
+
+            <xs:element name="using" minOccurs="0">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="call-parameter" maxOccurs="unbounded"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="on-overflow" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="on-exception" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="on-succeed" type="scope-statement"
+              minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="call-parameter">
+    <xs:choice>
+      <xs:group ref="identifier-or-literal"/>
+      <xs:group ref="file-ref"/>
+      <xs:element name="by-ref" type="call-parameter"/>
+      <xs:element name="by-value" type="call-parameter"/>
+      <xs:element name="by-content" type="call-parameter"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="call-parameter">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:choice>
+          <xs:group ref="identifier-or-literal"/>
+          <xs:group ref="file-ref"/>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="cancel-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+cancel-statement="CANCEL" { ( identifier | literal ) }+
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:group ref="identifier-or-literal" maxOccurs="unbounded"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="close-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+close-statement="CLOSE"{ file-name [ ( ( "REEL" | "UNIT" ) 
+  [ ( [ "FOR" ] "REMOVAL" | [ "WITH" ] "NO" "REWIND" ) ] | 
+  [ "WITH" ] ( "NO" "REWIND" | "LOCK" ) ) ] }+
+
+close-statement="CLOSE" { file-name [ [ "WITH" ] "LOCK" ] }+
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:element name="file" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="file-ref-wrapper">
+                    <xs:attribute name="option" use="optional">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="for-removal"/>
+                          <xs:enumeration value="no-rewind"/>
+                          <xs:enumeration value="lock"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                    <xs:attribute name="type" use="optional">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="reel"/>
+                          <xs:enumeration value="unit"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="compute-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+compute-statement="COMPUTE" { identifier [ "ROUNDED" ] }+ 
+  ( "=" | "EQUAL" )arithmetic-expression
+  [ [ "ON" ] "SIZE" "ERROR" statement-list ]
+  [ "NOT" [ "ON" ] "SIZE" "ERROR" statement-list ][ "END-COMPUTE" ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:element name="to" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="identifier"/>
+                    <xs:attribute name="rounded" type="xs:boolean"
+                      use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="value" type="unary-arithmetic-expression"/>
+
+            <xs:element name="on-size-error" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="on-succeed" type="scope-statement"
+              minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="continue-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+continue-statement="CONTINUE"
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement"/>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="delete-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+delete-statement="DELETE" file-name [ "RECORD" ]
+  [ "INVALID" [ "KEY" ] statement-list ]
+  [ "NOT" "INVALID" [ "KEY" ] statement-list ][ "END-DELETE" ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="file-ref"/>
+            <xs:element name="on-invalid-key" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="on-valid-key" type="scope-statement"
+              minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="display-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+display-statement="DISPLAY" { ( identifier | literal ) }+
+  [ "UPON" ( mnemonic-name | environment-name ) ]
+  [ [ "WITH" ] "NO" "ADVANCING" ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:group ref="identifier-or-literal" maxOccurs="unbounded"/>
+          <xs:attribute name="mnemonic" type="mnemonic-name"
+            use="optional"/>
+          <xs:attribute name="environment"
+            type="environment-name" use="optional"/>
+          <xs:attribute name="advancing" type="xs:boolean" use="optional"
+            default="true"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="divide-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+divide-statement="DIVIDE" ( identifier | literal ) 
+  "INTO" { identifier [ "ROUNDED" ] }+
+  [ [ "ON" ] "SIZE" "ERROR" statement-list ]
+  [ "NOT" [ "ON" ] "SIZE" "ERROR" statement-list ][ "END-DIVIDE" ]
+
+divide-statement="DIVIDE" ( identifier | literal ) 
+  "INTO" ( identifier | literal )"
+  GIVING" { identifier [ "ROUNDED" ] }+
+  [ [ "ON" ] "SIZE" "ERROR" statement-list ]
+  [ "NOT" [ "ON" ] "SIZE" "ERROR" statement-list ][ "END-DIVIDE" ]
+
+divide-statement="DIVIDE" ( identifier | literal ) 
+  "BY" ( identifier | literal )
+  "GIVING" { identifier [ "ROUNDED" ] }+
+  [ [ "ON" ] "SIZE" "ERROR" statement-list ]
+  [ "NOT" [ "ON" ] "SIZE" "ERROR" statement-list ][ "END-DIVIDE" ]
+
+divide-statement="DIVIDE" ( identifier | literal ) 
+  "INTO" ( identifier | literal )
+  "GIVING" identifier [ "ROUNDED" ] 
+  "REMAINDER" identifier
+  [ [ "ON" ] "SIZE" "ERROR" statement-list ]
+  [ "NOT" [ "ON" ] "SIZE" "ERROR" statement-list ][ "END-DIVIDE" ]
+
+divide-statement="DIVIDE" ( identifier | literal ) 
+  "BY" ( identifier | literal )
+  "GIVING" identifier [ "ROUNDED" ] 
+  "REMAINDER" identifier[ [ "ON" ] "SIZE" "ERROR" statement-list ]
+  [ "NOT" [ "ON" ] "SIZE" "ERROR" statement-list ][ "END-DIVIDE" ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="identifier-or-literal"/>
+
+            <xs:choice>
+              <xs:element name="into" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>
+                    Literal is permitted in case of giving only.
+                    In which case "to" should occur exactly once,
+                    and rounded should not be used.
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:complexContent>
+                    <xs:extension base="base-element">
+                      <xs:group ref="identifier-or-literal"/>
+                      <xs:attribute name="rounded" type="xs:boolean"
+                        use="optional"/>
+                    </xs:extension>
+                  </xs:complexContent>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="by">
+                <xs:annotation>
+                  <xs:documentation>
+                    "by" is permitted in case of giving only.
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:complexContent>
+                    <xs:extension base="base-element">
+                      <xs:group ref="identifier-or-literal"/>
+                    </xs:extension>
+                  </xs:complexContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+
+            <xs:element name="giving" minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>
+                  maxOccurs is 1 in case remainder is used.
+                </xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="identifier"/>
+                    <xs:attribute name="rounded" type="xs:boolean"
+                      use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="remainder" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>
+                  "remainder" is used only along with "giving".
+                </xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="identifier"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="on-size-error" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="on-succeed" type="scope-statement"
+              minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="entry-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+entry-statement="ENTRY" literal [ "USING" { data-name }+ ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="literal"/>
+
+            <xs:element name="using" minOccurs="0">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:choice>
+                      <xs:group ref="data-ref"/>
+                      <xs:element name="by-ref" type="data-ref-wrapper"/>
+                      <xs:element name="by-value" type="data-ref-wrapper"/>
+                    </xs:choice>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="evaluate-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+evaluate-statement="EVALUATE" 
+  ( identifier | literal | arithmetic-expression | condition | 
+  "TRUE" | "FALSE" ) 
+  { "ALSO" ( identifier | literal | arithmetic-expression | condition | 
+  "TRUE" | "FALSE" ) }*
+  { { "WHEN" evaluate-phrase { "ALSO" evaluate-phrase }* }+ statement-list }+
+  [ "WHEN" "OTHER" statement-list ] [ "END-EVALUATE" ]
+
+evaluate-phrase=( "ANY" | condition | "TRUE" | "FALSE" | 
+  [ "NOT" ] ( identifier | literal | arithmetic-expression ) 
+  [ ( "THROUGH" | "THRU" ) ( identifier | literal | arithmetic-expression ) ] )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:element name="test" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:choice>
+                      <xs:group ref="condition"/>
+                      <xs:element name="true" type="condition"/>
+                      <xs:element name="false" type="condition"/>
+                      <xs:group ref="arithmetic-expression"/>
+                    </xs:choice>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="when" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:sequence>
+                      <xs:choice maxOccurs="unbounded">
+                        <xs:element name="value">
+                          <xs:complexType>
+                            <xs:complexContent>
+                              <xs:extension base="base-element">
+                                <xs:choice>
+                                  <xs:element name="any" type="base-element"/>
+                                  
+                                  <xs:group ref="condition"/>
+                                  
+                                  <xs:element name="true" type="condition"/>
+                                  <xs:element name="false" type="condition"/>
+                                  
+                                  <xs:element name="in-range"
+                                    type="relational-condition"/>
+                                  <xs:group ref="arithmetic-expression"/>
+
+                                  <xs:element name="is-not">
+                                    <xs:complexType>
+                                      <xs:complexContent>
+                                        <xs:extension base="condition">
+                                          <xs:choice>
+                                            <xs:element name="in-range"
+                                              type="relational-condition"/>
+                                            <xs:group
+                                              ref="arithmetic-expression"/>
+                                          </xs:choice>
+                                        </xs:extension>
+                                      </xs:complexContent>
+                                    </xs:complexType>
+                                  </xs:element>
+                                </xs:choice>
+                              </xs:extension>
+                            </xs:complexContent>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:choice>
+
+                      <xs:element name="then" type="scope-statement"/>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="when-other" type="scope-statement"
+              minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="exit-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+exit-statement="EXIT"
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement"/>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="exit-program-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+exit-program-statement="EXIT" "PROGRAM"
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement"/>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="goback-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+goback-statement="GOBACK"
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement"/>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="go-to-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+go-to-statement="GO" [ "TO" ] procedure-name
+
+go-to-statement="GO" [ "TO" ] "MORE-LABELS"
+
+go-to-statement="GO" [ "TO" ] { procedure-name }+ 
+  "DEPENDING" [ "ON" ]identifier
+
+altered-goto=paragraph-name "." "GO" [ "TO" ] "."
+
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="procedure-ref"
+              minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="depending-on" type="identifier-expression"
+              minOccurs="0"/>
+          </xs:sequence>
+          <xs:attribute name="more" type="xs:boolean" use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="if-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+if-statement="IF" condition [ "THEN" ] ( { statement }+ | "NEXT" "SENTENCE" )
+  [ "ELSE" ( { statement }+ | "NEXT" "SENTENCE" ) ] [ "END-IF" ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:element name="condition" type="unary-condition"/>
+            <xs:element name="then" type="scope-statement"/>
+            <xs:element name="else" type="scope-statement" minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="initialize-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+initialize-statement="INITIALIZE" { identifier }+
+  [ "REPLACING" { ( "ALPHABETIC" | "ALPHANUMERIC" | "NUMERIC" | 
+  "ALPHANUMERIC-EDITED" | "NUMERIC-EDITED" | "DBCS" | "EGCS" ) [ "DATA" ] 
+  "BY" ( identifier | literal ) }+ ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="identifier" maxOccurs="unbounded"/>
+
+            <xs:element name="replace-by" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="identifier-or-literal"/>
+                    <xs:attribute name="source" use="required">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="alphabetic"/>
+                          <xs:enumeration value="alphanumeric"/>
+                          <xs:enumeration value="numeric"/>
+                          <xs:enumeration value="alphanumeric-edited"/>
+                          <xs:enumeration value="numeric-edited"/>
+                          <xs:enumeration value="dbcs"/>
+                          <xs:enumeration value="egcs"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="inspect-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+inspect-statement="INSPECT" identifier "TALLYING"
+  { identifier "FOR" { ( "CHARACTERS" { before-after-phrase }* | 
+  ( "ALL" | "LEADING" ) { ( identifier | literal ) 
+  { before-after-phrase }* }+ ) }+ }+
+
+inspect-statement="INSPECT" identifier "CONVERTING" ( identifier | literal ) 
+  "TO"( identifier | literal ) { before-after-phrase }*
+
+inspect-statement="INSPECT" identifier "TALLYING"
+  { identifier "FOR" { ( "CHARACTERS" { before-after-phrase }* | 
+  ( "ALL" | "LEADING" ) { ( identifier | literal ) 
+  { before-after-phrase }* }+ ) }+ }+ 
+  "REPLACING"{ ( "CHARACTERS" "BY" ( identifier | literal )
+  { before-after-phrase }* | ( "ALL" | "LEADING" | "FIRST" )
+  { ( identifier | literal ) "BY" ( identifier | literal )
+  { before-after-phrase }* }+ ) }+
+
+inspect-statement="INSPECT" identifier "REPLACING"
+  { ( "CHARACTERS" "BY" ( identifier | literal ) { before-after-phrase }* | 
+  ( "ALL" | "LEADING" | "FIRST" ) { ( identifier | literal ) 
+  "BY" ( identifier | literal ) { before-after-phrase }* }+ ) }+
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="identifier"/>
+
+            <xs:choice>
+              <xs:element name="converting">
+                <xs:complexType>
+                  <xs:complexContent>
+                    <xs:extension base="base-element">
+                      <xs:sequence>
+                        <xs:group ref="identifier-or-literal"/>
+                        <xs:group ref="identifier-or-literal"/>
+                        <xs:group ref="before-after-phrase"
+                          minOccurs="0" maxOccurs="unbounded"/>
+                      </xs:sequence>
+                    </xs:extension>
+                  </xs:complexContent>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:sequence>
+                <xs:element name="tallying" minOccurs="0" maxOccurs="unbounded">
+                  <xs:complexType>
+                    <xs:complexContent>
+                      <xs:extension base="base-element">
+                        <xs:sequence>
+                          <xs:group ref="identifier"/>
+
+                          <xs:group ref="identifier-or-literal" minOccurs="0"/>
+
+                          <xs:group ref="before-after-phrase"
+                            minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                        <xs:attribute name="operation" use="required">
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:enumeration value="characters"/>
+                              <xs:enumeration value="all"/>
+                              <xs:enumeration value="leading"/>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:attribute>
+                      </xs:extension>
+                    </xs:complexContent>
+                  </xs:complexType>
+                </xs:element>
+
+                <xs:element name="replacing" minOccurs="0" maxOccurs="unbounded">
+                  <xs:complexType>
+                    <xs:complexContent>
+                      <xs:extension base="base-element">
+                        <xs:sequence>
+                          <xs:group ref="identifier-or-literal" minOccurs="0"/>
+
+                          <xs:element name="by">
+                            <xs:complexType>
+                              <xs:complexContent>
+                                <xs:extension base="base-element">
+                                  <xs:group ref="identifier-or-literal"/>
+                                </xs:extension>
+                              </xs:complexContent>
+                            </xs:complexType>
+                          </xs:element>
+
+                          <xs:group ref="before-after-phrase"
+                            minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                        <xs:attribute name="operation" use="required">
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:enumeration value="characters"/>
+                              <xs:enumeration value="all"/>
+                              <xs:enumeration value="leading"/>
+                              <xs:enumeration value="first"/>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:attribute>
+                      </xs:extension>
+                    </xs:complexContent>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:choice>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="before-after-phrase">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+before-after-phrase=( "BEFORE" | "AFTER" ) [ "INITIAL" ] 
+  ( identifier | literal )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element name="before" type="before-after-phrase"/>
+      <xs:element name="after" type="before-after-phrase"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="before-after-phrase">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:group ref="identifier-or-literal"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="merge-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+merge-statement="MERGE" file-name { [ "ON" ] ( "ASCENDING" | "DESCENDING" ) 
+  [ "KEY" ] { qualified-data-name }+ }+
+  [ [ "COLLATING" ] "SEQUENCE" [ "IS" ] alphabet-name ] 
+  "USING" file-name { file-name }+
+  ( "OUTPUT" "PROCEDURE" [ "IS" ] procedure-name 
+  [ ( "THROUGH" | "THRU" ) procedure-name ] | 
+  "GIVING" { file-name }+ )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="file-ref"/>
+
+            <xs:element name="order-by" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="qualified-data-name-wrapper">
+                    <xs:attribute name="direction" type="order-direction"
+                      use="required"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="using">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="file-ref"
+                      minOccurs="2" maxOccurs="unbounded"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:choice>
+              <xs:element name="output" type="range-wrapper"/>
+              <xs:element name="giving" type="qualified-data-name-wrapper"
+                maxOccurs="unbounded"/>
+            </xs:choice>
+          </xs:sequence>
+          <xs:attribute name="collation" type="alphabet-name" use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="move-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+move-statement="MOVE" ( identifier | literal ) "TO" { identifier }+
+
+move-statement="MOVE" ( "CORRESPONDING" | "CORR" ) identifier 
+  "TO" { identifier }+
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="identifier-or-literal"/>
+
+            <xs:element name="to" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:sequence>
+                      <xs:group ref="identifier"/>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+
+          <xs:attribute name="corresponding" type="xs:boolean" use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="multiply-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+multiply-statement="MULTIPLY" ( identifier | literal ) 
+  "BY" { identifier [ "ROUNDED" ] }+[ [ "ON" ] "SIZE" "ERROR" statement-list ]
+  [ "NOT" [ "ON" ] "SIZE" "ERROR" statement-list ][ "END-MULTIPLY" ]
+
+multiply-statement="MULTIPLY" ( identifier | literal ) 
+  "BY" ( identifier | literal )"GIVING" { identifier [ "ROUNDED" ] }+
+  [ [ "ON" ] "SIZE" "ERROR" statement-list ]
+  [ "NOT" [ "ON" ] "SIZE" "ERROR" statement-list ][ "END-MULTIPLY" ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="identifier-or-literal"/>
+
+            <xs:element name="by" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>
+                  Literal is permitted in case of giving only.
+                  In which case "by" should occur exactly once,
+                  and rounded should not be used.
+                </xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="identifier-or-literal"/>
+                    <xs:attribute name="rounded" type="xs:boolean"
+                      use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="giving" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="identifier"/>
+                    <xs:attribute name="rounded" type="xs:boolean"
+                      use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="on-size-error" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="on-succeed" type="scope-statement"
+              minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="open-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+open-statement="OPEN" 
+  { ( "INPUT" { file-name [ ( "REVERSED" | [ "WITH" ] "NO" "REWIND" ) ] }+ | 
+  "OUTPUT" { file-name [ [ "WITH" ] "NO" "REWIND" ] }+ | 
+  "I-O" { file-name }+ | "EXTEND" { file-name }+ ) }+
+
+open-statement="OPEN" { ( "INPUT" { file-name }+ | 
+  "OUTPUT" { file-name }+ | "I-O" { file-name }+ | 
+  "EXTEND" { file-name }+ ) }+
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:choice maxOccurs="unbounded">
+            <xs:element name="input">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="file-ref-wrapper">
+                    <xs:attribute name="option" use="optional">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="reversed"/>
+                          <xs:enumeration value="no-rewind"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="output">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="file-ref-wrapper">
+                    <xs:attribute name="option" use="optional">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="no-rewind"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="io" type="file-ref-wrapper"/>
+            <xs:element name="extend" type="file-ref-wrapper"/>
+          </xs:choice>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="perform-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+perform-statement="PERFORM"
+  ( procedure-name [ ( "THROUGH" | "THRU" ) procedure-name ] | 
+  statement-list "END-PERFORM" )
+
+perform-statement="PERFORM" 
+  ( procedure-name [ ( "THROUGH" | "THRU" ) procedure-name ] 
+  perform-varying-phrase perform-after-phrase |
+  perform-varying-phrase statement-list "END-PERFORM" )
+
+perform-statement="PERFORM"
+  ( procedure-name [ ( "THROUGH" | "THRU" ) procedure-name ]
+  ( identifier | integer ) "TIMES" | ( identifier | integer )
+  "TIMES" statement-list "END-PERFORM" )
+
+perform-statement="PERFORM"
+  ( procedure-name [ ( "THROUGH" | "THRU" ) procedure-name ]
+  perform-until-phrase | perform-until-phrase statement-list "END-PERFORM" )
+
+perform-until-phrase=[ [ "WITH" ] "TEST" ( "BEFORE" | "AFTER" ) ] 
+  "UNTIL" condition
+
+perform-varying-phrase=[ [ "WITH" ] "TEST" ( "BEFORE" | "AFTER" ) ] 
+  "VARYING" ( identifier | index-name ) 
+  "FROM" ( identifier | index-name | literal ) 
+  "BY" ( identifier | literal ) "UNTIL"condition
+
+perform-after-phrase={ "AFTER" ( identifier | index-name ) 
+  "FROM" ( identifier | index-name | literal ) 
+  "BY" ( identifier | literal ) "UNTIL" condition }*
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:choice minOccurs="0">
+              <xs:element name="until">
+                <xs:complexType>
+                  <xs:complexContent>
+                    <xs:extension base="base-element">
+                      <xs:group ref="condition"/>
+                      <xs:attribute name="test" type="perform-test"
+                        use="optional"/>
+                    </xs:extension>
+                  </xs:complexContent>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="varying" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:complexContent>
+                    <xs:extension base="base-element">
+                      <xs:sequence>
+                        <xs:choice>
+                          <xs:group ref="identifier"/>
+                          <xs:element ref="index-ref"/>
+                        </xs:choice>
+
+                        <xs:element name="from">
+                          <xs:complexType>
+                            <xs:complexContent>
+                              <xs:extension base="base-element">
+                                <xs:choice>
+                                  <xs:group ref="identifier-or-literal"/>
+                                  <xs:element ref="index-ref"/>
+                                </xs:choice>
+                              </xs:extension>
+                            </xs:complexContent>
+                          </xs:complexType>
+                        </xs:element>
+
+                        <xs:element name="by">
+                          <xs:complexType>
+                            <xs:complexContent>
+                              <xs:extension base="base-element">
+                                <xs:group ref="identifier-or-literal"/>
+                              </xs:extension>
+                            </xs:complexContent>
+                          </xs:complexType>
+                        </xs:element>
+
+                        <xs:element name="until">
+                          <xs:complexType>
+                            <xs:complexContent>
+                              <xs:extension base="base-element">
+                                <xs:group ref="condition"/>
+                              </xs:extension>
+                            </xs:complexContent>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                      <xs:attribute name="test" type="perform-test"
+                        use="optional"/>
+                    </xs:extension>
+                  </xs:complexContent>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="times">
+                <xs:complexType>
+                  <xs:complexContent>
+                    <xs:extension base="base-element">
+                      <xs:choice>
+                        <xs:group ref="identifier"/>
+                        <xs:element ref="integer"/>
+                      </xs:choice>
+                    </xs:extension>
+                  </xs:complexContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+
+            <xs:choice>
+              <xs:group ref="range-ref"/>
+
+              <xs:element name="body">
+                <xs:complexType>
+                  <xs:complexContent>
+                    <xs:extension base="base-element">
+                      <xs:group ref="statement-list" minOccurs="0"/>
+                    </xs:extension>
+                  </xs:complexContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="perform-test">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="before"/>
+      <xs:enumeration value="after"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="read-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+read-statement="READ" file-name [ "NEXT" ] [ "RECORD" ][ "INTO" identifier ]
+  [ [ "AT" ] "END" statement-list ]
+  [ "NOT" [ "AT" ] "END" statement-list ] [ "END-READ" ]
+
+read-statement="READ" file-name [ "RECORD" ] [ "INTO" identifier ]
+  [ "KEY" [ "IS" ] qualified-data-name ]
+  [ "INVALID" [ "KEY" ] statement-list ]
+  [ "NOT" "INVALID" [ "KEY" ] statement-list ] [ "END-READ" ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="file-ref"/>
+
+            <xs:element name="into">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="identifier"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="key" type="qualified-data-name-wrapper"
+              minOccurs="0"/>
+
+            <xs:element name="at-end" type="scope-statement" minOccurs="0"/>
+            <xs:element name="not-at-end" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="on-invalid-key" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="on-valid-key" type="scope-statement"
+              minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="release-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+release-statement="RELEASE" record-name [ "FROM" identifier ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="record-name"/>
+            <xs:element name="from" type="identifier-expression"
+              minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="return-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+return-statement="RETURN" file-name [ "RECORD" ] [ "INTO" identifier ]
+  [ "AT" ] "END" statement-list
+  [ "NOT" [ "AT" ] "END" statement-list ] [ "END-RETURN" ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="file-ref"/>
+            <xs:element name="into" type="identifier-expression" 
+              minOccurs="0"/>
+            <xs:element name="at-end" type="scope-statement" minOccurs="0"/>
+            <xs:element name="not-at-end" type="scope-statement"
+              minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="rewrite-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+rewrite-statement="REWRITE" record-name [ "FROM" identifier ]
+  [ "INVALID" [ "KEY" ] statement-list ]
+  [ "NOT" "INVALID" [ "KEY" ] statement-list ][ "END-REWRITE" ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="record-name"/>
+            <xs:element name="from" type="identifier-expression"
+              minOccurs="0"/>
+            <xs:element name="on-invalid-key" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="on-valid-key" type="scope-statement"
+              minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="search-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+search-statement="SEARCH" identifier [ "VARYING" ( identifier | index-name ) ]
+  [ [ "AT" ] "END" statement-list ]
+  { "WHEN" condition ( statement-list | "NEXT" "SENTENCE" ) }+
+  [ "END-SEARCH" ]
+
+search-statement="SEARCH" "ALL" identifier 
+  [ [ "AT" ] "END" statement-list ]
+  "WHEN" ( qualified-data-name [ "IS" ] ( "EQUAL" [ "TO" ] | "=" ) 
+  ( identifier | literal | arithmetic-expression ) | 
+  condition-name-reference ){ "AND" ( qualified-data-name [ "IS" ] 
+  ( "EQUAL" [ "TO" ] | "=" ) ( identifier | literal | arithmetic-expression ) |
+  condition-name-reference ) }*( statement-list | "NEXT" "SENTENCE" ) 
+  [ "END-SEARCH" ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="identifier"/>
+
+            <xs:element name="varying" minOccurs="0">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:choice>
+                      <xs:group ref="identifier"/>
+                      <xs:element ref="index-ref"/>
+                    </xs:choice>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="at-end" type="scope-statement"
+              minOccurs="0"/>
+
+            <xs:element name="when" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:sequence>
+                      <xs:element name="condition" type="unary-condition"/>
+                      <xs:element name="body" type="scope-statement"
+                        minOccurs="0"/>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+
+          <xs:attribute name="all" type="xs:boolean" use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="set-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+set-statement="SET" { ( index-name | identifier ) }+ "TO" ( index-name | identifier | integer )
+
+set-statement="SET" { index-name }+ 
+  ( "UP" "BY" | "DOWN" "BY" ) ( identifier | integer )
+
+set-statement="SET" { { mnemonic-name }+ "TO" ( "ON" | "OFF" ) }+
+
+set-statement="SET" { condition-name-reference }+ "TO" "TRUE"
+
+set-statement="SET" { ( identifier | "ADDRESS" "OF" identifier ) }+
+  "TO" ( identifier | "ADDRESS" "OF" identifier | "NULL" | "NULLS" )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:choice>
+            <xs:group ref="condition-name-reference" maxOccurs="unbounded"/>
+
+            <xs:sequence>
+              <xs:choice maxOccurs="unbounded">
+                <xs:element ref="index-ref"/>
+                <xs:group ref="identifier"/>
+              </xs:choice>
+
+              <xs:choice>
+                <xs:element name="to">
+                  <xs:complexType>
+                    <xs:complexContent>
+                      <xs:extension base="base-element">
+                        <xs:choice>
+                          <xs:element ref="index-ref"/>
+                          <xs:group ref="identifier"/>
+                          <xs:element ref="integer"/>
+                          <xs:element ref="null"/>
+                        </xs:choice>
+                      </xs:extension>
+                    </xs:complexContent>
+                  </xs:complexType>
+                </xs:element>
+
+                <xs:element name="up-by">
+                  <xs:complexType>
+                    <xs:complexContent>
+                      <xs:extension base="base-element">
+                        <xs:choice>
+                          <xs:group ref="identifier"/>
+                          <xs:element ref="integer"/>
+                        </xs:choice>
+                      </xs:extension>
+                    </xs:complexContent>
+                  </xs:complexType>
+                </xs:element>
+
+                <xs:element name="down-by">
+                  <xs:complexType>
+                    <xs:complexContent>
+                      <xs:extension base="base-element">
+                        <xs:choice>
+                          <xs:group ref="identifier"/>
+                          <xs:element ref="integer"/>
+                        </xs:choice>
+                      </xs:extension>
+                    </xs:complexContent>
+                  </xs:complexType>
+                </xs:element>
+              </xs:choice>
+            </xs:sequence>
+
+            <xs:element name="mnemonic" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:attribute name="name" type="mnemonic-name"
+                      use="required"/>
+
+                    <xs:attribute name="value" use="required">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="on"/>
+                          <xs:enumeration value="off"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:choice>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="sort-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+sort-statement="SORT" file-name { [ "ON" ] ( "ASCENDING" | "DESCENDING" ) 
+  [ "KEY" ] { qualified-data-name }+ }+
+  [ [ "WITH" ] "DUPLICATES" [ "IN" ] [ "ORDER" ] ]
+  [ [ "COLLATING" ] "SEQUENCE" [ "IS" ] alphabet-name ]
+  ( "USING" { file-name }+ | 
+  "INPUT" "PROCEDURE" [ "IS" ] procedure-name 
+  [ ( "THROUGH" | "THRU" ) procedure-name ] )
+  ( "GIVING" { file-name }+ | 
+  "OUTPUT" "PROCEDURE" [ "IS" ] procedure-name 
+  [ ( "THROUGH" | "THRU" ) procedure-name ] )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="file-ref"/>
+            <xs:element name="order-by" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="qualified-data-name-wrapper">
+                    <xs:attribute name="direction" type="order-direction"
+                      use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:choice>
+              <xs:element name="using" minOccurs="0">
+                <xs:complexType>
+                  <xs:complexContent>
+                    <xs:extension base="base-element">
+                      <xs:group ref="file-ref" maxOccurs="unbounded"/>
+                    </xs:extension>
+                  </xs:complexContent>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="input" type="range-wrapper"/>
+            </xs:choice>
+
+            <xs:choice>
+              <xs:element name="giving" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:complexContent>
+                    <xs:extension base="base-element">
+                      <xs:group ref="file-ref" maxOccurs="unbounded"/>
+                    </xs:extension>
+                  </xs:complexContent>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="output" type="range-wrapper"/>
+            </xs:choice>
+          </xs:sequence>
+
+          <xs:attribute name="duplicates-in-order" type="xs:boolean"
+            use="optional"/>
+          <xs:attribute name="collation" type="alphabet-name"
+            use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="start-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+start-statement="START" file-name[ "KEY" [ "IS" ] 
+  ( "EQUAL" [ "TO" ] | "=" | "GREATER" [ "THAN" ] | ">" | 
+  "NOT" "LESS" [ "THAN" ] | "NOT" "<" | 
+  "GREATER" [ "THAN" ] "OR" "EQUAL" [ "TO" ] | ">=" ) 
+  qualified-data-name ]
+  [ "INVALID" [ "KEY" ] statement-list ]
+  [ "NOT" "INVALID" [ "KEY" ] statement-list ] [ "END-START" ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="file-ref"/>
+
+            <xs:element name="key">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="qualified-data-name"/>
+
+                    <xs:attribute name="condition" use="optional">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="eq"/>
+                          <xs:enumeration value="gt"/>
+                          <xs:enumeration value="ge"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="on-invalid-key" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="on-valid-key" type="scope-statement"
+              minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="stop-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+stop-statement="STOP" ( "RUN" | literal )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:choice>
+            <xs:element name="run" type="base-element"/>
+            <xs:group ref="literal"/>
+          </xs:choice>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="string-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+string-statement="STRING"{ { ( identifier | literal ) }+ 
+  "DELIMITED" [ "BY" ] ( identifier | literal | "SIZE" ) }+
+  "INTO" identifier [ [ "WITH" ] "POINTER" identifier ]
+  [ [ "ON" ] "OVERFLOW" statement-list ]
+  [ "NOT" [ "ON" ] "OVERFLOW" statement-list ][ "END-STRING" ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:element name="values">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:sequence>
+                      <xs:group ref="identifier-or-literal"
+                        maxOccurs="unbounded"/>
+
+                      <xs:element name="delimited-by">
+                        <xs:complexType>
+                          <xs:complexContent>
+                            <xs:extension base="base-element">
+                              <xs:choice>
+                                <xs:group ref="identifier-or-literal"/>
+                                <xs:element name="size" type="expression"/>
+                              </xs:choice>
+                            </xs:extension>
+                          </xs:complexContent>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="into">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="identifier"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="pointer" minOccurs="0">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="identifier"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="on-overflow" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="on-succeed" type="scope-statement"
+              minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="subtract-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+subtract-statement="SUBTRACT" { ( identifier | literal ) }+ 
+  "FROM"{ identifier [ "ROUNDED" ] }+
+  [ [ "ON" ] "SIZE" "ERROR" statement-list ]
+  [ "NOT" [ "ON" ] "SIZE" "ERROR" statement-list ][ "END-SUBTRACT" ]
+
+subtract-statement="SUBTRACT" { ( identifier | literal ) }+ 
+  "FROM" ( identifier | literal )
+  "GIVING" { identifier [ "ROUNDED" ] }+
+  [ [ "ON" ] "SIZE" "ERROR" statement-list ]
+  [ "NOT" [ "ON" ] "SIZE" "ERROR" statement-list ][ "END-SUBTRACT" ]
+
+subtract-statement="SUBTRACT" ( "CORRESPONDING" | "CORR" ) identifier 
+  "FROM"identifier [ "ROUNDED" ]
+  [ [ "ON" ] "SIZE" "ERROR" statement-list ]
+  [ "NOT" [ "ON" ] "SIZE" "ERROR" statement-list ][ "END-SUBTRACT" ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="identifier-or-literal" maxOccurs="unbounded"/>
+
+            <xs:element name="from" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>
+                  Literal is permitted in case of giving only.
+                  In which case "from" should occur exactly once,
+                  and rounded should not be used.
+                </xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="identifier-or-literal"/>
+                    <xs:attribute name="rounded" type="xs:boolean"
+                      use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="giving" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="identifier"/>
+                    <xs:attribute name="rounded" type="xs:boolean"
+                      use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="on-size-error" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="on-succeed" type="scope-statement"
+              minOccurs="0"/>
+          </xs:sequence>
+
+          <xs:attribute name="corresponding" type="xs:boolean" use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="unstring-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+unstring-statement="UNSTRING" identifier
+  [ "DELIMITED" [ "BY" ] [ "ALL" ] ( identifier | literal ) 
+  { "OR" [ "ALL" ] ( identifier | literal ) }* ] 
+  "INTO"{ identifier [ "DELIMITER" [ "IN" ] identifier ] 
+  [ "COUNT" [ "IN" ] identifier ] }+
+  [ [ "WITH" ] "POINTER" identifier ] 
+  [ "TALLYING" [ "IN" ] identifier ]
+  [ [ "ON" ] "OVERFLOW" statement-list ] 
+  [ "NOT" [ "ON" ] "OVERFLOW" statement-list ][ "END-UNSTRING" ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="identifier"/>
+
+            <xs:element name="delimited-by"
+              minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="identifier-or-literal"/>
+                    <xs:attribute name="all" type="xs:boolean" use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="into" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:sequence>
+                      <xs:group ref="identifier"/>
+
+                      <xs:element name="delimiter" minOccurs="0">
+                        <xs:complexType>
+                          <xs:complexContent>
+                            <xs:extension base="base-element">
+                              <xs:group ref="identifier"/>
+                            </xs:extension>
+                          </xs:complexContent>
+                        </xs:complexType>
+                      </xs:element>
+
+                      <xs:element name="count" minOccurs="0">
+                        <xs:complexType>
+                          <xs:complexContent>
+                            <xs:extension base="base-element">
+                              <xs:group ref="identifier"/>
+                            </xs:extension>
+                          </xs:complexContent>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="pointer" minOccurs="0">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="identifier"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="tallying" minOccurs="0">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="base-element">
+                    <xs:group ref="identifier"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="on-overflow" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="on-succeed" type="scope-statement"
+              minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="write-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+write-statement="WRITE" record-name [ "FROM" identifier ]
+  ( [ ( "BEFORE" | "AFTER" ) [ "ADVANCING" ] 
+  ( ( identifier | integer ) 
+  [ ( "LINE" | "LINES" ) ] | mnemonic-name | "PAGE" ) ] 
+  write-statement-phrase |
+  [ "INVALID" [ "KEY" ] statement-list ] 
+  [ "NOT" "INVALID" [ "KEY" ] statement-list ] ) [ "END-WRITE" ]
+
+write-statement="WRITE" record-name [ "FROM" identifier ]
+  [ "INVALID" [ "KEY" ] statement-list ]
+  [ "NOT" "INVALID" [ "KEY" ] statement-list ][ "END-WRITE" ]
+
+write-statement="WRITE" record-name [ "FROM" identifier ] [ "END-WRITE" ]
+
+write-statement-phrase=[ [ "AT" ] ( "END-OF-PAGE" | "EOP" ) statement-list ] 
+  [ "NOT" [ "AT" ] ( "END-OF-PAGE" | "EOP" ) statement-list ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="statement">
+          <xs:sequence>
+            <xs:group ref="record-name"/>
+
+            <xs:element name="from" type="identifier-expression"
+              minOccurs="0"/>
+
+            <xs:choice minOccurs="0">
+              <xs:element name="before-advancing"
+                type="before-after-advancing"/>
+              <xs:element name="after-advancing"
+                type="before-after-advancing"/>
+            </xs:choice>
+
+            <xs:element name="at-end-of-page" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="not-at-end-of-page" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="on-invalid-key" type="scope-statement"
+              minOccurs="0"/>
+            <xs:element name="on-valid-key" type="scope-statement"
+              minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="before-after-advancing">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:choice>
+          <xs:group ref="identifier"/>
+          <xs:element ref="integer"/>
+          <xs:element name="page" type="base-element"/>
+        </xs:choice>
+
+        <xs:attribute name="name" type="mnemonic-name" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="subscript">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+subscript={ ( integer | qualified-data-name [ ( "+" | "-" ) integer ] | 
+  index-name [ ( "+" | "-" ) integer ] ) }+
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="expression">
+          <xs:sequence>
+            <xs:group ref="data-ref"/>
+
+            <xs:choice minOccurs="1" maxOccurs="unbounded">
+              <xs:element ref="integer"/>
+              <xs:group ref="qualified-data-name"/>
+              <xs:element ref="index-ref"/>
+              <xs:element name="add" type="subscript-expression"/>
+              <xs:element name="sub" type="subscript-expression"/>
+            </xs:choice>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="subscript-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:choice>
+            <xs:group ref="qualified-data-name"/>
+            <xs:element ref="index-ref"/>
+          </xs:choice>
+
+          <xs:element name="integer"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="substring">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="expression">
+          <xs:sequence>
+            <xs:choice>
+              <xs:group ref="data-ref"/>
+              <xs:element ref="subscript"/>
+            </xs:choice>
+
+            <xs:group ref="arithmetic-expression"/>
+            <xs:group ref="arithmetic-expression" minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="condition-name-reference">
+    <xs:sequence>
+      <xs:element ref="condition-ref"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="condition-ref">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+condition-name-reference=condition-name { ( "IN" | "OF" ) data-name }*
+  [ ( "IN" | "OF" ) file-name ] { "(" subscript ")" }*
+
+condition-name-reference=condition-name { ( "IN" | "OF" ) mnemonic-name }*
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="condition">
+          <xs:group ref="identifier" minOccurs="0"/>
+
+          <xs:attribute name="name" type="condition-name" use="required"/>
+          <xs:attribute name="name-ref" type="xs:string" use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="file-ref">
+    <xs:sequence>
+      <xs:element ref="file-ref"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="data-ref">
+    <xs:choice>
+      <xs:element ref="data-ref"/>
+      <xs:element ref="function-call"/>
+      <xs:element ref="snippet-expression"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="qualified-data-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+qualified-data-name=data-name { ( "IN" | "OF" ) data-name }* 
+  [ ( "IN" | "OF" ) file-name ]
+
+qualified-data-name=special-register
+
+special-register=( "ADDRESS" "OF" data-name| "DEBUG-ITEM"| 
+  "LENGTH" "OF" identifier| "RETURN-CODE"| "SHIFT-OUT"| "SHIFT-IN"| 
+  "SORT-CONTROL"| "SORT-CORE-SIZE"| "SORT-FILE-SIZE"| "SORT-MESSAGE"| 
+  "SORT-MODE-SIZE"| "SORT-RETURN"| "TALLY"| "WHEN-COMPILED" )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:group ref="data-ref"/>
+      <xs:element ref="length-of"/>
+      <xs:element ref="address-of"/>
+      <xs:element ref="debug-item"/>
+      <xs:element ref="return-code"/>
+      <xs:element ref="shift-out"/>
+      <xs:element ref="shift-in"/>
+      <xs:element ref="sort-control"/>
+      <xs:element ref="sort-core-size"/>
+      <xs:element ref="sort-file-size"/>
+      <xs:element ref="sort-message"/>
+      <xs:element ref="sort-mode-size"/>
+      <xs:element ref="sort-return"/>
+      <xs:element ref="tally"/>
+      <xs:element ref="when-compiled"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="file-ref">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:attribute name="name" type="file-name" use="required"/>
+        <xs:attribute name="name-ref" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="qualified-data-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+qualified-data-name=data-name { ( "IN" | "OF" ) data-name }* 
+  [ ( "IN" | "OF" ) file-name ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:group ref="data-ref"/>
+          <xs:group ref="file-ref"/>
+        </xs:choice>
+
+        <xs:attribute name="name" type="data-name" use="required"/>
+        <xs:attribute name="name-ref" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="qualified-data-name-wrapper">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:group ref="qualified-data-name"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="data-ref-wrapper">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:group ref="data-ref"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="file-ref-wrapper">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:group ref="file-ref"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="identifier-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:group ref="identifier"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="identifier">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+identifier=qualified-data-name { "(" subscript ")" }*
+  [ "(" leftmost-character-position ":" [ length ] ")" ]
+
+identifier="LINAGE-COUNTER" [ ( "IN" | "OF" ) file-name ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:group ref="qualified-data-name"/>
+      <xs:element ref="subscript"/>
+      <xs:element ref="substring"/>
+      <xs:element ref="linage-counter"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:element name="snippet-expression">
+    <xs:annotation>
+      <xs:documentation>
+        A snippet expression.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="expression">
+          <xs:attribute name="value" use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="file-ref" type="file-ref"/>
+  <xs:element name="data-ref" type="qualified-data-name"/>
+  <xs:element name="length-of" type="identifier-expression"/>
+  <xs:element name="address-of" type="identifier-expression"/>
+  <xs:element name="debug-item" type="expression"/>
+  <xs:element name="return-code" type="expression"/>
+  <xs:element name="shift-out" type="expression"/>
+  <xs:element name="shift-in" type="expression"/>
+  <xs:element name="sort-control" type="expression"/>
+  <xs:element name="sort-core-size" type="expression"/>
+  <xs:element name="sort-file-size" type="expression"/>
+  <xs:element name="sort-message" type="expression"/>
+  <xs:element name="sort-mode-size" type="expression"/>
+  <xs:element name="sort-return" type="expression"/>
+  <xs:element name="tally" type="expression"/>
+  <xs:element name="when-compiled" type="expression"/>
+
+  <xs:group name="identifier-or-literal">
+    <xs:choice>
+      <xs:group ref="identifier"/>
+      <xs:group ref="literal"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:element name="linage-counter">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+identifier="LINAGE-COUNTER" [ ( "IN" | "OF" ) file-name ]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="expression">
+          <xs:sequence>
+            <xs:group ref="file-ref" minOccurs="0"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="unary-arithmetic-expression">
+    <xs:complexContent>
+      <xs:extension base="arithmetic-expression">
+        <xs:group ref="arithmetic-expression"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="binary-arithmetic-expression">
+    <xs:complexContent>
+      <xs:extension base="arithmetic-expression">
+        <xs:sequence>
+          <xs:group ref="arithmetic-expression"/>
+          <xs:group ref="arithmetic-expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="condition">
+    <xs:complexContent>
+      <xs:extension base="expression"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="condition">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+condition=( combinable-condition| combined-conditions )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:group ref="combinable-condition"/>
+      <xs:group ref="combined-conditions"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="combinable-condition">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+combinable-condition=( simple-condition| negated-simple-conditions| 
+  abbreviated-combined-relation-conditions )
+
+abbreviated-combined-relation-conditions=relation-conditionabbreviation-rest
+
+abbreviated-combined-relation-conditions=arithmetic-expression 
+  relational-operator"(" [ "NOT" ] arithmetic-expression abbreviation-rest ")"
+
+abbreviated-combined-relation-conditions=arithmetic-expression 
+  "(" [ "NOT" ] relational-operator arithmetic-expression abbreviation-rest ")"
+
+abbreviation-rest={ ( "AND" | "OR" ) [ "NOT" ] [ relational-operator ] 
+  abbreviation-leaf }+
+
+abbreviation-leaf=( arithmetic-expression | 
+  "(" arithmetic-expression abbreviation-rest ")" )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:group ref="simple-condition"/>
+      <xs:group ref="negated-simple-conditions"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="simple-condition">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+simple-condition=( class-condition| condition-name-condition| 
+  relation-condition| sign-condition| switch-status-condition| 
+  "(" condition ")" )
+
+condition-name-condition=condition-name-reference
+
+switch-status-condition=condition-name-reference
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:group ref="class-condition"/>
+      <xs:group ref="condition-name-reference"/>
+      <xs:group ref="relation-condition"/>
+      <xs:group ref="sign-condition"/>
+      <xs:element ref="logical-parens"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:element name="logical-parens" type="unary-condition"/>
+
+  <xs:group name="class-condition">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+class-condition=identifier [ "IS" ] [ "NOT" ] 
+  ( "NUMERIC" | "ALPHABETIC" | "ALPHABETIC-LOWER" | 
+  "ALPHABETIC-UPPER" | class-name | "DBCS" | "KANJI" )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element ref="is-numeric"/>
+      <xs:element ref="is-alphabetic"/>
+      <xs:element ref="is-alphabetic-lower"/>
+      <xs:element ref="is-alphabetic-upper"/>
+      <xs:element ref="is-dbcs"/>
+      <xs:element ref="is-kanji"/>
+      <xs:element ref="is-class"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:element name="is-numeric" type="class-condition"/>
+  <xs:element name="is-alphabetic" type="class-condition"/>
+  <xs:element name="is-alphabetic-lower" type="class-condition"/>
+  <xs:element name="is-alphabetic-upper" type="class-condition"/>
+  <xs:element name="is-dbcs" type="class-condition"/>
+  <xs:element name="is-kanji" type="class-condition"/>
+  <xs:element name="is-class" type="class-name-condition"/>
+
+  <xs:complexType name="class-condition">
+    <xs:complexContent>
+      <xs:extension base="condition">
+        <xs:group ref="identifier"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="class-name-condition">
+    <xs:complexContent>
+      <xs:extension base="class-condition">
+        <xs:attribute name="name" type="class-name" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="relation-condition">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+relation-condition=arithmetic-expression relational-operator
+  arithmetic-expression
+
+relational-operator=[ "IS" ]( [ "NOT" ] 
+  ( "GREATER" [ "THAN" ] | ">" | "LESS" [ "THAN" ] | "<" | 
+  "EQUAL" [ "TO" ] | "=" )| "GREATER" [ "THAN" ] "OR" "EQUAL" 
+  [ "TO" ]| ">="| "LESS" [ "THAN" ] "OR" "EQUAL" [ "TO" ]| "<" "=" )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element ref="gt"/>
+      <xs:element ref="lt"/>
+      <xs:element ref="eq"/>
+      <xs:element ref="ge"/>
+      <xs:element ref="le"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:element name="gt" type="relational-condition"/>
+  <xs:element name="lt" type="relational-condition"/>
+  <xs:element name="eq" type="relational-condition"/>
+  <xs:element name="ge" type="relational-condition"/>
+  <xs:element name="le" type="relational-condition"/>
+
+  <xs:complexType name="unary-condition">
+    <xs:complexContent>
+      <xs:extension base="condition">
+        <xs:sequence>
+          <xs:group ref="condition"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="arithmetic-expression-test">
+    <xs:complexContent>
+      <xs:extension base="condition">
+        <xs:sequence>
+          <xs:group ref="arithmetic-expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="relational-condition">
+    <xs:complexContent>
+      <xs:extension base="condition">
+        <xs:sequence>
+          <xs:group ref="arithmetic-expression"/>
+          <xs:group ref="arithmetic-expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="sign-condition">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+sign-condition=arithmetic-expression [ "IS" ] [ "NOT" ] 
+  ( "POSITIVE" | "NEGATIVE" | "ZERO" )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element ref="is-positive"/>
+      <xs:element ref="is-negative"/>
+      <xs:element ref="is-zero"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:element name="is-positive" type="arithmetic-expression-test"/>
+  <xs:element name="is-negative" type="arithmetic-expression-test"/>
+  <xs:element name="is-zero" type="arithmetic-expression-test"/>
+
+  <xs:group name="negated-simple-conditions">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+negated-simple-conditions="NOT" condition
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element ref="not"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="not" type="unary-condition"/>
+
+  <xs:group name="combined-conditions">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+combined-conditions=combinable-condition 
+  { ( "AND" | "OR" ) combinable-condition }+
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element ref="and"/>
+      <xs:element ref="or"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:element name="and" type="binary-condition"/>
+  <xs:element name="or" type="binary-condition"/>
+
+  <xs:complexType name="binary-condition">
+    <xs:complexContent>
+      <xs:extension base="condition">
+        <xs:sequence>
+          <xs:group ref="condition"/>
+          <xs:group ref="condition"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="expression">
+    <xs:complexContent>
+      <xs:extension base="base-element"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="arithmetic-expression">
+    <xs:complexContent>
+      <xs:extension base="expression"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="integer">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+/*
+ From the reference:
+;  In this manual, the word integer appearing in a format represents a
+;  numeric literal of nonzero value that contains no sign and no decimal
+;  point; any other restrictions are included with the description of the
+;  format.
+ It is actually questionable, if we should forbid nonzero values at the
+ lexical level. Moreover, for some uses of integer, zero is actually allowed
+ in contrast to the above rule.
+*/
+
+integer = [0]* [1-9] [0-9]*
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="arithmetic-expression">
+          <xs:attribute name="value" type="xs:int" use="required"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="arithmetic-expression">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+arithmetic-expression=times-div { ( "+" | "-" ) times-div }*
+
+times-div=power { ( "*" | "/" ) power }*
+
+power=[ ( "+" | "-" ) ] basis { "**" basis }*
+
+basis=( identifier | literal | "(" arithmetic-expression ")" )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element ref="add"/>
+      <xs:element ref="sub"/>
+      <xs:element ref="mul"/>
+      <xs:element ref="div"/>
+      <xs:element ref="power"/>
+      <xs:element ref="plus"/>
+      <xs:element ref="neg"/>
+      <xs:group ref="identifier-or-literal"/>
+      <xs:element ref="parens"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:element name="parens" type="unary-arithmetic-expression"/>
+  <xs:element name="add" type="binary-arithmetic-expression"/>
+  <xs:element name="sub" type="binary-arithmetic-expression"/>
+  <xs:element name="mul" type="binary-arithmetic-expression"/>
+  <xs:element name="div" type="binary-arithmetic-expression"/>
+  <xs:element name="power" type="binary-arithmetic-expression"/>
+  <xs:element name="plus" type="unary-arithmetic-expression"/>
+  <xs:element name="neg" type="unary-arithmetic-expression"/>
+
+  <xs:element name="function-call">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="arithmetic-expression">
+          <xs:group ref="arithmetic-expression"
+             minOccurs="0" maxOccurs="unbounded"/>
+
+          <xs:attribute name="name" type="program-name" use="required"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="priority-number">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+/*
+ From the reference:
+   Priority-numbers:  00-99
+   Each word must be a 1-digit or 2-digit integer.
+*/
+
+priority-number = [0-9] [0-9]
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:int"/>
+  </xs:simpleType>
+
+  <xs:group name="literal">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+literal=( nonnumeric | numeric | dbcs | figurative-constant )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element ref="string"/>
+      <xs:element ref="integer"/>
+      <xs:element ref="decimal"/>
+      <xs:group ref="figurative-constant"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:element name="literal-range">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="base-element">
+          <xs:sequence>
+            <xs:group ref="literal"/>
+            <xs:group ref="literal"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="figurative-constant">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+figurative-constant=( "ZERO" | "ZEROS" | "ZEROES"| "SPACE" | "SPACES"| 
+  "HIGH-VALUE" | "HIGH-VALUES"| "LOW-VALUE" | "LOW-VALUES"| "QUOTE" | 
+  "QUOTES"| "ALL" literal| "NULL" | "NULLS" )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element ref="zero"/>
+      <xs:element ref="space"/>
+      <xs:element ref="high-value"/>
+      <xs:element ref="low-value"/>
+      <xs:element ref="quote"/>
+      <xs:element ref="null"/>
+      <xs:element ref="all"/>
+      <xs:element ref="macro"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:element name="zero" type="expression"/>
+  <xs:element name="space" type="expression"/>
+  <xs:element name="high-value" type="expression"/>
+  <xs:element name="low-value" type="expression"/>
+  <xs:element name="quote" type="expression"/>
+  <xs:element name="null" type="expression"/>
+
+  <xs:element name="macro">
+    <xs:annotation>
+      <xs:documentation>
+        A macro parameter, which is expanded into literal string during generation.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="expression">
+          <xs:attribute name="name" use="required">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="program"/>
+                <xs:enumeration value="section"/>
+                <xs:enumeration value="paragraph"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="all">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="expression">
+          <xs:group ref="literal"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="range-ref">
+    <xs:choice>
+      <xs:group ref="procedure-ref"/>
+      <xs:element ref="range-ref"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="procedure-ref-wrapper">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:sequence>
+          <xs:group ref="procedure-ref"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="range-wrapper">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:group ref="range-ref"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="range-ref" type="range-ref"/>
+
+  <xs:complexType name="range-ref">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:group ref="procedure-ref" minOccurs="2" maxOccurs="2"/>
+
+        <xs:attribute name="through-ref" type="xs:boolean" 
+          default="true" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Indicates whether to issue THROUGH clause if present.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="procedure-ref">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+procedure-name=paragraph-name [ ( "IN" | "OF" ) section-name ]
+procedure-name = section-name
+      ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element ref="paragraph-ref"/>
+      <xs:element ref="section-ref"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:element name="section-ref" type="section-ref"/>
+  <xs:element name="paragraph-ref" type="section-ref"/>
+
+  <xs:complexType name="paragraph-ref">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:sequence>
+          <xs:element ref="section-ref" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="section-name" use="required"/>
+        <xs:attribute name="name-ref" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="section-ref">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:attribute name="name" type="section-name" use="required"/>
+        <xs:attribute name="name-ref" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="string">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+/*
+ From the reference:
+;  A nonnumeric literal is a character-string enclosed in quotation marks
+;  ("), and can contain any allowable character from the character set of the
+;  computer.  The maximum length of a nonnumeric literal is 160 characters.
+
+;  The enclosing quotation marks are excluded from the literal when the
+;  program is compiled.  An embedded quotation mark must be represented by a
+;  pair of quotation marks ("").  For example,      "THIS ISN""T WRONG"
+
+;x A nonnumeric literal can be enclosed in apostrophes (').  If the APOST
+;x option is specified, these apostrophes are excluded from the literal when
+;x the program is compiled.  An embedded apostrophe must be represented by a
+;x pair of apostrophes ('').  For example,     'THIS ISN''T WRONG'
+
+ ...
+
+;x Hexadecimal notation can be used for nonnumeric literals.  This
+;x hexadecimal notation has the following format:
+
+;x  ___ Hexadecimal Notation Format for Nonnumeric Literals ________________
+;  |                                                                        |
+;x | X"hexadecimal_digits"                                                  |
+;  |                                                                        |
+;  |________________________________________________________________________|
+
+;x X"
+;x     The opening delimiter for hexadecimal notation of a nonnumeric literal
+;x     (If the compiler option APOST is specified, the opening delimiter is
+;x     X'.)
+
+;x "
+;x     The closing delimiter for the hexadecimal notation of a nonnumeric
+;x     literal.  (If the compiler option APOST is specified, the closing
+;x     delimiter is '.)
+
+ Nonnumeric literals with double-byte characters are not supported in this
+ version of this lexical definition.
+*/
+
+nonnumeric = 
+ ( [\"] (~[\"] | [\"] [\"])* [\"]
+ | [\'] (~[\'] | [\'] [\'])* [\']
+ | [Xx] [\"] hexdigits [\"]
+ | [Xx] [\'] hexdigits [\'] )
+auxiliaries
+ begin
+  hexdigits = [0-9A-Fa-f]+
+ end
+
+/*
+ DBCS literals are not specified in this version.
+*/
+
+dbcs = ...
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="expression">
+          <xs:annotation>
+            <xs:documentation>
+              A string expression.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:attribute name="value" type="xs:string" use="optional"/>
+
+          <xs:attribute name="type" use="optional">
+            <xs:annotation>
+              <xs:documentation>A string type.</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="basic">
+                  <xs:annotation>
+                    <xs:documentation>
+                      Basic alphanumeric literals can contain only
+                      single-byte or multibyte characters.
+                    </xs:documentation>
+                  </xs:annotation>
+                </xs:enumeration>
+                <xs:enumeration value="hex">
+                  <xs:annotation>
+                    <xs:documentation>
+                      Hexadecimal notation can be used for
+                      alphanumeric literals.
+                    </xs:documentation>
+                  </xs:annotation>
+                </xs:enumeration>
+                <xs:enumeration value="null-terminated">
+                  <xs:annotation>
+                    <xs:documentation>
+                      A null-terminated alphanumeric literal.
+                    </xs:documentation>
+                  </xs:annotation>
+                </xs:enumeration>
+                <xs:enumeration value="dbcs">
+                  <xs:annotation>
+                    <xs:documentation>
+                      DBCS literals.
+                    </xs:documentation>
+                  </xs:annotation>
+                </xs:enumeration>
+                <xs:enumeration value="national-dbcs">
+                  <xs:annotation>
+                    <xs:documentation>
+                      National DBCS literals.
+                    </xs:documentation>
+                  </xs:annotation>
+                </xs:enumeration>
+                <xs:enumeration value="national">
+                  <xs:annotation>
+                    <xs:documentation>
+                      National characters.
+                    </xs:documentation>
+                  </xs:annotation>
+                </xs:enumeration>
+                <xs:enumeration value="national-hex">
+                  <xs:annotation>
+                    <xs:documentation>
+                      Hexadecimal notation for national literals.
+                    </xs:documentation>
+                  </xs:annotation>
+                </xs:enumeration>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="decimal">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+/*
+ From the reference:
+;  A numeric literal is a character-string whose characters are selected from
+;  the digits 0 through 9, a sign character (+ or -), and the decimal point.
+;  If the literal contains no decimal point, it is an integer.  (In this
+;  manual, the word integer appearing in a format represents a numeric
+;  literal of nonzero value that contains no sign and no decimal point; any
+;  other restrictions are included with the description of the format.)  The
+;  following rules apply:
+
+;  o   One through 18 digits are allowed.
+
+;  o   Only one sign character is allowed.  If included, it must be the
+;      leftmost character of the literal.  If the literal is unsigned, it is
+;      positive in value.
+
+;  o   Only one decimal point is allowed.  If a decimal point is included, it
+;      is treated as an assumed decimal point (that is, as not taking up a
+;      character position in the literal).  The decimal point can appear
+;      anywhere within the literal except as the rightmost character.
+
+ We do not enforce the constraint on the length of numeric literals in the
+ definition below. We omit a definition of floating-point literal values
+ available as an IBM extension.
+*/
+
+numeric = [\+\-]? ([0-9]* [\.] [0-9]+ | [0-9]+)
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="expression">
+          <xs:attribute name="value" type="xs:decimal" use="required"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="level-number">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+/*
+ From the reference:
+;  Level-numbers: 01-49,66,77,88.
+;  Each word must be a 1-digit or 2-digit integer.
+*/
+
+level-number =
+ ( [0]? [1-9]
+ | [1-4] [0-9]
+ | "66"
+ | "77"
+ | "88" )
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:int"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="library-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+library-name=user-defined-word
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="user-defined-word"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="program-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+program-name = user-defined-word
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="user-defined-word"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="basis-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+basis-name=program-name
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="program-name"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="text-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+text-name=user-defined-word
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="user-defined-word"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="paragraph-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+paragraph-name=user-defined-word
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="user-defined-word"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="section-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+section-name=user-defined-word
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="user-defined-word"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="computer-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+computer-name=system-name
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="system-name"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="language-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+language-name=system-name
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="system-name"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="assignment-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+assignment-name=system-name
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="system-name"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="environment-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+environment-name=system-name
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="system-name"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="system-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+        /*
+ From the reference:
+
+;  A system-name is a character string that is defined by IBM to have a
+;  specific meaning to the system.  There are three types of system-names:
+
+;| o   computer-name
+;| o   language-name
+;| o   implementor-name.
+
+;  There are two types of implementor-names:
+
+;| o   environment-name
+;| o   assignment-name.
+
+ If we abstract from the problem to reject reserved words as user-defined
+ words, user-defined words are COBOL words.
+*/
+
+system-name = cobol-word
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="cobol-word"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="user-defined-word">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+/*
+From the reference:
+
+;| Within a source program the following rules apply for all COBOL words:
+
+;| o   A reserved word cannot be used as a user-defined word or as a
+;|     system-name.
+
+;| o   The same COBOL word, however, can be used as both a user-defined word
+;|     and as a system-name.  The classification of a specific occurrence of
+;|     a COBOL word is determined by the context of the clause or phrase in
+;|     which it occurs.
+
+If we abstract from the problem to reject reserved words as user-defined
+words, user-defined words are COBOL words.
+*/
+
+user-defined-word = cobol-word
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="cobol-word"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="cobol-word">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+/*
+ From the reference:
+;  A COBOL word is a character-string of not more than 30 characters which
+;  forms a user-defined word, a system-name, or a reserved word.  Except for
+;  arithmetic operators and relation characters, each character of a COBOL
+;  word is selected from the set of letters, digits, and the hyphen; the
+;  hyphen cannot appear as the first or last character in such words.  Each
+;  lowercase letter is considered to be equivalent to its corresponding
+;  uppercase letter.
+ We do not enforce the constraint on the maximum length of COBOL words.
+*/
+
+cobol-word = [A-Za-z0-9]+ ([\-]+ [A-Za-z0-9]+)*
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:NMTOKEN"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="alphabet-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+alphabet-name=alphabetic-user-defined-word
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="alphabetic-user-defined-word"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="class-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+class-name=alphabetic-user-defined-word
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="alphabetic-user-defined-word"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="condition-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+condition-name=alphabetic-user-defined-word
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="alphabetic-user-defined-word"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="data-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+data-name=alphabetic-user-defined-word
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="alphabetic-user-defined-word"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="file-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+file-name=alphabetic-user-defined-word
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="alphabetic-user-defined-word"/>
+  </xs:simpleType>
+
+  <xs:element name="index-ref">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="base-element">
+          <xs:attribute name="name" type="index-name" use="required"/>
+          <xs:attribute name="name-ref" type="xs:string" use="optional"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="index-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+index-name=alphabetic-user-defined-word
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="alphabetic-user-defined-word"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="mnemonic-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+mnemonic-name=alphabetic-user-defined-word
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="alphabetic-user-defined-word"/>
+  </xs:simpleType>
+
+  <xs:group name="record-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+record-name=qualified-data-name
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:group ref="qualified-data-name"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:simpleType name="routine-name">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+routine-name=alphabetic-user-defined-word
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="alphabetic-user-defined-word"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="symbolic-character">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+symbolic-character=alphabetic-user-defined-word
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="alphabetic-user-defined-word"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="alphabetic-user-defined-word">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+/*
+ Some kinds of user-defined words are required to contain at least one
+ alphabetic. A corresponding class of character-strings is defined below.
+*/
+
+alphabetic-user-defined-word = ([0-9]+ [\-]*)* [0-9]* [A-Za-z] [A-Za-z0-9]* 
+  ([\-]+ [A-Za-z0-9]+)*
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:NMTOKEN"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="comment-entry">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+/*
+ From the reference:
+;  A comment is a character-string that can contain any combination of
+;  characters from the character set of the computer.
+ We do not provide a lexical definition because we prefer to regard the
+ problem of recognizing comment entries as a preprocessing issue.
+*/
+
+comment-entry = ...
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="order-direction">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ascending"/>
+      <xs:enumeration value="descending"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!--
+basis-statement
+cbl-process-statement
+compiler-directing-statement
+control-cbl-statement
+copy-operand
+copy-statement
+delete-compiler-directing-statement
+eject-statement
+enter-statement
+insert-statement
+options-list
+quoted-pseudo-text
+ready-or-reset-trace-statement
+replace-statement
+sequence-number-field
+service-label-statement
+service-reload-statement
+skip1-2-3-statement
+title-statement
+  -->
+
+</xs:schema>

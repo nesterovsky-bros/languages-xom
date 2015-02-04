@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/java-1.5/2008-02-07" package="com.nesterovskyBros.test">
+  <comment>$Id: $</comment>
+  <enum name="ErrorCode" access="public">
+    <comment doc="true">Defines vendor independent error codes.</comment>
+    <constant value="Success">
+      <comment doc="true">Operation succeeded.</comment>
+    </constant>
+    <constant value="NotFound">
+      <comment doc="true">Data not found.</comment>
+    </constant>
+    <constant value="NotUnique">
+      <comment doc="true">Not unique identifier was used.</comment>
+    </constant>
+    <constant value="AlreadyExists">
+      <comment doc="true">Value already exists.</comment>
+    </constant>
+    <constant value="PermittedValueViolation">
+      <comment doc="true">Invalid permitted value.</comment>
+    </constant>
+    <constant value="Timeout">
+      <comment doc="true">Operation timeout.</comment>
+    </constant>
+    <constant value="DatabaseError">
+      <comment doc="true">Other database error.</comment>
+    </constant>
+    <constant value="Error">
+      <comment doc="true">Unknown error.</comment>
+    </constant>
+  </enum>
+</unit>

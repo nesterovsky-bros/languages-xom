@@ -1,0 +1,1166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/csharp-3.0/2009-05-23">
+  <comment>Test unit</comment>
+  <using-namespace name="System"/>
+  <using-namespace name="System.Collections.Generic"/>
+  <using-namespace name="System.Linq"/>
+  <using-namespace name="System.Text"/>
+
+  <using-alias name="F">
+    <type name="Functions" namespace="NesterovskyBros.API"/>
+  </using-alias>
+
+  <pp-if>
+    <pp-condition>
+      <pp-or>
+        <pp-macro name="DEBUG"/>
+        <pp-macro name="TRACE"/>
+      </pp-or>
+    </pp-condition>
+    <pp-then>
+      <using-namespace name="System.Diagnostics"/>
+    </pp-then>
+  </pp-if>
+
+  <using-namespace name="ConsoleApplication2.Test"/>
+
+  <attributes>
+    <attribute target="assembly">
+      <type name="CopyrightAttribute" namespace="System"/>
+      <arguments>
+        <string value="(C) 2009"/>
+      </arguments>
+    </attribute>
+    <attribute target="assembly">
+      <type name="TrademarkAttribute" namespace="System"/>
+      <arguments>
+        <string value="Nesterovsky bros"/>
+      </arguments>
+    </attribute>
+  </attributes>
+
+  <namespace name="My">
+    <class access="public" name="A">
+      <base-class>
+        <type name="C" namespace="MyNamespace"/>
+      </base-class>
+      <base-interface>
+        <type name="I" namespace="MyNamespace"/>
+      </base-interface>
+
+      <constructor name="A" access="public">
+        <initialize type="base">
+          <arguments>
+            <int value="1"/>
+          </arguments>
+        </initialize>
+        <block>
+          <var name="j" name-id="id-j1">
+            <type name="string"/>
+            <initialize>
+              <string verbatim="true" value="one&#13;&#10;two&#13;&#10;three"/>
+            </initialize>
+          </var>
+
+          <label name="L">
+            <var name="i" name-id="id-i1">
+              <type name="int"/>
+              <initialize>
+                <int value="7"/>
+              </initialize>
+            </var>
+          </label>
+
+          <expression>
+            <inc>
+              <var-ref name="i" name-ref="id-i1"/>
+            </inc>
+          </expression>
+
+          <pp-if>
+            <pp-condition>
+              <pp-macro name="DEBUG"/>
+            </pp-condition>
+            <pp-then>
+              <expression>
+                <invoke>
+                  <static-method-ref name="WriteLine">
+                    <type name="Console" namespace="System"/>
+                  </static-method-ref>
+                  <arguments>
+                    <property-ref name="command">
+                      <property-ref name="iefSupplied">
+                        <var-ref name="export"/>
+                      </property-ref>
+                    </property-ref>
+                  </arguments>
+                </invoke>
+              </expression>
+            </pp-then>
+            <pp-else>
+              <pp-if>
+                <pp-condition>
+                  <pp-macro name="TRACE"/>
+                </pp-condition>
+                <pp-then>
+                  <expression>
+                    <invoke>
+                      <static-method-ref name="WriteLine">
+                        <type name="Console" namespace="System"/>
+                      </static-method-ref>
+                      <arguments>
+                        <property-ref name="command">
+                          <property-ref name="iefSupplied">
+                            <var-ref name="export"/>
+                          </property-ref>
+                        </property-ref>
+                      </arguments>
+                    </invoke>
+                  </expression>
+                </pp-then>
+              </pp-if>
+            </pp-else>
+          </pp-if>
+
+          <if>
+            <condition>
+              <gt>
+                <var-ref name="i" name-ref="id-i1"/>
+                <int value="0"/>
+              </gt>
+            </condition>
+            <then>
+              <block>
+                <return/>
+              </block>
+            </then>
+            <else>
+              <if>
+                <condition>
+                  <eq>
+                    <var-ref name="i" name-ref="id-i1"/>
+                    <int value="0"/>
+                  </eq>
+                </condition>
+                <then>
+                  <block>
+                    <throw>
+                      <new-object>
+                        <type name="Exception" namespace="System"/>
+                      </new-object>
+                    </throw>
+                  </block>
+                </then>
+              </if>
+            </else>
+          </if>
+
+          <var name="o" name-id="id-o1">
+            <initialize>
+              <new-object>
+                <type name="MyObject" namespace="MyNamespace"/>
+              </new-object>
+            </initialize>
+          </var>
+          <var name="o" name-id="id-o2">
+            <initialize>
+              <new-object>
+                <type name="MyObject" namespace="MyNamespace"/>
+                <arguments>
+                  <var-ref name="i" name-ref="id-i1"/>
+                </arguments>
+              </new-object>
+            </initialize>
+          </var>
+          <var name="o" name-id="id-o3">
+            <initialize>
+              <new-object>
+                <type name="MyObject" namespace="MyNamespace"/>
+                <initialize>
+                  <member name="A">
+                    <var-ref name="i" name-ref="id-i1"/>
+                  </member>
+                </initialize>
+              </new-object>
+            </initialize>
+          </var>
+          <var name="o" name-id="id-o4">
+            <initialize>
+              <new-object>
+                <type name="MyObject" namespace="MyNamespace"/>
+                <arguments>
+                  <var-ref name="i" name-ref="id-i1"/>
+                </arguments>
+                <initialize>
+                  <member name="A">
+                    <int value="0"/>
+                  </member>
+                  <member name="B">
+                    <int value="0"/>
+                  </member>
+                  <member name="C">
+                    <int value="0"/>
+                  </member>
+                </initialize>
+              </new-object>
+            </initialize>
+          </var>
+          <var name="o" name-id="id-o5">
+            <initialize>
+              <new-object>
+                <initialize>
+                  <member name="A">
+                    <int value="0"/>
+                  </member>
+                </initialize>
+              </new-object>
+            </initialize>
+          </var>
+          <var name="a">
+            <initialize>
+              <new-array rank="1">
+                <initialize>
+                  <item>
+                    <var-ref name="0" name-ref="id-o1"/>
+                  </item>
+                  <item>
+                    <var-ref name="0" name-ref="id-o2"/>
+                  </item>
+                  <item>
+                    <var-ref name="0" name-ref="id-o3"/>
+                  </item>
+                  <item>
+                    <var-ref name="0" name-ref="id-o4"/>
+                  </item>
+                </initialize>
+              </new-array>
+            </initialize>
+          </var>
+
+          <switch>
+            <test>
+              <var-ref name="i" name-ref="id-i1"/>
+            </test>
+            <case>
+              <value>
+                <int value="1"/>
+              </value>
+              <goto>
+                <int value="2"/>
+              </goto>
+            </case>
+            <case>
+              <value>
+                <int value="2"/>
+              </value>
+              <break/>
+            </case>
+            <case>
+              <return/>
+            </case>
+          </switch>
+
+          <while>
+            <condition>
+              <lt>
+                <var-ref name="i" name-ref="id-i1"/>
+                <int value="10"/>
+              </lt>
+            </condition>
+            <block>
+              <expression>
+                <inc>
+                  <var-ref name="i" name-ref="id-i1"/>
+                </inc>
+              </expression>
+            </block>
+          </while>
+
+          <do-while>
+            <condition>
+              <lt>
+                <var-ref name="i" name-ref="id-i1"/>
+                <int value="10"/>
+              </lt>
+            </condition>
+            <block>
+              <expression>
+                <inc>
+                  <var-ref name="i" name-ref="id-i1"/>
+                </inc>
+              </expression>
+            </block>
+          </do-while>
+
+          <for>
+            <var name="j" name-id="id-j2">
+              <type name="int"/>
+              <initialize>
+                <int value="0"/>
+              </initialize>
+            </var>
+            <condition>
+              <lt>
+                <var-ref name="j" name-ref="id-j2"/>
+                <int value="100"/>
+              </lt>
+            </condition>
+            <update>
+              <inc>
+                <var-ref name="j" name-ref="id-j2"/>
+              </inc>
+            </update>
+            <block>
+              <expression>
+                <invoke>
+                  <static-method-ref name="WriteLine">
+                    <type name="Console" namespace="System"/>
+                  </static-method-ref>
+                  <arguments>
+                    <var-ref name="j" name-ref="id-j2"/>
+                  </arguments>
+                </invoke>
+              </expression>
+            </block>
+          </for>
+
+          <foreach>
+            <var name="i" name-id="id-i2">
+              <initialize>
+                <invoke>
+                  <method-ref name="Items"/>
+                </invoke>
+              </initialize>
+            </var>
+            <block>
+              <if>
+                <condition>
+                  <eq>
+                    <var-ref name="i" name-ref="id-i2"/>
+                    <int value="7"/>
+                  </eq>
+                </condition>
+                <then>
+                  <return/>
+                </then>
+                <else>
+                  <continue/>
+                </else>
+              </if>
+            </block>
+          </foreach>
+
+          <lock>
+            <resource>
+              <var-ref name="sync"/>
+            </resource>
+            <lock>
+              <resource>
+                <var-ref name="sync2"/>
+              </resource>
+              <expression>
+                <invoke>
+                  <method-ref name="process"/>
+                </invoke>
+              </expression>
+            </lock>
+          </lock>
+
+          <using>
+            <resource>
+              <invoke>
+                <method-ref name="BeginScope"/>
+              </invoke>
+            </resource>
+            <return/>
+          </using>
+
+          <try>
+            <block type="checked">
+              <expression>
+                <inc>
+                  <var-ref name="i" name-ref="id-i1"/>
+                </inc>
+              </expression>
+            </block>
+
+            <block type="unchecked">
+              <expression>
+                <inc>
+                  <var-ref name="i" name-ref="id-i1"/>
+                </inc>
+              </expression>
+            </block>
+
+            <catch name="e">
+              <type name="OverflowException" namespace="System"/>
+              <return>
+                <int value="0"/>
+              </return>
+            </catch>
+            <finally>
+              <expression>
+                <inc>
+                  <var-ref name="i" name-ref="id-i1"/>
+                </inc>
+              </expression>
+            </finally>
+          </try>
+
+          <yield>
+            <subscript>
+              <field-ref name="items">
+                <this/>
+              </field-ref>
+              <var-ref name="i" name-ref="id-i1"/>
+            </subscript>
+          </yield>
+
+          <yield/>
+
+          <fixed>
+            <var name="p">
+              <type name="int" pointer="1"/>
+              <initialize>
+                <stackalloc>
+                  <type name="int"/>
+                  <int value="100"/>
+                </stackalloc>
+              </initialize>
+            </var>
+            <block>
+              <expression>
+                <assign>
+                  <deref>
+                    <var-ref name="intref"/>
+                  </deref>
+                  <int value="1"/>
+                </assign>
+              </expression>
+            </block>
+          </fixed>
+
+          <var name="anonymous">
+            <initialize>
+              <member name="A">
+                <int value="1"/>
+              </member>
+              <member name="B">
+                <int value="2"/>
+              </member>
+              <member name="C">
+                <int value="3"/>
+              </member>
+            </initialize>
+          </var>
+
+          <var name="query">
+            <initialize>
+              <!--from c in customers
+              group c by c.Country into g
+              select new { Country = g.Key, CustCount = g.Count() }-->
+
+              <query>
+                <from name="c">
+                  <property-ref name="customers"/>
+                </from>
+                <groupby>
+                  <var-ref name="c"/>
+                  <property-ref name="Country">
+                    <var-ref name="c"/>
+                  </property-ref>
+                  <into name="g"/>
+                </groupby>
+                <select>
+                  <new-object>
+                    <initialize>
+                      <member name="Country">
+                        <property-ref name="Key">
+                          <var-ref name="g"/>
+                        </property-ref>
+                      </member>
+                      <member name="CustCount">
+                        <invoke>
+                          <method-ref name="Count">
+                            <var-ref name="g"/>
+                          </method-ref>
+                        </invoke>
+                      </member>
+                    </initialize>
+                  </new-object>
+                </select>
+              </query>
+            </initialize>
+          </var>
+
+          <expression>
+            <invoke>
+              <static-method-ref name="DoSomething">
+                <type name="Functions" namespace="NesterovskyBros.API"/>
+              </static-method-ref>
+            </invoke>
+          </expression>
+        </block>
+      </constructor>
+
+      <destructor name="A">
+        <block/>
+      </destructor>
+
+      <field access="private" name="f1">
+        <type name="int"/>
+      </field>
+      <field access="private" volatile="true" name="f2">
+        <attributes>
+          <attribute>
+            <type name="ObsoleteAttribute" namespace="System"/>
+          </attribute>
+        </attributes>
+        <type name="int"/>
+      </field>
+
+      <method access="public" name="Handler">
+        <parameters>
+          <parameter name="value">
+            <type name="object"/>
+          </parameter>
+        </parameters>
+        <block/>
+      </method>
+
+      <method name="m" access="public">
+        <returns>
+          <type name="int"/>
+        </returns>
+        <type-parameters>
+          <type-parameter name="T"/>
+        </type-parameters>
+        <parameters>
+          <parameter name="t">
+            <type name="T"/>
+          </parameter>
+        </parameters>
+        <constraints>
+          <type name="T"/>
+          <constructor/>
+        </constraints>
+        <block>
+          <expression>
+            <invoke>
+              <base name="m"/>
+              <arguments>
+
+                <var-ref name="t"/>
+              </arguments>
+            </invoke>
+          </expression>
+
+          <return>
+            <int value="1"/>
+          </return>
+        </block>
+      </method>
+
+      <property name="P" access="public">
+        <type name="string"/>
+        <get>
+          <block>
+            <return>
+              <string value="A"/>
+            </return>
+          </block>
+        </get>
+        <set>
+        </set>
+      </property>
+
+      <property name="P" access="public" override="abstract">
+        <type name="string"/>
+        <get/>
+      </property>
+
+      <property name="this" access="public" override="abstract">
+        <type name="int"/>
+        <parameters>
+          <parameter name="index">
+            <type name="int"/>
+          </parameter>
+        </parameters>
+        <get/>
+        <set access="internal-protected"/>
+      </property>
+
+      <event name="E" access="public">
+        <type name="Event" namespace="System"/>
+      </event>
+
+      <operator name="add" implicit="true" static="true" access="public">
+        <returns>
+          <type name="A" namespace="My"/>
+        </returns>
+        <parameters>
+          <parameter name="first">
+            <type name="A" namespace="My"/>
+          </parameter>
+          <parameter name="second">
+            <type name="A" namespace="My"/>
+          </parameter>
+        </parameters>
+        <block>
+          <var name="handler">
+            <type name="Delegate" namespace="System"/>
+            <initialize>
+              <new-delegate>
+                <type name="Delegate" namespace="System"/>
+                <method-ref name="Handler"/>
+              </new-delegate>
+            </initialize>
+          </var>
+
+          <return>
+            <invoke>
+              <method-ref name="Add">
+                <var-ref name="first"/>
+              </method-ref>
+              <arguments>
+                <var-ref name="second"/>
+              </arguments>
+            </invoke>
+          </return>
+        </block>
+      </operator>
+
+      <class name="C"/>
+    </class>
+
+    <struct access="public" name="S">
+      <base-interface>
+        <type name="I"/>
+      </base-interface>
+
+      <constructor name="S" access="public">
+        <block/>
+      </constructor>
+
+      <field access="private" name="f1">
+        <type name="int"/>
+      </field>
+      <field access="private" volatile="true" name="f2">
+        <attributes>
+          <attribute>
+            <type name="ObsoleteAttribute" namespace="System"/>
+          </attribute>
+        </attributes>
+        <type name="int"/>
+      </field>
+
+      <method name="m" access="public" override="abstract">
+        <returns>
+          <type name="int"/>
+        </returns>
+        <type-parameters>
+          <type-parameter name="T"/>
+        </type-parameters>
+        <parameters>
+          <parameter name="t">
+            <type name="T"/>
+          </parameter>
+        </parameters>
+        <constraints>
+          <type name="T"/>
+          <constructor/>
+        </constraints>
+        <block>
+          <return>
+            <int value="1"/>
+          </return>
+        </block>
+      </method>
+
+      <property name="P" access="public">
+        <type name="string"/>
+        <get>
+          <block>
+            <return>
+              <string value="A"/>
+            </return>
+          </block>
+        </get>
+        <set>
+        </set>
+      </property>
+
+      <property name="P" access="public" override="abstract">
+        <type name="string"/>
+        <get/>
+      </property>
+
+      <property name="this" access="public" override="abstract">
+        <type name="int"/>
+        <parameters>
+          <parameter name="index">
+            <type name="int"/>
+          </parameter>
+        </parameters>
+        <get/>
+        <set access="internal-protected"/>
+      </property>
+
+      <event name="E" access="public">
+        <type name="Event" namespace="System"/>
+      </event>
+
+      <operator name="add" implicit="true" static="true" access="public">
+        <returns>
+          <type name="A" namespace="My"/>
+        </returns>
+        <parameters>
+          <parameter name="first">
+            <type name="A" namespace="My"/>
+          </parameter>
+          <parameter name="second">
+            <type name="A" namespace="My"/>
+          </parameter>
+        </parameters>
+        <block>
+          <return>
+            <invoke>
+              <method-ref name="Add">
+                <var-ref name="first"/>
+              </method-ref>
+              <arguments>
+                <var-ref name="second"/>
+              </arguments>
+            </invoke>
+          </return>
+        </block>
+      </operator>
+
+      <fixed-size-field name="field">
+        <type name="int"/>
+        <size>
+          <int value="10"/>
+        </size>
+      </fixed-size-field>
+
+      <class name="C"/>
+    </struct>
+
+    <interface name="I" access="public">
+      <method name="A">
+        <parameters>
+          <parameter name="value">
+            <type name="int"/>
+          </parameter>
+        </parameters>
+      </method>
+
+      <property name="Value">
+        <type name="string"/>
+        <get/>
+        <set/>
+      </property>
+    </interface>
+
+    <enum name="E" access="public">
+      <value name="A"/>
+      <value name="B"/>
+      <value name="C"/>
+
+      <pp-if>
+        <pp-condition>
+          <pp-macro name="DEBUG"/>
+        </pp-condition>
+        <pp-then>
+          <value name="D"/>
+        </pp-then>
+      </pp-if>
+    </enum>
+
+    <delegate access="public" name="Delegate">
+      <parameters>
+        <parameter name="P">
+          <type name="object"/>
+        </parameter>
+      </parameters>
+    </delegate>
+
+    <namespace name="Test">
+
+      <using-namespace name="System"/>
+      <using-namespace name="System.Collections"/>
+
+      <class name="List" access="public">
+        <comment doc="true">
+          <summary>
+            Returns a enumerator of powers of a specified number.
+          </summary>
+          <param name="number">A base value.</param>
+          <param name="exponent">Number of iterations.</param>
+          <returns>
+            <see>
+              <meta>
+                <attribute name="cref">
+                  <type name="Object" namespace="System"/>
+                </attribute>
+              </meta>
+            </see>
+            <para>
+              Returns a enumerator <c>NAME</c>.
+            </para>
+            <list>
+              <listheader>Header</listheader>
+              <value>d</value>
+            </list>
+          </returns>
+          <seealso cref="Exception"/>
+          <remarks>
+            <code>
+              <while>
+                <condition>
+                  <lt>
+                    <post-inc>
+                      <var-ref name="counter"/>
+                    </post-inc>
+                    <var-ref name="exponent"/>
+                  </lt>
+                </condition>
+                <block>
+                  <comment>Display powers of 2 up to the exponent 8:</comment>
+                  <expression>
+                    <assign>
+                      <var-ref name="result"/>
+                      <mul>
+                        <var-ref name="result"/>
+                        <var-ref name="number"/>
+                      </mul>
+                    </assign>
+                  </expression>
+
+                  <yield>
+                    <var-ref name="result"/>
+                  </yield>
+                </block>
+              </while>
+              <para>This is a code sample.</para>
+            </code>
+          </remarks>
+        </comment>
+        <method access="public" static="true" name="Power">
+          <returns>
+            <type name="IEnumerable" namespace="System"/>
+          </returns>
+          <parameters>
+            <parameter name="number">
+              <type name="int"/>
+            </parameter>
+            <parameter name="exponent">
+              <type name="int"/>
+            </parameter>
+          </parameters>
+          <block>
+            <var name="counter">
+              <type name="int"/>
+              <initialize>
+                <int value="0"/>
+              </initialize>
+            </var>
+            <var name="result">
+              <type name="int"/>
+              <initialize>
+                <int value="0"/>
+              </initialize>
+            </var>
+
+            <while>
+              <condition>
+                <lt>
+                  <post-inc>
+                    <var-ref name="counter"/>
+                  </post-inc>
+                  <var-ref name="exponent"/>
+                </lt>
+              </condition>
+              <block>
+                <expression>
+                  <assign>
+                    <var-ref name="result"/>
+                    <mul>
+                      <var-ref name="result"/>
+                      <var-ref name="number"/>
+                    </mul>
+                  </assign>
+                </expression>
+
+                <yield>
+                  <var-ref name="result"/>
+                </yield>
+              </block>
+            </while>
+          </block>
+        </method>
+
+        <pp-region name="Entry point">
+          <method static="true" name="Main">
+            <block>
+              <foreach>
+                <comment>Display powers of 2 up to the exponent 8:</comment>
+                <var name="i">
+                  <type name="int"/>
+                  <initialize>
+                    <invoke>
+                      <static-method-ref name="Power"/>
+                      <arguments>
+                        <int value="2"/>
+                        <int value="8"/>
+                      </arguments>
+                    </invoke>
+                  </initialize>
+                </var>
+                <block>
+                  <expression>
+                    <invoke>
+                      <static-method-ref name="Write">
+                        <type name="Console" namespace="System"/>
+                      </static-method-ref>
+                      <arguments>
+                        <string value="{0} "/>
+
+                        <invoke>
+                          <cast>
+                            <anonymous-method>
+                              <block>
+                                <if>
+                                  <condition>
+                                    <eq>
+                                      <var-ref name="i"/>
+                                      <int value="0"/>
+                                    </eq>
+                                  </condition>
+                                  <then>
+                                    <throw>
+                                      <new-object>
+                                        <type name="Exception" namespace="System"/>
+                                      </new-object>
+                                    </throw>
+                                  </then>
+                                </if>
+
+                                <return>
+                                  <var-ref name="i"/>
+                                </return>
+                              </block>
+                            </anonymous-method>
+                            <type name="Func" namespace="System">
+                              <type-arguments>
+                                <type name="int"/>
+                              </type-arguments>
+                            </type>
+                          </cast>
+                        </invoke>
+
+                      </arguments>
+                    </invoke>
+                  </expression>
+                </block>
+              </foreach>
+            </block>
+          </method>
+        </pp-region>
+      </class>
+
+    </namespace>
+
+    <!-- C# 4.0 features. -->
+    <interface access="public" name="Variance">
+      <type-parameters>
+        <type-parameter name="T" variance="in"/>
+        <type-parameter name="P" variance="out"/>
+        <type-parameter name="Q"/>
+      </type-parameters>
+
+      <method name="X">
+        <parameters>
+          <parameter name="t">
+            <type name="T"/>
+          </parameter>
+        </parameters>
+      </method>
+    </interface>
+
+    <class access="public" name="Class1">
+      <method name="Increment">
+        <returns>
+          <type name="int"/>
+        </returns>
+        <parameters>
+          <parameter name="value">
+            <type name="int"/>
+          </parameter>
+          <parameter name="increment">
+            <type name="int"/>
+            <initialize>
+              <int value="1"/>
+            </initialize>
+          </parameter>
+        </parameters>
+        <block>
+          <return>
+            <add>
+              <var-ref name="value"/>
+              <var-ref name="increment"/>
+            </add>
+          </return>
+        </block>
+      </method>
+
+      <method name="Test">
+        <block>
+          <expression>
+            <comment>
+              Regular call.
+            </comment>
+            <invoke>
+              <method-ref name="Increment"/>
+              <arguments>
+                <int value="7"/>
+                <int value="1"/>
+              </arguments>
+            </invoke>
+          </expression>
+
+          <expression>
+            <comment>
+              Call with named parameter.
+            </comment>
+            <invoke>
+              <method-ref name="Increment"/>
+              <arguments>
+                <argument name="value">
+                  <int value="7"/>
+                </argument>
+                <argument name="increment">
+                  <int value="1"/>
+                </argument>
+              </arguments>
+            </invoke>
+          </expression>
+
+          <expression>
+            <comment>
+              Call with default.
+            </comment>
+            <invoke>
+              <method-ref name="Increment"/>
+              <arguments>
+                <int value="7"/>
+              </arguments>
+            </invoke>
+          </expression>
+
+          <var name="v">
+            <type name="dynamic"/>
+
+            <initialize>
+              <invoke>
+                <method-ref name="Increment"/>
+                <arguments>
+                  <int value="7"/>
+                </arguments>
+              </invoke>
+            </initialize>
+          </var>
+        </block>
+      </method>
+      
+      <!-- C# 4.5 features. -->
+      <method name="GetURLContentsAsync" access="private" async="true">
+        <returns>
+          <type name="Task" namespace="System.Threading.Tasks">
+            <type-arguments>
+              <type name="byte" rank="1"/>
+            </type-arguments>
+          </type>
+        </returns>
+        <parameters>
+          <parameter name="url">
+            <type name="string"/>
+          </parameter>
+        </parameters>
+        <block>
+          <var name="content">
+            <initialize>
+              <new-object>
+                <type name="MemoryStream" namespace="System.IO"/>
+              </new-object>
+            </initialize>
+          </var>
+          <var name="request">
+            <initialize>
+              <cast>
+                <invoke>
+                  <static-method-ref name="Create">
+                    <type name="WebRequest" namespace="System.Net"/>
+                  </static-method-ref>
+                  <arguments>
+                    <var-ref name="url"/>
+                  </arguments>
+                </invoke>
+                <type name="HttpWebRequest" namespace="System.Net"/>
+              </cast>
+            </initialize>
+          </var>
+
+          <using>
+            <resource>
+              <var name="response">
+                <initialize>
+                  <await>
+                    <invoke>
+                      <method-ref name="GetResponseAsync">
+                        <var-ref name="request"/>
+                      </method-ref>
+                    </invoke>
+                  </await>
+                </initialize>
+              </var>
+            </resource>
+            <using>
+              <resource>
+                <var name="responseStream">
+                  <initialize>
+                    <invoke>
+                      <method-ref name="GetResponseStream">
+                        <var-ref name="response"/>
+                      </method-ref>
+                    </invoke>
+                  </initialize>
+                </var>
+              </resource>
+              <expression>
+                <await>
+                  <invoke>
+                    <method-ref name="CopyToAsync">
+                      <var-ref name="responseStream"/>
+                    </method-ref>
+                    <arguments>
+                      <var-ref name="content"/>
+                    </arguments>
+                  </invoke>
+                </await>
+              </expression>
+            </using>
+          </using>
+
+          <return>
+            <invoke>
+              <method-ref name="ToArray">
+                <var-ref name="content"/>
+              </method-ref>
+            </invoke>
+          </return>
+        </block>
+      </method>
+    </class>
+  </namespace>
+</unit>

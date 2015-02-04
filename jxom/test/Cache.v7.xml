@@ -1,0 +1,713 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/java-1.5/2008-02-07" package="com.nesterovskyBros.test">
+  <comment>$Id: $</comment>
+  <class name="Cache" access="public">
+    <comment doc="true">
+      <para>An object cache storing objects with expiration.</para>
+      <para/>
+      <para>Note that values are cached until their expiration points. An expiration point is updated after invoke of get() method.</para>
+      <para type="param" name="&lt;K&gt;">a key type.</para>
+      <para type="param" name="&lt;V&gt;">a value type.</para>
+    </comment>
+
+    <type-parameters>
+      <parameter name="K"/>
+      <parameter name="V"/>
+    </type-parameters>
+
+    <class-field static="true" override="final" access="public" name="defaultExpirationInterval">
+      <comment doc="true">Default expiration interval (10 minutes).</comment>
+      <type name="int"/>
+      <initialize>
+        <mul>
+          <mul>
+            <int value="10"/>
+            <int value="60"/>
+          </mul>
+          <int value="1000"/>
+        </mul>
+      </initialize>
+    </class-field>
+
+    <constructor name="Cache" access="public">
+      <comment doc="true">Creates a {@link Cache} instance.</comment>
+      <block>
+        <expression>
+          <assign>
+            <field name="defaultExpiration">
+              <this/>
+            </field>
+            <static-field name="defaultExpirationInterval"/>
+          </assign>
+        </expression>
+      </block>
+    </constructor>
+
+    <constructor name="Cache" access="public">
+      <comment doc="true">
+        <para>Creates a {@link Cache} instance.</para>
+        <para type="param" name="defaultExpiration">a default expiration interval.</para>
+      </comment>
+      <parameters>
+        <parameter name="defaultExpiration">
+          <type name="long"/>
+        </parameter>
+      </parameters>
+      <block>
+        <expression>
+          <assign>
+            <field name="defaultExpiration">
+              <this/>
+            </field>
+            <var name="defaultExpiration"/>
+          </assign>
+        </expression>
+      </block>
+    </constructor>
+
+    <class-method name="get" access="public">
+      <comment doc="true">
+        <para>Gets a cached object for a specified key.</para>
+        <para type="param" name="key">a key of the object.</para>
+        <para type="return">an object for a key, or null if object is not in the cache.</para>
+      </comment>
+      <returns>
+        <type name="V"/>
+      </returns>
+      <parameters>
+        <parameter name="key">
+          <type name="K"/>
+        </parameter>
+      </parameters>
+      <block>
+        <var-decl name="item">
+          <type name="Item"/>
+          <initialize>
+            <invoke name="get">
+              <instance>
+                <field name="cache"/>
+              </instance>
+              <arguments>
+                <var name="key"/>
+              </arguments>
+            </invoke>
+          </initialize>
+        </var-decl>
+
+        <if>
+          <condition>
+            <eq>
+              <var name="item"/>
+              <null/>
+            </eq>
+          </condition>
+          <then>
+            <return>
+              <null/>
+            </return>
+          </then>
+          <else>
+            <expression>
+              <assign>
+                <field name="lastAccess">
+                  <var name="item"/>
+                </field>
+                <static-invoke name="currentTimeMillis">
+                  <type name="System"/>
+                </static-invoke>
+              </assign>
+            </expression>
+
+            <return>
+              <field name="value">
+                <var name="item"/>
+              </field>
+            </return>
+          </else>
+        </if>
+      </block>
+    </class-method>
+
+    <class-method name="put">
+      <comment doc="true">
+        <para>Puts an object into the cache with default value of the sliding expiration.</para>
+        <para type="param" name="key">a key of the object (cannot be null).</para>
+        <para type="param" name="value">value a value to put. If value is null then object corresponding to the specified key is removed from the cache.</para>
+      </comment>
+      <parameters>
+        <parameter name="key">
+          <type name="K"/>
+        </parameter>
+        <parameter name="value">
+          <type name="V"/>
+        </parameter>
+      </parameters>
+      <block>
+        <expression>
+          <invoke name="put">
+            <arguments>
+              <var name="key"/>
+              <var name="value"/>
+              <field name="defaultExpiration"/>
+              <boolean value="true"/>
+            </arguments>
+          </invoke>
+        </expression>
+      </block>
+    </class-method>
+
+    <class-method name="put">
+      <comment doc="true">
+        <para>Puts an object into the cache.</para>
+        <para type="param" name="key">a key of the object (cannot be null).</para>
+        <para type="param" name="value">a value to put. If value is null then object corresponding to the specified key is removed from the cache.</para>
+        <para type="param" name="expiration">expiration an expiration in milliseconds.</para>
+        <para type="param" name="slidingExpiration">true for sliding, and false for absolute expiration.</para>
+      </comment>
+      <parameters>
+        <parameter name="key">
+          <type name="K"/>
+        </parameter>
+        <parameter name="value">
+          <type name="V"/>
+        </parameter>
+        <parameter name="expiration">
+          <type name="long"/>
+        </parameter>
+        <parameter name="slidingExpiration">
+          <type name="boolean"/>
+        </parameter>
+      </parameters>
+      <block>
+        <var-decl name="now">
+          <type name="long"/>
+          <initialize>
+            <static-invoke name="currentTimeMillis">
+              <type name="System"/>
+            </static-invoke>
+          </initialize>
+        </var-decl>
+
+        <if>
+          <condition>
+            <eq>
+              <var name="value"/>
+              <null/>
+            </eq>
+          </condition>
+          <then>
+            <var-decl name="previous">
+              <type name="Item"/>
+              <initialize>
+                <invoke name="remove">
+                  <instance>
+                    <field name="cache"/>
+                  </instance>
+                  <arguments>
+                    <var name="key"/>
+                  </arguments>
+                </invoke>
+              </initialize>
+            </var-decl>
+
+            <if>
+              <condition>
+                <ne>
+                  <var name="previous"/>
+                  <null/>
+                </ne>
+              </condition>
+              <then>
+                <expression>
+                  <assign>
+                    <field name="lastAccess">
+                      <var name="previous"/>
+                    </field>
+                    <sub>
+                      <var name="now"/>
+                      <field name="expiration">
+                        <var name="previous"/>
+                      </field>
+                    </sub>
+                  </assign>
+                </expression>
+              </then>
+            </if>
+          </then>
+          <else>
+            <var-decl name="item">
+              <type name="Item"/>
+              <initialize>
+                <new-object>
+                  <type name="Item"/>
+                </new-object>
+              </initialize>
+            </var-decl>
+            <expression>
+              <assign>
+                <field name="key">
+                  <var name="item"/>
+                </field>
+                <var name="key"/>
+              </assign>
+            </expression>
+            <expression>
+              <assign>
+                <field name="value">
+                  <var name="item"/>
+                </field>
+                <var name="value"/>
+              </assign>
+            </expression>
+            <expression>
+              <assign>
+                <field name="expiration">
+                  <var name="item"/>
+                </field>
+                <var name="expiration"/>
+              </assign>
+            </expression>
+            <expression>
+              <assign>
+                <field name="slidingExpiration">
+                  <var name="item"/>
+                </field>
+                <var name="slidingExpiration"/>
+              </assign>
+            </expression>
+            <expression>
+              <assign>
+                <field name="lastAccess">
+                  <var name="item"/>
+                </field>
+                <var name="now"/>
+              </assign>
+            </expression>
+
+            <var-decl name="previous">
+              <type name="Item"/>
+              <initialize>
+                <invoke name="put">
+                  <instance>
+                    <field name="cache"/>
+                  </instance>
+                  <arguments>
+                    <var name="key"/>
+                    <var name="item"/>
+                  </arguments>
+                </invoke>
+              </initialize>
+            </var-decl>
+
+            <if>
+              <condition>
+                <ne>
+                  <var name="previous"/>
+                  <null/>
+                </ne>
+              </condition>
+              <then>
+                <expression>
+                  <assign>
+                    <field name="lastAccess">
+                      <var name="previous"/>
+                    </field>
+                    <sub>
+                      <var name="now"/>
+                      <field name="expiration">
+                        <var name="previous"/>
+                      </field>
+                    </sub>
+                  </assign>
+                </expression>
+              </then>
+            </if>
+
+            <var-decl name="task">
+              <type name="Task">
+                <argument>
+                  <type name="K"/>
+                </argument>
+                <argument>
+                  <type name="V"/>
+                </argument>
+              </type>
+              <initialize>
+                <new-object>
+                  <type name="Task">
+                    <argument/>
+                  </type>
+                </new-object>
+              </initialize>
+            </var-decl>
+
+            <expression>
+              <assign>
+                <field name="item">
+                  <var name="task"/>
+                </field>
+                <new-object>
+                  <type package="java.lang.ref" name="WeakReference">
+                    <argument/>
+                  </type>
+                  <arguments>
+                    <var name="item"/>
+                  </arguments>
+                </new-object>
+              </assign>
+            </expression>
+
+            <expression>
+              <invoke name="schedule">
+                <instance>
+                  <static-field name="executor"/>
+                </instance>
+                <arguments>
+                  <var name="task"/>
+                  <field name="expiration">
+                    <var name="item"/>
+                  </field>
+                  <static-field name="MILLISECONDS">
+                    <type name="TimeUnit" package="java.util.concurrent"/>
+                  </static-field>
+                </arguments>
+              </invoke>
+            </expression>
+          </else>
+        </if>
+      </block>
+    </class-method>
+
+
+    <class name="Task" access="private" static="true">
+      <comment doc="true">
+        <para>Scheduler task.</para>
+        <para>Note that a {@link Task} does not prevent a {@link Cache} to be collected.</para>
+      </comment>
+      <type-parameters>
+        <parameter name="K"/>
+        <parameter name="V"/>
+      </type-parameters>
+      <implements>
+        <type name="Runnable"/>
+      </implements>
+      <class-field name="item" access="public">
+        <comment doc="true">Item reference.</comment>
+        <type package="java.lang.ref"  name="WeakReference">
+          <argument>
+            <type name="Item">
+              <type name="Cache">
+                <argument>
+                  <type name="K"/>
+                </argument>
+                <argument>
+                  <type name="V"/>
+                </argument>
+              </type>
+            </type>
+          </argument>
+        </type>
+      </class-field>
+
+      <class-method name="run" access="public">
+        <comment doc="true">Invalidates an item.</comment>
+        <block>
+          <var-decl name="item">
+            <type name="Item">
+              <type name="Cache">
+                <argument>
+                  <type name="K"/>
+                </argument>
+                <argument>
+                  <type name="V"/>
+                </argument>
+              </type>
+            </type>
+            <initialize>
+              <invoke name="get">
+                <instance>
+                  <field name="item">
+                    <this/>
+                  </field>
+                </instance>
+              </invoke>
+            </initialize>
+          </var-decl>
+
+          <if>
+            <condition>
+              <ne>
+                <var name="item"/>
+                <null/>
+              </ne>
+            </condition>
+            <then>
+              <var-decl name="now">
+                <type name="long"/>
+                <initialize>
+                  <static-invoke name="currentTimeMillis">
+                    <type name="System"/>
+                  </static-invoke>
+                </initialize>
+              </var-decl>
+              <var-decl name="delta">
+                <type name="long"/>
+                <initialize>
+                  <sub>
+                    <add>
+                      <field name="lastAccess">
+                        <var name="item"/>
+                      </field>
+                      <field name="expiration">
+                        <var name="item"/>
+                      </field>
+                    </add>
+                    <var name="now"/>
+                  </sub>
+                </initialize>
+              </var-decl>
+
+              <if>
+                <condition>
+                  <and>
+                    <field name="slidingExpiration">
+                      <var name="item"/>
+                    </field>
+                    <gt>
+                      <var name="delta"/>
+                      <int value="0"/>
+                    </gt>
+                  </and>
+                </condition>
+                <then>
+                  <expression>
+                    <invoke name="schedule">
+                      <instance>
+                        <static-field name="executor"/>
+                      </instance>
+                      <arguments>
+                        <this/>
+                        <var name="delta"/>
+                        <static-field name="MILLISECONDS">
+                          <type name="TimeUnit" package="java.util.concurrent"/>
+                        </static-field>
+                      </arguments>
+                    </invoke>
+                  </expression>
+                </then>
+                <else>
+                  <expression>
+                    <invoke name="remove">
+                      <instance>
+                        <invoke name="cache">
+                          <instance>
+                            <var name="item"/>
+                          </instance>
+                        </invoke>
+                      </instance>
+                      <arguments>
+                        <field name="key">
+                          <var name="item"/>
+                        </field>
+                        <var name="item"/>
+                      </arguments>
+                    </invoke>
+                  </expression>
+                </else>
+              </if>
+            </then>
+          </if>
+        </block>
+      </class-method>
+    </class>
+
+    <class name="Item" access="private">
+      <comment doc="true">An item of the storage map.</comment>
+
+      <class-method name="cache" access="public">
+        <comment doc="true">
+          <para>Gets the storage map.</para>
+          <para type="return">the storage map.</para>
+        </comment>
+        <returns>
+          <type package="java.util.concurrent" name="ConcurrentHashMap">
+            <argument>
+              <type name="K"/>
+            </argument>
+            <argument>
+              <type name="Item"/>
+            </argument>
+          </type>
+        </returns>
+        <block>
+          <return>
+            <field name="cache"/>
+          </return>
+        </block>
+      </class-method>
+
+      <class-field name="key" access="public">
+        <comment doc="true">Object key.</comment>
+        <type name="K"/>
+      </class-field>
+
+      <class-field name="value" access="public">
+        <comment doc="true">Object itself.</comment>
+        <type name="V"/>
+      </class-field>
+
+      <class-field name="expiration" access="public">
+        <comment doc="true">Expiration interval.</comment>
+        <type name="long"/>
+      </class-field>
+
+      <class-field name="slidingExpiration" access="public">
+        <comment doc="true">
+          true for sliding, and false for absolute expiration.
+        </comment>
+        <type name="boolean"/>
+      </class-field>
+
+      <class-field name="lastAccess" access="public" volatile="true">
+        <comment doc="true">Last access instant.</comment>
+        <type name="long"/>
+      </class-field>
+    </class>
+
+    <class-field name="defaultExpiration" access="private" override="final">
+      <comment doc="true">A default expiration value.</comment>
+      <type name="long"/>
+    </class-field>
+
+    <class-field name="cache" access="private" override="final">
+      <comment doc="true">Objects storage.</comment>
+      <type package="java.util.concurrent" name="ConcurrentHashMap">
+        <argument>
+          <type name="K"/>
+        </argument>
+        <argument>
+          <type name="Item"/>
+        </argument>
+      </type>
+      <initialize>
+        <new-object>
+          <type package="java.util.concurrent" name="ConcurrentHashMap">
+            <argument/>
+          </type>
+        </new-object>
+      </initialize>
+    </class-field>
+
+    <class-field name="executor" access="private" override="final" static="true">
+      <comment doc="true">An executor reference to clean caches.</comment>
+      <type name="ScheduledThreadPoolExecutor" package="java.util.concurrent"/>
+    </class-field>
+
+    <class-initializer static="true">
+      <comment doc="true">Sets up a global executor to clean caches.</comment>
+      <block>
+        <expression>
+          <assign>
+            <static-field name="executor"/>
+            <new-object>
+              <type name="ScheduledThreadPoolExecutor" package="java.util.concurrent"/>
+              <arguments>
+                <int value="1"/>
+                <new-object>
+                  <type name="ThreadFactory" package="java.util.concurrent"/>
+                  <declaration>
+                    <class-method name="newThread" access="public">
+                      <returns>
+                        <type name="Thread"/>
+                      </returns>
+                      <parameters>
+                        <parameter name="target">
+                          <type name="Runnable"/>
+                        </parameter>
+                      </parameters>
+                      <block>
+                        <var-decl name="thread">
+                          <type name="Thread"/>
+                          <initialize>
+                            <new-object>
+                              <type name="Thread"/>
+                              <arguments>
+                                <var name="target"/>
+                                <string value="Cache cleaner"/>
+                              </arguments>
+                            </new-object>
+                          </initialize>
+                        </var-decl>
+
+                        <expression>
+                          <invoke name="setDaemon">
+                            <instance>
+                              <var name="thread"/>
+                            </instance>
+                            <arguments>
+                              <boolean value="true"/>
+                            </arguments>
+                          </invoke>
+                        </expression>
+                        <expression>
+                          <invoke name="setPriority">
+                            <instance>
+                              <var name="thread"/>
+                            </instance>
+                            <arguments>
+                              <static-field name="MAX_PRIORITY">
+                                <type name="Thread"/>
+                              </static-field>
+                            </arguments>
+                          </invoke>
+                        </expression>
+
+                        <return>
+                          <var name="thread"/>
+                        </return>
+                      </block>
+                    </class-method>
+                  </declaration>
+                </new-object>
+              </arguments>
+            </new-object>
+          </assign>
+        </expression>
+
+        <expression>
+          <invoke name="setMaximumPoolSize">
+            <instance>
+              <static-field name="executor"/>
+            </instance>
+            <arguments>
+              <int value="1"/>
+            </arguments>
+          </invoke>
+        </expression>
+        <expression>
+          <invoke name="setKeepAliveTime">
+            <instance>
+              <static-field name="executor"/>
+            </instance>
+            <arguments>
+              <int value="1"/>
+              <static-field name="MINUTES">
+                <type name="TimeUnit" package="java.util.concurrent"/>
+              </static-field>
+            </arguments>
+          </invoke>
+        </expression>
+        <expression>
+          <invoke name="allowCoreThreadTimeOut">
+            <instance>
+              <static-field name="executor"/>
+            </instance>
+            <arguments>
+              <boolean value="true"/>
+            </arguments>
+          </invoke>
+        </expression>
+      </block>
+    </class-initializer>
+  </class>
+</unit>

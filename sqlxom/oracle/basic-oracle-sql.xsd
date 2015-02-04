@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  This xml schema defines simplified schema of
+  the sql oracle statements used.
+
+  $Id$
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://www.bphx.com/basic-sql/2008-12-11/oracle"
+  xmlns:oracle="http://www.bphx.com/basic-sql/2008-12-11/oracle"
+  xmlns:sql="http://www.bphx.com/basic-sql/2008-12-11"
+  targetNamespace="http://www.bphx.com/basic-sql/2008-12-11"
+  elementFormDefault="qualified">
+
+  <xs:import namespace="http://www.bphx.com/basic-sql/2008-12-11/oracle"
+    schemaLocation="oracle-sql-ext.xsd"/>
+
+  <xs:redefine schemaLocation="../basic-sql.xsd">
+    <xs:group name="statement">
+      <xs:choice>
+        <xs:group ref="sql:statement"/>
+        <xs:element ref="oracle:null-statement"/>
+        <xs:element ref="oracle:block"/>
+        <xs:element ref="oracle:if"/>
+        <xs:element ref="oracle:while"/>
+        <xs:element ref="oracle:for"/>
+        <xs:element ref="oracle:goto"/>
+        <xs:element ref="oracle:exit"/>
+        <xs:element ref="oracle:continue"/>
+        <xs:element ref="oracle:return"/>
+        <xs:element ref="oracle:set"/>
+        <xs:element ref="oracle:call"/>
+        <xs:element ref="oracle:open"/>
+        <xs:element ref="oracle:close"/>
+        <xs:element ref="oracle:fetch"/>
+        <xs:element ref="oracle:savepoint"/>
+        <xs:element ref="oracle:commit"/>
+        <xs:element ref="oracle:rollback"/>
+        <xs:element ref="oracle:raise"/>
+        <xs:element ref="oracle:create-procedure"/>
+        <xs:element ref="oracle:create-function"/>
+      </xs:choice>
+    </xs:group>
+
+    <xs:group name="expression">
+      <xs:choice>
+        <xs:group ref="sql:expression"/>
+        <xs:element ref="oracle:true"/>
+        <xs:element ref="oracle:false"/>
+        <xs:element ref="oracle:simple-case"/>
+        <xs:element ref="oracle:search-case"/>
+      </xs:choice>
+    </xs:group>
+  </xs:redefine>
+
+</xs:schema>

@@ -1,0 +1,901 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/java-1.5/2008-02-07">
+  <class name="Unreachable">
+    <!--1. The block that is the body of a constructor, method, instance
+    initializer or static initializer is reachable.-->
+
+    <class-method name="rule1">
+      <block>
+        <comment>Rule 1</comment>
+      </block>
+    </class-method>
+    
+    <!--2. An empty block that is not a switch block can complete normally iff
+    it is reachable. A nonempty block that is not a switch block can
+    complete normally iff the last statement in it can complete normally.
+    The first statement in a nonempty block that is not a switch block is
+    reachable iff the block is reachable. Every other statement S in a
+    nonempty block that is not a switch block is reachable iff the
+    statement preceding S can complete normally.
+
+    3. A local class declaration statement can complete normally iff it is
+    reachable.
+    4. A local variable declaration statement can complete normally iff it is
+    reachable.
+
+    5. An empty statement can complete normally iff it is reachable.
+    -->
+    <class-method name="rule2">
+      <block>
+        <statement>
+          <comment>Rules 2, 3, 4, 5</comment>
+        </statement>
+        
+        <expression>
+          <assign>
+            <var name="i"/>
+            <int value="0"/>
+          </assign>
+        </expression>
+
+        <block>
+          <expression>
+            <assign>
+              <var name="j"/>
+              <int value="0"/>
+            </assign>
+          </expression>
+        </block>
+
+        <return/>
+
+        <var-decl name="k">
+          <type name="int"/>
+          <initialize>
+            <int value="0"/>
+          </initialize>
+        </var-decl>
+
+        <class name="D">
+          <class-field name="f">
+            <type name="int"/>
+          </class-field>
+        </class>
+      </block>
+    </class-method>
+
+    <!--
+    6. A labeled statement can complete normally if at least one of the
+    following is true:
+    The contained statement can complete normally.
+    There is a reachable break statement that exits the labeled statement.
+    The contained statement is reachable iff the labeled statement is reachable.
+
+    7. An expression statement can complete normally iff it is reachable.
+    The if statement, whether or not it has an else part, is handled in an
+    unusual manner.
+    -->
+    <class-method name="rule6">
+      <block>
+        <comment>Rules 6, 7</comment>
+
+        <block label="l1">
+          <if>
+            <condition>
+              <eq>
+                <int value="1"/>
+                <int value="2"/>
+              </eq>
+            </condition>
+            <then>
+              <break destination-label="l1"/>
+            </then>
+            <else>
+              <return/>
+            </else>
+          </if>
+
+          <assert>
+            <condition>
+              <eq>
+                <var name="c"/>
+                <int value="0"/>
+              </eq>
+            </condition>
+          </assert>
+        </block>
+
+        <expression>
+          <assign>
+            <var name="c"/>
+            <int value="0"/>
+          </assign>
+        </expression>
+
+        <block label="l2">
+          <if>
+            <condition>
+              <eq>
+                <var name="a"/>
+                <var name="b"/>
+              </eq>
+            </condition>
+            <then>
+              <throw>
+                <var name="e"/>
+              </throw>
+            </then>
+            <else>
+              <return/>
+            </else>
+          </if>
+        </block>
+
+        <expression>
+          <assign>
+            <var name="c"/>
+            <int value="1"/>
+          </assign>
+        </expression>
+      </block>
+    </class-method>
+
+
+    <!--
+    8. A switch statement can complete normally iff at least one of the
+    following is true:
+    The last statement in the switch block can complete normally.
+    The switch block is empty or contains only switch labels.
+    There is at least one switch label after the last switch
+    block statement group.
+    The switch block does not contain a default label.
+    There is a reachable break statement that exits the switch statement.
+
+    9. A switch block is reachable iff its switch statement is reachable.
+
+    10. A statement in a switch block is reachable iff its switch statement
+    is reachable and at least one of the following is true:
+    It bears a case or default label.
+    There is a statement preceding it in the switch block and that
+    preceding statement can complete normally.
+    -->
+    <class-method name="rule8">
+      <block>
+        <comment>Rules 8, 9, 10</comment>
+
+        <switch>
+          <test>
+            <var name="i"/>
+          </test>
+          <case>
+            <value>
+              <int value="0"/>
+            </value>
+            <block>
+              <return/>
+            </block>
+          </case>
+          <case>
+            <value>
+              <int value="1"/>
+            </value>
+            <block>
+              <throw>
+                <var name="e"/>
+              </throw>
+            </block>
+          </case>
+          <case>
+            <block>
+              <expression>
+                <assign>
+                  <var name="c"/>
+                  <int value="0"/>
+                </assign>
+              </expression>
+            </block>
+          </case>
+        </switch>
+
+        <expression>
+          <assign>
+            <var name="d"/>
+            <int value="0"/>
+          </assign>
+        </expression>
+      </block>
+    </class-method>
+
+    <class-method name="rule8_2">
+      <block>
+        <comment>Rules 8, 9, 10</comment>
+
+        <switch>
+          <test>
+            <var name="i"/>
+          </test>
+          <case>
+            <value>
+              <int value="0"/>
+            </value>
+            <block>
+              <return/>
+            </block>
+          </case>
+          <case>
+            <block>
+              <throw>
+                <var name="e"/>
+              </throw>
+            </block>
+          </case>
+        </switch>
+
+        <expression>
+          <assign>
+            <var name="d"/>
+            <int value="0"/>
+          </assign>
+        </expression>
+      </block>
+    </class-method>
+
+    <class-method name="rule8_3">
+      <block>
+        <comment>Rules 8, 9, 10</comment>
+
+        <switch>
+          <test>
+            <var name="i"/>
+          </test>
+          <case>
+            <value>
+              <int value="0"/>
+            </value>
+            <block>
+              <return/>
+            </block>
+          </case>
+          <case>
+            <value>
+              <int value="1"/>
+            </value>
+            <block>
+              <throw>
+                <var name="e"/>
+              </throw>
+            </block>
+          </case>
+        </switch>
+
+        <expression>
+          <assign>
+            <var name="d"/>
+            <int value="0"/>
+          </assign>
+        </expression>
+      </block>
+    </class-method>
+
+    <class-method name="rule8_4">
+      <block>
+        <comment>Rules 8, 9, 10</comment>
+
+        <switch>
+          <test>
+            <var name="i"/>
+          </test>
+          <case>
+            <value>
+              <int value="0"/>
+            </value>
+            <block>
+              <return/>
+            </block>
+          </case>
+          <case>
+            <value>
+              <int value="1"/>
+            </value>
+            <block>
+              <throw>
+                <var name="e"/>
+              </throw>
+            </block>
+          </case>
+          <case>
+            <block>
+              <if>
+                <condition>
+                  <eq>
+                    <var name="a"/>
+                    <var name="b"/>
+                  </eq>
+                </condition>
+                <then>
+                  <break/>
+                </then>
+              </if>
+              
+              <throw>
+                <var name="e"/>
+              </throw>
+            </block>
+          </case>
+        </switch>
+
+        <expression>
+          <assign>
+            <var name="d"/>
+            <int value="0"/>
+          </assign>
+        </expression>
+      </block>
+    </class-method>
+
+    <!--
+    11. A while statement can complete normally iff at least one of the
+    following is true:
+    The while statement is reachable and the condition expression
+    is not a constant expression with value true.
+    There is a reachable break statement that exits the while statement.
+    The contained statement is reachable iff the while statement is
+    reachable and the condition expression is not a constant expression
+    whose value is false.
+    -->
+    <class-method name="rule11">
+      <block>
+        <comment>Rule 11</comment>
+
+        <while>
+          <condition>
+            <lt>
+              <var name="i"/>
+              <int value="10"/>
+            </lt>
+          </condition>
+          <block>
+            <expression>
+              <add-to>
+                <var name="d"/>
+                <var name="i"/>
+              </add-to>
+            </expression>
+
+            <expression>
+              <inc>
+                <var name="i"/>
+              </inc>
+            </expression>
+          </block>
+        </while>
+
+        <while>
+          <condition>
+            <boolean value="true"/>
+          </condition>
+          <block>
+            <expression>
+              <add-to>
+                <var name="d"/>
+                <var name="i"/>
+              </add-to>
+            </expression>
+
+            <expression>
+              <inc>
+                <var name="i"/>
+              </inc>
+            </expression>
+          </block>
+        </while>
+
+        <expression>
+          <inc>
+            <var name="i"/>
+          </inc>
+        </expression>
+      </block>
+    </class-method>
+
+    <class-method name="rule11_2">
+      <block>
+        <comment>Rule 11</comment>
+
+        <while>
+          <condition>
+            <boolean value="true"/>
+          </condition>
+          <block>
+            <expression>
+              <add-to>
+                <var name="d"/>
+                <var name="i"/>
+              </add-to>
+            </expression>
+
+            <if>
+              <condition>
+                <invoke name="c"/>
+              </condition>
+              <then>
+                <break/>
+              </then>
+            </if>
+
+            <expression>
+              <inc>
+                <var name="i"/>
+              </inc>
+            </expression>
+          </block>
+        </while>
+
+        <expression>
+          <inc>
+            <var name="i"/>
+          </inc>
+        </expression>
+
+        <while>
+          <condition>
+            <boolean value="true"/>
+          </condition>
+          <block>
+            <expression>
+              <add-to>
+                <var name="d"/>
+                <var name="i"/>
+              </add-to>
+            </expression>
+
+            <if>
+              <condition>
+                <var name="b"/>
+              </condition>
+              <then>
+                <throw>
+                  <var name="e"/>
+                </throw>
+              </then>
+              <else>
+                <return/>
+              </else>
+            </if>
+            
+            <if>
+              <condition>
+                <invoke name="c"/>
+              </condition>
+              <then>
+                <break/>
+              </then>
+            </if>
+
+            <expression>
+              <inc>
+                <var name="i"/>
+              </inc>
+            </expression>
+          </block>
+        </while>
+
+        <expression>
+          <inc>
+            <var name="i"/>
+          </inc>
+        </expression>
+      </block>
+    </class-method>
+
+    <class-method name="rule11_3">
+      <block>
+        <comment>Rule 11</comment>
+
+        <while>
+          <condition>
+            <boolean value="false"/>
+          </condition>
+          <block>
+            <expression>
+              <add-to>
+                <var name="d"/>
+                <var name="i"/>
+              </add-to>
+            </expression>
+
+            <expression>
+              <inc>
+                <var name="i"/>
+              </inc>
+            </expression>
+          </block>
+        </while>
+
+        <while>
+          <condition>
+            <boolean value="true"/>
+          </condition>
+          <block>
+            <expression>
+              <add-to>
+                <var name="d"/>
+                <var name="i"/>
+              </add-to>
+            </expression>
+
+            <expression>
+              <inc>
+                <var name="i"/>
+              </inc>
+            </expression>
+          </block>
+        </while>
+
+        <expression>
+          <inc>
+            <var name="i"/>
+          </inc>
+        </expression>
+      </block>
+    </class-method>
+
+    <!--
+    12. A do statement can complete normally iff at least one of the
+    following is true:
+    The contained statement can complete normally and the condition
+    expression is not a constant expression with value true.
+    The do statement contains a reachable continue statement with no label,
+    and the do statement is the innermost while, do, or for statement that
+    contains that continue statement, and the condition expression is not
+    a constant expression with value true.
+    The do statement contains a reachable continue statement with a label
+    L, and the do statement has label L, and the condition expression is
+    not a constant expression with value true.
+    There is a reachable break statement that exits the do statement.
+    The contained statement is reachable iff the do statement is reachable.
+    -->
+    <class-method name="rule12">
+      <block>
+        <comment>Rule 12</comment>
+
+        <do-while>
+          <condition>
+            <ne>
+              <var name="a"/>
+              <var name="b"/>
+            </ne>
+          </condition>
+          <block>
+            <expression>
+              <add-to>
+                <var name="d"/>
+                <var name="i"/>
+              </add-to>
+            </expression>
+
+            <expression>
+              <inc>
+                <var name="i"/>
+              </inc>
+            </expression>
+          </block>
+        </do-while>
+
+        <expression>
+          <inc>
+            <var name="i"/>
+          </inc>
+        </expression>
+
+        <do-while>
+          <condition>
+            <ne>
+              <var name="a"/>
+              <var name="b"/>
+            </ne>
+          </condition>
+          <block>
+            <expression>
+              <add-to>
+                <var name="d"/>
+                <var name="i"/>
+              </add-to>
+            </expression>
+
+            <if>
+              <condition>
+                <var name="b"/>
+              </condition>
+              <then>
+                <return/>
+              </then>
+              <else>
+                <continue/>
+              </else>
+            </if>
+
+            <expression>
+              <inc>
+                <var name="i"/>
+              </inc>
+            </expression>
+          </block>
+        </do-while>
+
+        <expression>
+          <inc>
+            <var name="i"/>
+          </inc>
+        </expression>
+
+        <do-while>
+          <condition>
+            <ne>
+              <var name="a"/>
+              <var name="b"/>
+            </ne>
+          </condition>
+          <block>
+            <expression>
+              <add-to>
+                <var name="d"/>
+                <var name="i"/>
+              </add-to>
+            </expression>
+
+            <if>
+              <condition>
+                <var name="b"/>
+              </condition>
+              <then>
+                <return/>
+              </then>
+              <else>
+                <break/>
+              </else>
+            </if>
+
+            <expression>
+              <inc>
+                <var name="i"/>
+              </inc>
+            </expression>
+          </block>
+        </do-while>
+
+        <expression>
+          <inc>
+            <var name="i"/>
+          </inc>
+        </expression>
+
+        <do-while>
+          <condition>
+            <boolean value="true"/>
+          </condition>
+          <block>
+            <expression>
+              <add-to>
+                <var name="d"/>
+                <var name="i"/>
+              </add-to>
+            </expression>
+
+            <if>
+              <condition>
+                <var name="b"/>
+              </condition>
+              <then>
+                <return/>
+              </then>
+              <else>
+                <continue/>
+              </else>
+            </if>
+          </block>
+        </do-while>
+
+        <expression>
+          <inc>
+            <var name="i"/>
+          </inc>
+        </expression>
+      </block>
+    </class-method>
+
+    <!--
+    13. A for statement can complete normally iff at least one of the
+    following is true:
+    The for statement is reachable, there is a condition expression, and
+    the condition expression is not a constant expression with value true.
+    There is a reachable break statement that exits the for statement.
+    The contained statement is reachable iff the for statement is reachable
+    and the condition expression is not a constant expression whose value
+    is false.
+
+    14. A break, continue, return, or throw statement cannot complete
+    normally.
+
+    15. A synchronized statement can complete normally iff the contained
+    statement can complete normally. The contained statement is reachable
+    iff the synchronized statement is reachable.
+    -->
+    <class-method name="rule13">
+      <block>
+        <comment>Rules 13, 14, 15</comment>
+
+        <for>
+          <var-decl name="i">
+            <type name="int"/>
+            <initialize>
+              <int value="0"/>
+            </initialize>
+          </var-decl>
+          <condition>
+            <lt>
+              <var name="i"/>
+              <int value="10"/>
+            </lt>
+          </condition>
+          <update>
+            <inc>
+              <var name="i"/>
+            </inc>
+          </update>
+          <block>
+            <expression>
+              <invoke name="m"/>
+            </expression>
+          </block>
+        </for>
+
+        <for>
+          <var-decl name="i">
+            <type name="int"/>
+            <initialize>
+              <int value="0"/>
+            </initialize>
+          </var-decl>
+          <condition>
+            <boolean value="false"/>
+          </condition>
+          <update>
+            <inc>
+              <var name="i"/>
+            </inc>
+          </update>
+          <block>
+            <expression>
+              <invoke name="m"/>
+            </expression>
+          </block>
+        </for>
+
+        <for>
+          <var-decl name="i">
+            <type name="int"/>
+            <initialize>
+              <int value="0"/>
+            </initialize>
+          </var-decl>
+          <condition>
+            <boolean value="true"/>
+          </condition>
+          <update>
+            <inc>
+              <var name="i"/>
+            </inc>
+          </update>
+          <block>
+            <synchronized>
+              <monitor>
+                <var name="sync"/> 
+              </monitor>
+              <block>
+                <expression>
+                  <invoke name="s"/>
+                </expression>
+
+                <return/>
+              </block>
+            </synchronized>
+            
+            <expression>
+              <invoke name="m"/>
+            </expression>
+          </block>
+        </for>
+
+
+        <expression>
+          <inc>
+            <var name="i"/>
+          </inc>
+        </expression>
+      </block>
+    </class-method>
+
+    <!--
+    16. A try statement can complete normally iff both of the following are
+    true:
+    The try block can complete normally or any catch block can complete
+    normally.
+    If the try statement has a finally block, then the finally block
+    can complete normally.
+    The try block is reachable iff the try statement is reachable.
+
+    17. A catch block C is reachable iff both of the following are true:
+    Some expression or throw statement in the try block is reachable and
+    can throw an exception whose type is assignable to the parameter of
+    the catch clause C. (An expression is considered reachable iff the
+    innermost statement containing it is reachable.)
+    There is no earlier catch block A in the try statement such that
+    the type of C's parameter is the same as or a subclass of the type
+    of A's parameter.
+    If a finally block is present, it is reachable iff the try statement
+    is reachable.-->
+    <class-method name="rule16">
+      <block>
+        <comment>Rules 16, 17</comment>
+
+        <try>
+          <block/>
+          <finally>
+            <expression>
+              <inc>
+                <var name="i"/>
+              </inc>
+            </expression>
+          </finally>
+        </try>
+
+        <try>
+          <block/>
+          <catch>
+            <parameter name="e">
+              <type name="Exception"/>
+            </parameter>
+            <block>
+              <expression>
+                <inc>
+                  <var name="i"/>
+                </inc>
+              </expression>
+            </block>
+          </catch>
+        </try>
+
+        <try>
+          <block>
+            <expression>
+              <invoke name="m"/>
+            </expression>
+            
+            <return/>
+          </block>
+          <catch>
+            <parameter name="e">
+              <type name="Exception"/>
+            </parameter>
+            <block>
+              <expression>
+                <inc>
+                  <var name="i"/>
+                </inc>
+              </expression>
+            </block>
+          </catch>
+        </try>
+
+        <expression>
+          <inc>
+            <var name="i"/>
+          </inc>
+        </expression>
+      </block>
+    </class-method>
+
+
+  </class>
+</unit>

@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/java-1.5/2008-02-07">
+  <class name="NormalizeNames">
+    <class-method name="test">
+      <block>
+        <try>
+          <resource>
+            <var-decl name="iterator" name-id="d4364.iterator">
+              <type name="ResultIterator" package="com.bphx.cool"/>
+              <initialize>
+                <invoke name="readAltEntgeltKategorie" name-ref="d4364.method-name">
+                  <meta/>
+                </invoke>
+              </initialize>
+            </var-decl>
+          </resource>
+          <block>
+            <for-each>
+              <var-decl name="item" name-id="d4364.item">
+                <type name="boolean"/>
+                <initialize>
+                  <var name="iterator" name-ref="d4364.iterator"/>
+                </initialize>
+              </var-decl>
+              <block>
+                <try>
+                  <resource>
+                    <var-decl name="iterator" name-id="d4513.iterator">
+                      <type name="ResultIterator" package="com.bphx.cool"/>
+                      <initialize>
+                        <invoke name="readTarifVorschrift4" name-ref="d4513.method-name">
+                          <meta/>
+                        </invoke>
+                      </initialize>
+                    </var-decl>
+                  </resource>
+                  <block>
+                    <for-each>
+                      <var-decl name="item" name-id="d4513.item">
+                        <type name="boolean"/>
+                        <initialize>
+                          <var name="iterator" name-ref="d4513.iterator"/>
+                        </initialize>
+                      </var-decl>
+                      <block>
+                        <expression>
+                          <invoke name="transferTarifVorschrift1" name-ref="d4727.method-name">
+                            <meta/>
+                          </invoke>
+                        </expression>
+                        <expression>
+                          <assign>
+                            <var name="x"/>
+                            <var name="item" name-ref="d4513.item"/>
+                          </assign>
+                        </expression>
+                      </block>
+                    </for-each>
+                  </block>
+                </try>
+              </block>
+            </for-each>
+          </block>
+        </try>
+      </block>
+    </class-method>
+  </class>
+</unit>

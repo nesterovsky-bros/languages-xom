@@ -1,0 +1,932 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  This xml schema defines simplified schema of
+  the basic sql statements.
+
+  $Id$
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://www.bphx.com/basic-sql/2008-12-11"
+  targetNamespace="http://www.bphx.com/basic-sql/2008-12-11"
+  elementFormDefault="qualified">
+
+  <xs:element name="meta" type="meta"/>
+
+  <xs:complexType name="meta" mixed="true">
+    <xs:annotation>
+      <xs:documentation>
+        Meta information, allowing to attach custom information to any element.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:any namespace="##any" processContents="skip"
+        minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:anyAttribute processContents="skip"/>
+  </xs:complexType>
+
+  <xs:element name="comment" type="comment"/>
+
+  <xs:complexType name="comment" mixed="true">
+    <xs:annotation>
+      <xs:documentation>
+        Comment. It can be attached to most elements.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:any processContents="skip"/>
+    </xs:sequence>
+    <xs:anyAttribute processContents="skip"/>
+  </xs:complexType>
+
+  <xs:complexType name="sql-element" abstract="true">
+    <xs:annotation>
+      <xs:documentation>
+        Base element of the sql object model.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="meta"/>
+        <xs:element ref="comment"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:anyAttribute processContents="skip"/>
+  </xs:complexType>
+
+  <!-- Statements. -->
+  <xs:group name="query">
+    <xs:choice>
+      <xs:group ref="query-without-values"/>
+      <xs:element ref="values"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="query-without-values">
+    <xs:choice>
+      <xs:element ref="select"/>
+      <xs:element ref="union"/>
+      <xs:element ref="intersect"/>
+      <xs:element ref="except"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="subquery">
+    <xs:choice>
+      <xs:element name="select" type="subselect-statement"/>
+      <xs:element name="union" type="binary-set-operator"/>
+      <xs:element name="intersect" type="binary-set-operator"/>
+      <xs:element name="except" type="binary-set-operator"/>
+      <xs:element name="values" type="values-statement"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="statement">
+    <xs:choice>
+      <xs:group ref="query"/>
+      <xs:element ref="insert"/>
+      <xs:element ref="update"/>
+      <xs:element ref="delete"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:element name="select" type="select-statement"/>
+  <xs:element name="union" type="full-binary-set-operator"/>
+  <xs:element name="intersect" type="full-binary-set-operator"/>
+  <xs:element name="except" type="full-binary-set-operator"/>
+  <xs:element name="values" type="full-values-statement"/>
+
+  <xs:element name="insert" type="insert-statement"/>
+  <xs:element name="update" type="update-statement"/>
+  <xs:element name="delete" type="delete-statement"/>
+
+  <!-- Expressions. -->
+  <xs:group name="expression">
+    <xs:choice>
+      <xs:element ref="add"/>
+      <xs:element ref="sub"/>
+      <xs:element ref="mul"/>
+      <xs:element ref="div"/>
+      <xs:element ref="neg"/>
+      <xs:element ref="parens"/>
+      <xs:element ref="null"/>
+      <xs:element ref="default"/>
+      <xs:element ref="host-expression"/>
+      <xs:element ref="string"/>
+      <xs:element ref="number"/>
+      <xs:element ref="var"/>
+      <xs:element ref="field"/>
+      <xs:element ref="min"/>
+      <xs:element ref="max"/>
+      <xs:element ref="avg"/>
+      <xs:element ref="count"/>
+      <xs:element ref="sum"/>
+      <xs:element ref="aggregate-function"/>
+      <xs:element ref="ranking-function"/>
+      <xs:element ref="analytic-function"/>
+      <xs:element ref="function"/>
+      <xs:element ref="cast"/>
+      <xs:element ref="or"/>
+      <xs:element ref="and"/>
+      <xs:element ref="not"/>
+      <xs:element ref="eq"/>
+      <xs:element ref="ne"/>
+      <xs:element ref="gt"/>
+      <xs:element ref="lt"/>
+      <xs:element ref="le"/>
+      <xs:element ref="ge"/>
+      <xs:element ref="like"/>
+      <xs:element ref="between"/>
+      <xs:element ref="in"/>
+      <xs:element ref="exists"/>
+      <xs:element ref="is-null"/>
+    </xs:choice>
+  </xs:group>
+  
+  <xs:group name="literal">
+    <xs:choice>
+      <xs:element ref="string"/>
+      <xs:element ref="number"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="literal-or-null">
+    <xs:choice>
+      <xs:group ref="literal"/>
+      <xs:element ref="null"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="var-or-host">
+    <xs:choice>
+      <xs:element ref="var"/>
+      <xs:element ref="host-expression"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="var-or-literal">
+    <xs:choice>
+      <xs:element ref="var"/>
+      <xs:group ref="literal"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="var-or-literal-or-null">
+    <xs:choice>
+      <xs:element ref="var"/>
+      <xs:group ref="literal-or-null"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:element name="add" type="binary-expression"/>
+  <xs:element name="sub" type="binary-expression"/>
+  <xs:element name="mul" type="binary-expression"/>
+  <xs:element name="div" type="binary-expression"/>
+  <xs:element name="neg" type="unary-expression"/>
+  <xs:element name="parens" type="unary-expression"/>
+  <xs:element name="null" type="expression"/>
+  <xs:element name="default" type="expression"/>
+  <xs:element name="host-expression" type="host-expression"/>
+  <xs:element name="string" type="string-literal-expression"/>
+  <xs:element name="number" type="literal-expression"/>
+  <xs:element name="var" type="var-expression"/>
+  <xs:element name="field" type="field-expression"/>
+  <xs:element name="min" type="aggregate-expression"/>
+  <xs:element name="max" type="aggregate-expression"/>
+  <xs:element name="avg" type="aggregate-expression"/>
+  <xs:element name="count" type="aggregate-expression"/>
+  <xs:element name="sum" type="aggregate-expression"/>
+  <xs:element name="aggregate-function" type="aggregate-expression"/>
+  <xs:element name="ranking-function" type="aggregate-expression"/>
+  <xs:element name="analytic-function" type="aggregate-expression"/>
+  <xs:element name="function" type="function-call-expression"/>
+  <xs:element name="cast" type="cast-expression"/>
+  <xs:element name="or" type="binary-expression"/>
+  <xs:element name="and" type="binary-expression"/>
+  <xs:element name="not" type="unary-expression"/>
+  <xs:element name="eq" type="binary-expression"/>
+  <xs:element name="ne" type="binary-expression"/>
+  <xs:element name="gt" type="binary-expression"/>
+  <xs:element name="lt" type="binary-expression"/>
+  <xs:element name="le" type="binary-expression"/>
+  <xs:element name="ge" type="binary-expression"/>
+  <xs:element name="like" type="binary-expression"/>
+  <xs:element name="between" type="between-expression"/>
+  <xs:element name="in" type="in-expression"/>
+  <xs:element name="exists" type="exists-expression"/>
+  <xs:element name="is-null" type="unary-expression"/>
+
+  <!--Type. -->
+  
+  <xs:group name="type">
+    <xs:sequence>
+      <xs:element ref="type"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="type" type="type"/>
+
+  <!-- Table sources. -->
+  <xs:group name="source">
+    <xs:choice>
+      <xs:element name="table" type="table-source"/>
+      <xs:element name="derived" type="derived-source"/>
+      <xs:element name="function-table" type="function-source"/>
+      <xs:group ref="join"/>
+    </xs:choice>
+  </xs:group>
+  
+  <!-- Statement types. -->
+  <xs:complexType name="common-table-expression">
+    <xs:complexContent>
+      <xs:extension base="sql-element">
+        <xs:sequence>
+          <xs:element name="source" type="source"/>
+          <xs:group ref="subquery"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="statement">
+    <xs:complexContent>
+      <xs:extension base="sql-element"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="with-clause">
+    <xs:sequence>
+      <xs:element name="with" type="common-table-expression"
+        minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="binary-set-operator">
+    <xs:sequence>
+      <xs:group ref="subquery" minOccurs="2" maxOccurs="2"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="full-binary-set-operator">
+    <xs:sequence>
+      <xs:group ref="with-clause"/>
+      <xs:group ref="subquery" minOccurs="2" maxOccurs="2"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:attributeGroup name="binary-set-operator-attributes">
+    <xs:attribute name="all" type="xs:boolean" default="false" use="optional"/>
+  </xs:attributeGroup>
+
+  <xs:complexType name="binary-set-operator">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:group ref="binary-set-operator"/>
+        <xs:attributeGroup ref="binary-set-operator-attributes"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="full-binary-set-operator">
+    <xs:complexContent>
+      <xs:extension base="select-statement">
+        <xs:group ref="full-binary-set-operator"/>
+        <xs:attributeGroup ref="binary-set-operator-attributes"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="values-statement">
+    <xs:choice>
+      <xs:group ref="expression" maxOccurs="unbounded"/>
+      <xs:element name="row" type="expression-list" maxOccurs="unbounded"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="full-values-statement">
+    <xs:sequence>
+      <xs:group ref="with-clause"/>
+      <xs:group ref="values-statement"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:complexType name="values-statement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:group ref="values-statement"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="full-values-statement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:group ref="full-values-statement"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="from-clause">
+    <xs:complexContent>
+      <xs:extension base="sql-element">
+        <xs:group ref="source" maxOccurs="unbounded"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="from-clause">
+    <xs:sequence>
+      <xs:element name="from" type="from-clause"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="select-column-clause">
+    <xs:sequence>
+      <xs:element name="column" type="select-column-clause"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:complexType name="select-column-clause">
+    <xs:complexContent>
+      <xs:extension base="sql-element">
+        <xs:group ref="expression" minOccurs="0"/>
+        <xs:attribute name="wildcard" type="xs:boolean"
+          use="optional" default="false"/>
+        <xs:attribute name="alias" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="subselect-clauses">
+    <xs:sequence>
+      <xs:group ref="select-column-clause" maxOccurs="unbounded"/>
+      <xs:element ref="into" minOccurs="0"/>
+      <xs:group ref="from-clause" minOccurs="0"/>
+      <xs:element name="where" type="unary-expression" minOccurs="0"/>
+      <xs:element name="group-by" type="expression-list" minOccurs="0"/>
+      <xs:element name="having" type="unary-expression" minOccurs="0"/>
+      <xs:element name="order-by" type="order-by-clause" minOccurs="0"/>
+    </xs:sequence>    
+  </xs:group>
+
+  <xs:group name="select-clauses">
+    <xs:sequence>
+      <xs:group ref="with-clause"/>
+      <xs:group ref="subselect-clauses"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:attributeGroup name="select-attributes">
+    <xs:attribute name="specification" type="query-specification"
+      use="optional" default="all"/>
+  </xs:attributeGroup>
+  
+  <xs:complexType name="subselect-statement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:group ref="subselect-clauses"/>
+        <xs:attributeGroup ref="select-attributes"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="select-statement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:group ref="select-clauses"/>
+        <xs:attributeGroup ref="select-attributes"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="into">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="sql-element">
+          <xs:group ref="var-or-host" maxOccurs="unbounded"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="full-insert-clauses">
+    <xs:sequence>
+      <xs:group ref="with-clause"/>
+      <xs:group ref="insert-clauses"/>
+    </xs:sequence>    
+  </xs:group>
+
+  <xs:group name="insert-clauses">
+    <xs:sequence>
+      <xs:group ref="source"/>
+      <xs:group ref="subquery"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:complexType name="insert-statement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:group ref="full-insert-clauses"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="set-column-clause">
+    <xs:complexContent>
+      <xs:extension base="sql-element">
+        <xs:sequence>
+          <xs:element ref="field"/>
+          <xs:group ref="expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="update-set-clause">
+    <xs:sequence>
+      <xs:element name="set" type="set-column-clause"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="full-update-clauses">
+    <xs:sequence>
+      <xs:group ref="with-clause"/>
+      <xs:group ref="update-clauses"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="update-clauses">
+    <xs:sequence>
+      <xs:group ref="source"/>
+      <xs:group ref="update-set-clause" minOccurs="1" maxOccurs="unbounded"/>
+      <xs:element name="where" type="unary-expression" minOccurs="0"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:complexType name="update-statement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:group ref="full-update-clauses"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="full-delete-clauses">
+    <xs:sequence>
+      <xs:group ref="with-clause"/>
+      <xs:group ref="delete-clauses"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="delete-clauses">
+    <xs:sequence>
+      <xs:group ref="source"/>
+      <xs:element name="where" type="unary-expression" minOccurs="0"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:complexType name="delete-statement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:group ref="full-delete-clauses"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Expressions. -->
+
+  <xs:complexType name="expression">
+    <xs:complexContent>
+      <xs:extension base="sql-element"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="literal-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:attribute name="value" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="string-literal-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:attribute name="value" type="xs:string" use="optional"/>
+        <xs:attribute name="binary" type="xs:boolean" use="optional" default="false"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="unary-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:group ref="expression"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="binary-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:group ref="expression" minOccurs="2" maxOccurs="2"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="expression-list">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:group ref="expression" maxOccurs="unbounded"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="between-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:element name="value" type="unary-expression"/>
+          <xs:element name="range" type="binary-expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="in-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:element name="value" type="unary-expression"/>
+          <xs:choice>
+            <xs:element name="range" type="expression-list"/>
+            <xs:group ref="subquery"/>
+          </xs:choice>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="exists-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:group ref="subquery"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="host-expression-base">
+    <xs:complexContent>
+      <xs:restriction base="expression">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element ref="meta"/>
+            <xs:element ref="comment"/>
+          </xs:choice>
+        </xs:sequence>
+        <xs:anyAttribute processContents="skip"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="host-expression">
+    <xs:complexContent>
+      <xs:extension base="host-expression-base">
+        <xs:sequence>
+          <xs:any namespace="##other" processContents="skip"
+            minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="var-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="field-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:group ref="source-ref" minOccurs="0"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="aggregate-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:group ref="expression" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:group ref="over-clause" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="wildcard" type="xs:boolean"
+          use="optional" default="false"/>
+        <xs:attribute name="specification" type="query-specification"
+          use="optional" default="all"/>
+        <xs:attribute name="name" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="function-call-expression">
+    <xs:complexContent>
+      <xs:extension base="expression-list">
+        <xs:attribute name="name" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:group name="cast">
+    <xs:sequence>
+      <xs:element name="value" type="unary-expression"/>
+      <xs:group ref="type"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:attributeGroup name="cast-attributes"/>
+
+  <xs:complexType name="cast-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:group ref="cast"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:attributeGroup name="type-attributes">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="precision" type="xs:int" use="optional"/>
+    <xs:attribute name="scale" type="xs:int" use="optional"/>
+  </xs:attributeGroup>
+
+  <xs:complexType name="type">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:attributeGroup ref="type-attributes"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="order-by-clause">
+    <xs:complexContent>
+      <xs:extension base="sql-element">
+        <xs:sequence>
+          <xs:choice maxOccurs="unbounded">
+            <xs:element name="ascending" type="unary-expression"/>
+            <xs:element name="descending" type="unary-expression"/>
+          </xs:choice>
+
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element name="offset" type="unary-expression"/>
+            <xs:element name="fetch" type="unary-expression" minOccurs="0"/>
+          </xs:sequence>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:complexType name="over-clause">
+    <xs:complexContent>
+      <xs:extension base="sql-element">
+        <xs:sequence>
+          <xs:element name="partition-by" type="expression-list"
+            minOccurs="0"/>
+          <xs:element name="order-by" type="order-by-clause" minOccurs="0"/>
+          <xs:choice minOccurs="0">
+            <xs:element name="rows" type="rows-or-range-clause"/>
+            <xs:element name="range" type="rows-or-range-clause"/>
+          </xs:choice>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:group name="over-clause">
+    <xs:sequence>
+      <xs:element name="over" type="over-clause"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:complexType name="window-frame">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+<window frame preceding> ::= 
+{
+    UNBOUNDED PRECEDING
+  | <unsigned_value_specification> PRECEDING
+  | CURRENT ROW
+}
+
+<window frame following> ::= 
+{
+    UNBOUNDED FOLLOWING
+  | <unsigned_value_specification> FOLLOWING
+  | CURRENT ROW
+}
+
+<unsigned value specification> ::= 
+{  <unsigned integer literal> }-->
+      ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="sql-element">
+        <xs:choice>
+          <xs:element name="unbounded" type="sql-element"/>
+          <xs:element name="current-row" type="sql-element"/>
+          <xs:element ref="number"/>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="rows-or-range-clause">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+<ROW or RANGE clause> ::=
+{ ROWS | RANGE } <window frame extent>
+
+<window frame extent> ::= 
+{   <window frame preceding>
+  | <window frame between>
+}
+      ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="sql-element">
+        <xs:choice>
+          <xs:element name="preceding" type="window-frame"/>
+          <xs:element name="between">
+            <xs:complexType>
+              <xs:annotation>
+                <xs:documentation>
+        <![CDATA[
+<window frame between> ::= 
+  BETWEEN <window frame bound> AND <window frame bound>
+
+<window frame bound> ::= 
+{   <window frame preceding>
+  | <window frame following>
+}
+      ]]>
+                </xs:documentation>
+              </xs:annotation>
+              <xs:complexContent>
+                <xs:extension base="sql-element">
+                  <xs:choice minOccurs="2" maxOccurs="2">
+                    <xs:element name="preceding" type="window-frame"/>
+                    <xs:element name="following" type="window-frame"/>
+                  </xs:choice>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Sources. -->
+
+  <xs:group name="source-ref">
+    <xs:choice>
+      <xs:element name="source" type="source-ref"/>
+      <xs:element name="qualified-source" type="qualified-source-ref"/>
+    </xs:choice>
+  </xs:group>
+  
+  <xs:complexType name="source-ref">
+    <xs:complexContent>
+      <xs:extension base="sql-element">
+        <xs:attribute name="alias" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="qualified-source-ref">
+    <xs:complexContent>
+      <xs:extension base="sql-element">
+        <xs:attributeGroup ref="qualified-name"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:complexType name="column">
+    <xs:complexContent>
+      <xs:extension base="sql-element">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:group name="column">
+    <xs:sequence>
+      <xs:element name="column" type="column"/>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:complexType name="source">
+    <xs:complexContent>
+      <xs:extension base="source-ref">
+        <xs:group ref="column" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:attributeGroup name="qualified-name">
+    <xs:attribute name="database" type="xs:string" use="optional"/>
+    <xs:attribute name="schema" type="xs:string" use="optional"/>
+    <xs:attribute name="owner" type="xs:string" use="optional"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:attributeGroup>
+
+  <xs:complexType name="table-source">
+    <xs:complexContent>
+      <xs:extension base="source">
+        <xs:attributeGroup ref="qualified-name"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="derived-source">
+    <xs:complexContent>
+      <xs:extension base="source">
+        <xs:group ref="subquery"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="join-clauses">
+    <xs:sequence>
+      <xs:group ref="source" minOccurs="2" maxOccurs="2"/>
+      <xs:element name="on" type="unary-expression" minOccurs="0"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:attributeGroup name="join-attributes"/>
+
+  <xs:group name="cross-join-clauses">
+    <xs:sequence>
+      <xs:group ref="source" minOccurs="2" maxOccurs="2"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:attributeGroup name="cross-join-attributes"/>
+  
+  <xs:group name="join">
+    <xs:choice>
+      <xs:element name="join" type="join-source"/>
+      <xs:element name="inner-join" type="join-source"/>
+      <xs:element name="left-join" type="join-source"/>
+      <xs:element name="right-join" type="join-source"/>
+      <xs:element name="full-join" type="join-source"/>
+      <xs:element name="cross-join" type="cross-join-source"/>
+      <xs:element name="cross-apply" type="cross-join-source"/>
+      <xs:element name="outer-apply" type="cross-join-source"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="join-source">
+    <xs:complexContent>
+      <xs:extension base="source">
+        <xs:group ref="join-clauses"/>
+        <xs:attributeGroup ref="join-attributes"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="cross-join-source">
+    <xs:complexContent>
+      <xs:extension base="source">
+        <xs:group ref="cross-join-clauses"/>
+        <xs:attributeGroup ref="cross-join-attributes"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="function-source">
+    <xs:complexContent>
+      <xs:extension base="source">
+        <xs:sequence>
+          <xs:element ref="function"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="query-specification">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="all"/>
+      <xs:enumeration value="distinct"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

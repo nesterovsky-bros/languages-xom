@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<db2:scope
+  xmlns:db2="http://www.bphx.com/basic-sql/2008-12-11/db2"
+  xmlns:sql="http://www.bphx.com/basic-sql/2008-12-11">
+
+  <sql:select>
+    <sql:with>
+      <sql:source alias="T">
+        <sql:column name="A"/>
+        <sql:column name="B"/>
+        <sql:column name="C"/>
+      </sql:source>
+
+      <sql:select>
+        <sql:column>
+          <sql:analytic-function name="row_number">
+            <sql:over>
+              <sql:order-by>
+                <sql:ascending>
+                  <sql:number value="1"/>
+                </sql:ascending>
+              </sql:order-by>
+            </sql:over>
+          </sql:analytic-function>
+        </sql:column>
+        <sql:column>
+          <sql:number value="2"/>
+        </sql:column>
+        <sql:column>
+          <sql:number value="3"/>
+        </sql:column>
+        <sql:from>
+          <sql:table name="D"/>
+        </sql:from>
+        <sql:where>
+          <sql:eq>
+            <sql:field name="E"/>
+            <sql:number value="7"/>
+          </sql:eq>
+        </sql:where>
+      </sql:select>
+    </sql:with>
+
+    <sql:column wildcard="true"/>
+
+    <sql:from>
+      <sql:table name="T"/>
+    </sql:from>
+
+    <db2:fetch-first rows="10"/>
+  </sql:select>
+</db2:scope>

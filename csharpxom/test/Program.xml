@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/csharp-3.0/2009-05-23">
+  <using-namespace name="System"/>
+  <using-namespace name="System.Collections.Generic"/>
+  <using-namespace name="System.Linq"/>
+  <using-namespace name="System.Text"/>
+  <using-namespace name="ConsoleApplication2.Test"/>
+
+  <namespace name="ConsoleApplication2">
+    <comment>
+      <summary>This is a test program calling a web service.</summary>
+    </comment>
+    <class name="Program">
+      <pp-region name="Entry point">
+        <method static="true" name="Main">
+          <parameters>
+            <parameter name="args">
+              <type name="string" rank="1"/>
+            </parameter>
+          </parameters>
+          <block>
+            <var name="service">
+              <type name="TestWebServiceClient"/>
+              <initialize>
+                <new-object>
+                  <type name="TestWebServiceClient"/>
+                </new-object>
+              </initialize>
+            </var>
+
+            <var name="global">
+              <type name="global"/>
+              <initialize>
+                <new-object>
+                  <type name="global"/>
+                </new-object>
+              </initialize>
+            </var>
+
+            <var name="export">
+              <type name="export"/>
+              <initialize>
+                <new-object>
+                  <type name="export"/>
+                </new-object>
+              </initialize>
+            </var>
+
+            <expression>
+              <assign>
+                <property-ref name="userId">
+                  <var-ref name="global"/>
+                </property-ref>
+                <string value="vladimirn"/>
+              </assign>
+            </expression>
+
+            <expression>
+              <assign>
+                <property-ref name="iefSupplied">
+                  <var-ref name="export"/>
+                </property-ref>
+                <new-object>
+                  <type name="iefSupplied"/>
+                </new-object>
+              </assign>
+            </expression>
+            <expression>
+              <assign>
+                <property-ref name="command">
+                  <property-ref name="iefSupplied">
+                    <var-ref name="export"/>
+                  </property-ref>
+                </property-ref>
+                <string value="?"/>
+              </assign>
+            </expression>
+
+            <try>
+              <block>
+                <expression>
+                  <invoke>
+                    <method-ref name="guiServer">
+                      <var-ref name="service"/>
+                    </method-ref>
+                    <arguments>
+                      <ref>
+                        <var-ref name="global"/>
+                      </ref>
+                      <ref>
+                        <var-ref name="export"/>
+                      </ref>
+                    </arguments>
+                  </invoke>
+                </expression>
+
+                <expression>
+                  <invoke>
+                    <static-method-ref name="WriteLine">
+                      <type name="Console"/>
+                    </static-method-ref>
+                    <arguments>
+                      <property-ref name="command">
+                        <property-ref name="iefSupplied">
+                          <var-ref name="export"/>
+                        </property-ref>
+                      </property-ref>
+                    </arguments>
+                  </invoke>
+                </expression>
+              </block>
+              <catch name="e">
+                <type name="Exception" namespace="System"/>
+                <block>
+                  <expression>
+                    <invoke>
+                      <static-method-ref name="WriteLine">
+                        <type name="Console"/>
+                      </static-method-ref>
+                      <arguments>
+                        <var-ref name="e"/>
+                      </arguments>
+                    </invoke>
+                  </expression>
+                </block>
+              </catch>
+            </try>
+          </block>
+        </method>
+      </pp-region>
+    </class>
+  </namespace>
+</unit>
+<!--
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using ConsoleApplication2.Test;
+
+namespace ConsoleApplication2
+{
+  class Program
+  {
+    static void Main(string[] args)
+    {
+      TestWebServiceClient service = new TestWebServiceClient();
+
+      global global = new global();
+      export export = new export();
+
+      global.userId = "vladimirn";
+
+      export.iefSupplied = new iefSupplied();
+      export.iefSupplied.command = "?";
+
+      try
+      {
+        service.guiServer(ref global, ref export);
+
+        Console.WriteLine(export.iefSupplied.command);
+      }
+      catch(System.Exception e)
+      {
+        Console.WriteLine(e);
+      }
+    }
+  }
+}
+-->

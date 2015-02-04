@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/java-1.5/2008-02-07" package="com.nesterovskyBros.test">
+  <class name="TryResource" access="public">
+    <class-method name="tryResource" access="public">
+      <block>
+        <try>
+          <resource>
+            <var-decl name="connection">
+              <type name="Connection"/>
+              <initialize>
+                <invoke name="getConnection"/>
+              </initialize>
+            </var-decl>
+            <var-decl name="statement">
+              <type name="Statement"/>
+              <initialize>
+                <invoke name="prepareStatement">
+                  <instance>
+                    <var name="connection"/>
+                  </instance>
+                  <arguments>
+                    <string value="select * from t"/>
+                  </arguments>
+                </invoke>
+              </initialize>
+            </var-decl>
+          </resource>
+          <block>
+            <expression>
+              <invoke name="execute">
+                <instance>
+                  <var name="statement"/>
+                </instance>
+              </invoke>
+            </expression>
+          </block>
+        </try>
+      </block>
+    </class-method>
+    <class-method name="tryResource2" access="public">
+      <block>
+        <expression>
+          <invoke name="print">
+            <arguments>
+              <string value="Start"/>
+            </arguments>
+          </invoke>
+        </expression>
+        <try>
+          <resource>
+            <var-decl name="connection">
+              <type name="Connection"/>
+              <initialize>
+                <invoke name="getConnection"/>
+              </initialize>
+            </var-decl>
+            <var-decl name="statement">
+              <type name="Statement"/>
+              <initialize>
+                <invoke name="prepareStatement">
+                  <instance>
+                    <var name="connection"/>
+                  </instance>
+                  <arguments>
+                    <string value="select * from t"/>
+                  </arguments>
+                </invoke>
+              </initialize>
+            </var-decl>
+          </resource>
+          <block>
+            <expression>
+              <invoke name="execute">
+                <instance>
+                  <var name="statement"/>
+                </instance>
+              </invoke>
+            </expression>
+          </block>
+          <finally>
+            <expression>
+              <invoke name="print">
+                <arguments>
+                  <string value="End"/>
+                </arguments>
+              </invoke>
+            </expression>
+          </finally>
+        </try>
+      </block>
+    </class-method>
+    <class-method name="tryResource3" access="public">
+      <block>
+        <expression>
+          <invoke name="print">
+            <arguments>
+              <string value="Start"/>
+            </arguments>
+          </invoke>
+        </expression>
+        <try>
+          <resource>
+            <var-decl name="connection">
+              <type name="Connection"/>
+              <initialize>
+                <invoke name="getConnection"/>
+              </initialize>
+            </var-decl>
+            <var-decl name="statement">
+              <type name="Statement"/>
+              <initialize>
+                <invoke name="prepareStatement">
+                  <instance>
+                    <var name="connection"/>
+                  </instance>
+                  <arguments>
+                    <string value="select * from t"/>
+                  </arguments>
+                </invoke>
+              </initialize>
+            </var-decl>
+          </resource>
+          <block>
+            <expression>
+              <invoke name="execute">
+                <instance>
+                  <var name="statement"/>
+                </instance>
+              </invoke>
+            </expression>
+          </block>
+          <catch>
+            <parameter name="e">
+              <type name="IOException"/>
+              <type name="IllegalArgumentException"/>
+            </parameter>
+            <block>
+              <expression>
+                <invoke name="print">
+                  <arguments>
+                    <var name="e"/>
+                  </arguments>
+                </invoke>
+              </expression>
+            </block>
+          </catch>
+          <finally>
+            <expression>
+              <invoke name="print">
+                <arguments>
+                  <string value="End"/>
+                </arguments>
+              </invoke>
+            </expression>
+          </finally>
+        </try>
+      </block>
+    </class-method>
+    <class-method name="tryResourceSM" access="public">
+      <block>
+        <expression>
+          <invoke name="print">
+            <arguments>
+              <string value="Start"/>
+            </arguments>
+          </invoke>
+        </expression>
+        <try>
+          <resource>
+            <var-decl name="r" name-id="connection">
+              <type name="Connection"/>
+              <initialize>
+                <invoke name="getConnection"/>
+              </initialize>
+            </var-decl>
+            <var-decl name="r" name-id="statement">
+              <type name="Statement"/>
+              <initialize>
+                <invoke name="prepareStatement">
+                  <instance>
+                    <var name="r" name-ref="connection"/>
+                  </instance>
+                  <arguments>
+                    <string value="select * from t"/>
+                  </arguments>
+                </invoke>
+              </initialize>
+            </var-decl>
+          </resource>
+          <block>
+            <expression>
+              <invoke name="execute">
+                <instance>
+                  <var name="r" name-ref="statement"/>
+                </instance>
+              </invoke>
+            </expression>
+            <snippet-statement yield="true" value="/*yield*/"/>
+            <expression>
+              <invoke name="update">
+                <instance>
+                  <var name="r" name-ref="statement"/>
+                </instance>
+              </invoke>
+            </expression>
+          </block>
+          <catch>
+            <parameter name="e">
+              <type name="IOException"/>
+              <type name="IllegalArgumentException"/>
+            </parameter>
+            <block>
+              <expression>
+                <invoke name="print">
+                  <arguments>
+                    <var name="e"/>
+                  </arguments>
+                </invoke>
+              </expression>
+            </block>
+          </catch>
+          <finally>
+            <expression>
+              <invoke name="print">
+                <arguments>
+                  <string value="End"/>
+                </arguments>
+              </invoke>
+            </expression>
+          </finally>
+        </try>
+      </block>
+    </class-method>
+  </class>
+</unit>

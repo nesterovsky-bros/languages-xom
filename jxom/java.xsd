@@ -1,0 +1,2803 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://www.bphx.com/java-1.5/2008-02-07"
+           targetNamespace="http://www.bphx.com/java-1.5/2008-02-07"
+           elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation><![CDATA[
+      $Id$
+
+      This xml flavour of java grammar is derived from
+      a Java 1.5 grammar for ANTLR v3 derived from the spec.
+    ]]></xs:documentation>
+  </xs:annotation>
+
+  <xs:simpleType name="ids">
+    <xs:annotation>
+      <xs:documentation>
+        A list of ids.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:list itemType="xs:string"/>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="name-id">
+    <xs:attribute name="name-id" type="ids" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          A name id used for the name normalization.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="name-ref">
+    <xs:attribute name="name-ref" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          A name ref used for the name normalization.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:element name="meta" type="meta"/>
+
+  <xs:complexType name="meta" mixed="true">
+    <xs:annotation>
+      <xs:documentation>
+        Meta information, allowing to attach custom information to any element.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <!--
+      <xs:element ref="type">
+        <xs:annotation>
+          <xs:documentation>
+            Defines a compile time expression type.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="value" type="unary-expression">
+        <xs:annotation>
+          <xs:documentation>
+            Defines a compile time expression value.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      -->
+      <xs:any processContents="skip"/>
+    </xs:choice>
+    <xs:anyAttribute processContents="skip"/>
+  </xs:complexType>
+
+  <xs:element name="comment" type="comment"/>
+
+  <xs:complexType name="comment" mixed="true">
+    <xs:annotation>
+      <xs:documentation>
+        Comment. It can be attached to most elements.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:any namespace="##other" processContents="skip"/>
+      <xs:element ref="meta"/>
+      <xs:element name="para">
+        <xs:complexType mixed="true">
+          <xs:sequence>
+            <xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
+          </xs:sequence>
+          <xs:attribute name="pre" type="xs:boolean" use="optional"/>
+          <xs:attribute name="type" type="xs:string" use="optional"/>
+          <xs:attribute name="name" type="xs:string" use="optional"/>
+          <xs:anyAttribute processContents="skip"/>
+        </xs:complexType>
+      </xs:element>
+
+      <!--
+        This is a commented code.
+      -->
+      <xs:element ref="unit"/>
+      <xs:element ref="class-members"/>
+      <xs:element ref="interface-members"/>
+      <xs:element ref="annotation-members"/>
+      <xs:element ref="scope"/>
+    </xs:choice>
+    <xs:attribute name="doc" type="xs:boolean" default="false" use="optional"/>
+    <xs:anyAttribute processContents="skip"/>
+  </xs:complexType>
+
+  <xs:complexType name="java-element" abstract="true">
+    <xs:annotation>
+      <xs:documentation>
+        Base element of the java object model.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="meta"/>
+      <xs:element ref="comment"/>
+    </xs:choice>
+    <xs:anyAttribute processContents="skip"/>
+  </xs:complexType>
+
+  <xs:element name="unit" type="compilationUnit">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        Starting point for parsing a java file.
+      ]]></xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="compilationUnit">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        compilationUnit
+        :	annotations?
+        packageDeclaration?
+        importDeclaration*
+        typeDeclaration*
+        ;
+
+        packageDeclaration
+        :	'package' qualifiedName ';'
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:group ref="annotations"/>
+          <xs:element name="imports" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="import" type="importDeclaration"
+                  minOccurs="1" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:group ref="typeDeclaration" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="package" type="qualifiedName" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="importDeclaration">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        importDeclaration
+        :	'import' 'static'? Identifier ('.' Identifier)* ('.' '*')? ';'
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:element ref="type"/>
+        </xs:sequence>
+        <xs:attribute name="static" type="xs:boolean"
+          default="false" use="optional"/>
+        
+        <xs:attribute name="name" type="Identifier" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Static member name.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attributeGroup ref="name-ref"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="snippet-decl" type="snippetDeclaration"/>
+  <xs:element name="class" type="classDeclaration"/>
+  <xs:element name="enum" type="enumDeclaration"/>
+  <xs:element name="interface" type="interfaceDeclaration"/>
+  <xs:element name="annotation-decl" type="annotationDeclaration"/>
+
+  <xs:group name="typeDeclaration">
+    <xs:choice>
+      <xs:element ref="snippet-decl"/>
+      <xs:element ref="class"/>
+      <xs:element ref="enum"/>
+      <xs:element ref="interface"/>
+      <xs:element ref="annotation-decl"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="typeDeclaration" abstract="true">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        typeDeclaration
+        :	classOrInterfaceDeclaration
+        |   ';'
+        ;
+
+        classOrInterfaceDeclaration
+        :	modifier* (classDeclaration | interfaceDeclaration)
+        ;
+
+        classDeclaration
+        :	normalClassDeclaration
+        |   enumDeclaration
+        ;
+
+        interfaceDeclaration
+        :	normalInterfaceDeclaration
+        | annotationTypeDeclaration
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="memberDecl"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="snippetDeclaration">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:attribute name="value" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="snippetMember">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:attribute name="value" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="snippetStatement">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:attribute name="value" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="snippetExpression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:attribute name="value" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="classDeclaration">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        normalClassDeclaration
+        :	'class' Identifier (typeParameters)?
+        ('extends' type)?
+        ('implements' typeList)?
+        classBody
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="typeDeclaration">
+        <xs:sequence>
+          <xs:group ref="typeParameters"/>
+          <xs:group ref="classExtends"/>
+          <xs:group ref="classImplements"/>
+          <xs:group ref="classBody"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="enumDeclaration">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        enumDeclaration
+        :	ENUM Identifier ('implements' typeList)? enumBody
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="typeDeclaration">
+        <xs:sequence>
+          <xs:group ref="classImplements"/>
+          <xs:group ref="enumBody"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="interfaceDeclaration">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        normalInterfaceDeclaration
+        :	'interface' Identifier typeParameters?
+          ('extends' typeList)? interfaceBody
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="typeDeclaration">
+        <xs:sequence>
+          <xs:group ref="typeParameters"/>
+          <xs:group ref="interfaceExtends"/>
+          <xs:group ref="interfaceBody"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="annotationDeclaration">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        annotationTypeDeclaration
+        :	'@' 'interface' Identifier annotationTypeBody
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="typeDeclaration">
+        <xs:group ref="annotationTypeBody"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="classImplements">
+    <xs:sequence>
+      <xs:element name="implements" type="classImplements"
+        minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="interfaceExtends">
+    <xs:sequence>
+      <xs:element name="extends" type="classImplements"
+        minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:complexType name="classImplements">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:element ref="type" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="classExtends">
+    <xs:sequence>
+      <xs:element name="extends" type="classExtends"
+        minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:complexType name="classExtends">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:element ref="type"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="type-parameters">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="java-element">
+          <xs:sequence>
+            <xs:element name="parameter" type="typeParameter"
+              minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="typeParameters">
+    <xs:sequence>
+      <xs:element ref="type-parameters" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:complexType name="typeParameter">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        typeParameters
+        :	'&lt;' typeParameter (',' typeParameter)* '&gt;'
+        ;
+
+        typeParameter
+        :	Identifier ('extends' bound)?
+        ;
+
+        bound
+        :	type ('&amp;' type)*
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:element ref="type" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="Identifier" use="required"/>
+        <xs:attributeGroup ref="name-id"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="throws">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="java-element">
+          <xs:sequence>
+            <xs:element ref="type" minOccurs="1" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="throws">
+    <xs:sequence>
+      <xs:element ref="throws" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="constant" type="enumConstant"/>
+
+  <xs:group name="enumBody">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        enumBody
+        :	'{' enumConstants? ','? enumBodyDeclarations? '}'
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element ref="constant" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:group ref="enumBodyDeclarations" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:complexType name="enumConstant">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        enumConstants
+        :	enumConstant (',' enumConstant)*
+        ;
+
+        enumConstant
+        :	annotations? Identifier (arguments)? (classBody)?
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+
+          <xs:group ref="annotations"/>
+          <xs:element name="arguments" type="arguments"
+            minOccurs="0" maxOccurs="1"/>
+          <xs:group ref="classBody"/>
+        </xs:sequence>
+        <xs:attribute name="value" type="Identifier" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="enumBodyDeclarations">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        enumBodyDeclarations
+        :	';' (classBodyDeclaration)*
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:group ref="classBodyDeclaration"
+        minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="types">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="java-element">
+          <xs:sequence>
+            <xs:element ref="type" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="typeList">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        typeList
+        :	type (',' type)*
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element ref="types" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="classBody">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        classBody
+        :	'{' classBodyDeclaration* '}'
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:group ref="classBodyDeclaration"
+        minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="interfaceBody">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        interfaceBody
+        :	'{' interfaceBodyDeclaration* '}'
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:group ref="interfaceBodyDeclaration"
+        minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="class-members" type="classDeclarationScope"/>
+  <xs:element name="class-snippet-member" type="snippetMember"/>
+  <xs:element name="class-initializer" type="classInitializer"/>
+  <xs:element name="class-method" type="methodDeclaration"/>
+  <xs:element name="constructor" type="constructorDeclarator"/>
+  <xs:element name="class-field" type="fieldDeclaration"/>
+
+  <xs:group name="classBodyDeclaration">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        classBodyDeclaration
+        :	';'
+        |	'static'? block
+        |	modifier* memberDecl
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element ref="class-members"/>
+      <xs:element name="snippet-member" type="snippetMember"/>
+      <xs:element ref="class-snippet-member"/>
+      <xs:element ref="class-initializer"/>
+      <xs:element ref="class-method"/>
+      <xs:element ref="constructor"/>
+      <xs:element name="field" type="fieldDeclaration"/>
+      <xs:element ref="class-field"/>
+      <xs:group ref="typeDeclaration"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="classDeclarationScope">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:group ref="classBodyDeclaration"
+            minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="classInitializer">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:element name="block" type="block"/>
+        </xs:sequence>
+        <xs:attribute name="static" type="xs:boolean" 
+          default="false" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="memberDecl" abstract="true">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        memberDecl
+        :	genericMethodOrConstructorDecl
+        |	methodDeclaration
+        |	fieldDeclaration
+        |	'void' Identifier voidMethodDeclaratorRest
+        |	Identifier constructorDeclaratorRest
+        |	interfaceDeclaration
+        |	classDeclaration
+        ;
+
+        genericMethodOrConstructorDecl
+        :	typeParameters genericMethodOrConstructorRest
+        ;
+
+        genericMethodOrConstructorRest
+        :	(type | 'void') Identifier methodDeclaratorRest
+        |	Identifier constructorDeclaratorRest
+        ;
+
+        methodDeclaration
+        :	type Identifier methodDeclaratorRest
+        ;
+
+        fieldDeclaration
+        :	type variableDeclarators ';'
+        ;
+
+        methodDeclaratorRest
+        :	formalParameters ('[' ']')*
+        ('throws' qualifiedNameList)?
+        (   methodBody
+        |   ';'
+        )
+        ;
+
+        voidMethodDeclaratorRest
+        :	formalParameters ('throws' qualifiedNameList)?
+        (   methodBody
+        |   ';'
+        )
+        ;
+
+        constructorDeclaratorRest
+        :	formalParameters ('throws' qualifiedNameList)? methodBody
+        ;
+
+        variableDeclarators
+        :	variableDeclarator (',' variableDeclarator)*
+        ;
+
+        variableDeclarator
+        :	Identifier variableDeclaratorRest
+        ;
+
+        variableDeclaratorRest
+        :	('[' ']')+ ('=' variableInitializer)?
+        |	'=' variableInitializer
+        |
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:group ref="annotations"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="Identifier" use="required"/>
+        <xs:attributeGroup ref="name-id"/>
+        <xs:attributeGroup ref="modifiers"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="methodDeclaration">
+    <xs:complexContent>
+      <xs:extension base="memberDecl">
+        <xs:sequence>
+          <xs:group ref="typeParameters"/>
+          <xs:group ref="returns"/>
+          <xs:group ref="parameters"/>
+          <xs:group ref="throws"/>
+          <xs:group ref="methodBody"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="constructorDeclarator">
+    <xs:complexContent>
+      <xs:extension base="memberDecl">
+        <xs:sequence>
+          <xs:group ref="typeParameters"/>
+          <xs:group ref="parameters"/>
+          <xs:group ref="throws"/>
+          <xs:group ref="methodBody"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="fieldDeclaration">
+    <xs:complexContent>
+      <xs:extension base="memberDecl">
+        <xs:sequence>
+          <xs:element ref="type"/>
+          <xs:group ref="initialize"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="interface-members" type="interfaceDeclarationScope"/>
+  <xs:element name="interface-snippet-member" type="snippetMember"/>
+  <xs:element name="interface-method" type="interfaceMethod"/>
+  <xs:element name="interface-field" type="interfaceConstant"/>
+
+  <xs:group name="interfaceBodyDeclaration">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        interfaceBodyDeclaration
+        :	modifier* interfaceMemberDecl
+        |   ';'
+        ;
+
+        interfaceMemberDecl
+        :	interfaceMethodOrFieldDecl
+        |   interfaceGenericMethodDecl
+        |   'void' Identifier voidInterfaceMethodDeclaratorRest
+        |   interfaceDeclaration
+        |   classDeclaration
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element ref="interface-members"/>
+      <xs:element name="snippet-member" type="snippetMember"/>
+      <xs:element ref="interface-snippet-member"/>
+      <xs:element name="method" type="interfaceMethod"/>
+      <xs:element ref="interface-method"/>
+      <xs:element name="field" type="interfaceConstant"/>
+      <xs:element ref="interface-field"/>
+      <xs:group ref="typeDeclaration"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="interfaceDeclarationScope">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:group ref="interfaceBodyDeclaration"
+            minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="interfaceMemberDeclaration" abstract="true">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+
+          <xs:group ref="annotations"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="Identifier" use="required"/>
+        <xs:attributeGroup ref="name-id"/>
+        <xs:attributeGroup ref="modifiers"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="interfaceMethod">
+    <xs:complexContent>
+      <xs:extension base="interfaceMemberDeclaration">
+        <xs:sequence>
+          <xs:group ref="typeParameters"/>
+          <xs:group ref="returns"/>
+          <xs:group ref="parameters"/>
+          <xs:group ref="throws"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="interfaceConstant">
+    <xs:complexContent>
+      <xs:extension base="interfaceMemberDeclaration">
+        <xs:sequence>
+          <xs:element ref="type"/>
+          <xs:group ref="initialize"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="array" type="arrayInitializer"/>
+
+  <xs:group name="variableInitializer">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        variableInitializer
+        :	arrayInitializer
+        |   expression
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:group ref="expression"/>
+      <xs:element ref="array"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="arrayInitializer">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        arrayInitializer
+        :	'{' (variableInitializer (',' variableInitializer)* (',')? )? '}'
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:group ref="variableInitializer"
+            minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="annotations" type="annotations"/>
+
+  <xs:group name="annotations">
+    <xs:sequence>
+      <xs:element ref="annotations" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:complexType name="annotations">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:element ref="annotation" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="initialize" type="initialize"/>
+
+  <xs:group name="initialize">
+    <xs:sequence>
+      <xs:element ref="initialize" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:complexType name="initialize">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:group ref="variableInitializer"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:attributeGroup name="modifiers">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        modifier
+        :   annotation
+        |   'public'
+        |   'protected'
+        |   'private'
+        |   'static'
+        |   'abstract'
+        |   'final'
+        |   'native'
+        |   'synchronized'
+        |   'transient'
+        |   'volatile'
+        |   'strictfp'
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="access" type="accessSpecifier"
+      default="package" use="optional"/>
+    <xs:attribute name="override" type="overrideSpecifier" use="optional"/>
+    <xs:attribute name="static" type="xs:boolean"
+      default="false" use="optional"/>
+    <xs:attribute name="native" type="xs:boolean"
+      default="false" use="optional"/>
+    <xs:attribute name="synchronized" type="xs:boolean"
+      default="false" use="optional"/>
+    <xs:attribute name="transient" type="xs:boolean"
+      default="false" use="optional"/>
+    <xs:attribute name="volatile" type="xs:boolean"
+      default="false" use="optional"/>
+    <xs:attribute name="strictfp" type="xs:boolean"
+      default="false" use="optional"/>
+  </xs:attributeGroup>
+
+  <xs:simpleType name="accessSpecifier">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="package"/>
+      <xs:enumeration value="public"/>
+      <xs:enumeration value="protected"/>
+      <xs:enumeration value="private"/>
+      <xs:enumeration value="public"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="overrideSpecifier">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="virtual"/>
+      <xs:enumeration value="abstract"/>
+      <xs:enumeration value="final"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="packageOrTypeName">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        packageOrTypeName
+        :	Identifier ('.' Identifier)*
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumConstantName">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        enumConstantName
+        :   Identifier
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:element name="type" type="type"/>
+
+  <xs:complexType name="type">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        type
+        :	Identifier (typeArguments)?
+          ('.' Identifier (typeArguments)? )* ('[' ']')*
+        |	primitiveType ('[' ']')*
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:element name="argument" type="typeArgument"
+            minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>
+                Type arguments.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          
+          <xs:element ref="type" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>
+                Container type.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="package" type="packageOrTypeName" use="optional"/>
+        <xs:attribute name="name" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Optional in case of import.
+            </xs:documentation>
+          </xs:annotation>
+
+          <xs:simpleType>
+            <xs:union memberTypes="xs:string primitiveType"/>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attributeGroup ref="name-id"/>
+        <xs:attribute name="arity" type="xs:int" default="0" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Defines array's arity. 
+              Default 0, which means a scalar value.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="primitiveType">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        primitiveType
+        :   'boolean'
+        |	'char'
+        |	'byte'
+        |	'short'
+        |	'int'
+        |	'long'
+        |	'float'
+        |	'double'
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="boolean"/>
+      <xs:enumeration value="char"/>
+      <xs:enumeration value="byte"/>
+      <xs:enumeration value="short"/>
+      <xs:enumeration value="int"/>
+      <xs:enumeration value="long"/>
+      <xs:enumeration value="float"/>
+      <xs:enumeration value="double"/>
+      <xs:enumeration value="void"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="typeArgument">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        typeArguments
+        :	'&lt;' typeArgument (',' typeArgument)* '&gt;'
+        ;
+
+        typeArgument
+        :	type
+        |	'?' (('extends' | 'super') type)?
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:element ref="type" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="match" type="typeArgumentMatch"
+          default="precise" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="typeArgumentMatch">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="precise"/>
+      <xs:enumeration value="any"/>
+      <xs:enumeration value="extends"/>
+      <xs:enumeration value="super"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="parameters" type="formalParameters"/>
+
+  <xs:group name="parameters">
+    <xs:sequence>
+      <xs:element ref="parameters" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:complexType name="formalParameters">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        formalParameters
+        :	'(' formalParameterDecls? ')'
+        ;
+
+        formalParameterDecls
+        :	variableModifier* type formalParameterDeclsRest?
+        ;
+
+        formalParameterDeclsRest
+        :	variableDeclaratorId (',' formalParameterDecls)?
+        |   '...' variableDeclaratorId
+        ;
+
+        variableDeclaratorId
+        :	Identifier ('[' ']')*
+        ;
+
+        variableModifier
+        :	'final'
+        |   annotation
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:element name="parameter" type="formalParameter"
+            minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="vararg" type="xs:boolean"
+          default="false" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="formalParameter">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:group ref="annotations"/>
+          <xs:element ref="type"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="Identifier" use="required"/>
+        <xs:attributeGroup ref="name-id"/>
+        <xs:attribute name="final" type="xs:boolean"
+          default="false" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="returns" type="returns"/>
+
+
+  <xs:group name="returns">
+    <xs:sequence>
+      <xs:element ref="returns" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:complexType name="returns">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:element ref="type"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="methodBody">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        methodBody
+        :	block
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="block" type="block"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:simpleType name="qualifiedName">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        qualifiedNameList
+        :	qualifiedName (',' qualifiedName)*
+        ;
+
+        qualifiedName
+        :	Identifier ('.' Identifier)*
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:complexType name="literal-expression">
+    <xs:annotation>
+      <xs:documentation>
+        A value is specified either as text or as "value" attribute.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:attribute name="value" type="xs:string" use="optional"/>
+        <xs:attribute name="escaped" type="xs:boolean" 
+          use="optional" default="false"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="int" type="literal-expression"/>
+
+  <xs:element name="short" type="literal-expression"/>
+
+  <xs:element name="byte" type="literal-expression"/>
+
+  <xs:element name="long" type="literal-expression"/>
+
+  <xs:element name="float" type="literal-expression"/>
+
+  <xs:element name="double" type="literal-expression"/>
+
+  <xs:element name="string" type="literal-expression"/>
+
+  <xs:element name="char" type="literal-expression"/>
+
+  <xs:element name="boolean" type="literal-expression"/>
+
+  <xs:element name="null" type="expression"/>
+
+  <xs:complexType name="annotation">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        // ANNOTATIONS
+
+        annotations
+        :	annotation+
+        ;
+
+        annotation
+        :	'@' annotationName ('(' elementValuePairs? ')')?
+        ;
+
+        annotationName
+        : Identifier ('.' Identifier)*
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:element ref="type"/>
+          <xs:element name="parameter" type="elementValuePair"
+            minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="elementValuePair">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        elementValuePairs
+        : elementValuePair (',' elementValuePair)*
+        ;
+
+        elementValuePair
+        : (Identifier '=')? elementValue
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:group ref="elementValue"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="Identifier" use="optional"/>
+        <xs:attributeGroup ref="name-ref"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="annotation" type="annotation"/>
+
+  <xs:element name="annotation-array" type="elementValueArrayInitializer"/>
+
+  <xs:group name="elementValue">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        elementValue
+        :	conditionalExpression
+        |   annotation
+        |   elementValueArrayInitializer
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:group ref="expression"/>
+      <xs:element ref="annotation"/>
+      <xs:element name="array" type="elementValueArrayInitializer"/>
+      <xs:element ref="annotation-array"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="elementValueArrayInitializer">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        elementValueArrayInitializer
+        :	'{' (elementValue (',' elementValue )*)? '}'
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:group ref="elementValue" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="annotationTypeBody">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        annotationTypeBody
+        :	'{' (annotationTypeElementDeclarations)? '}'
+        ;
+
+        annotationTypeElementDeclarations
+        :	(annotationTypeElementDeclaration)
+          (annotationTypeElementDeclaration)*
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:group ref="annotationTypeElementDeclaration"
+        minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="annotation-members" type="annotationDeclarationScope"/>
+  <xs:element name="annotation-snippet-member" type="snippetMember"/>
+  <xs:element name="annotation-method" type="annotationMethodDeclaration"/>
+  <xs:element name="annotation-field" type="fieldDeclaration"/>
+
+  <xs:group name="annotationTypeElementDeclaration">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        annotationTypeElementDeclaration
+        :	(modifier)* annotationTypeElementRest
+        ;
+
+        annotationTypeElementRest
+        :	type annotationMethodOrConstantRest ';'
+        |   classDeclaration ';'?
+        |   interfaceDeclaration ';'?
+        |   enumDeclaration ';'?
+        |   annotationTypeDeclaration ';'?
+        ;
+
+        annotationMethodOrConstantRest
+        :	annotationMethodRest
+        |   annotationConstantRest
+        ;
+
+        annotationConstantRest
+        :	variableDeclarators
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element ref="annotation-members"/>
+      <xs:group ref="typeDeclaration"/>
+      <xs:element name="snippet-member" type="snippetMember"/>
+      <xs:element ref="annotation-snippet-member"/>
+      <xs:element name="method" type="annotationMethodDeclaration"/>
+      <xs:element ref="annotation-method"/>
+      <xs:element name="field" type="fieldDeclaration"/>
+      <xs:element ref="annotation-field"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="annotationDeclarationScope">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:group ref="annotationTypeElementDeclaration"
+            minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="annotationMethodDeclaration">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        annotationMethodRest
+        :	Identifier '(' ')' (defaultValue)?
+        ;
+
+        defaultValue
+        :	'default' elementValue
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="memberDecl">
+        <xs:sequence>
+          <xs:element ref="type"/>
+          <xs:element name="default" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:group ref="elementValue"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="block">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        // STATEMENTS / BLOCKS
+
+        block
+        :	'{' blockStatement* '}'
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:group ref="statement" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="var-decl" type="localVariableDeclaration"/>
+  <xs:element name="scope" type="blockStatement"/>
+  <xs:element name="snippet-statement" type="snippetStatement"/>
+  <xs:element name="block" type="blockStatement"/>
+  <xs:element name="statement" type="statement"/>
+  <xs:element name="assert" type="assertStatement"/>
+  <xs:element name="if" type="ifStatement"/>
+  <xs:element name="for" type="forStatement"/>
+  <xs:element name="for-each" type="forEachStatement"/>
+  <xs:element name="while" type="whileStatement"/>
+  <xs:element name="do-while" type="doWhileStatement"/>
+  <xs:element name="try" type="tryStatement"/>
+  <xs:element name="switch" type="switchStatement"/>
+  <xs:element name="synchronized" type="synchronizedStatement"/>
+  <xs:element name="return" type="returnStatement"/>
+  <xs:element name="throw" type="throwStatement"/>
+  <xs:element name="break" type="breakStatement"/>
+  <xs:element name="continue" type="continueStatement"/>
+  <xs:element name="expression" type="expressionStatement"/>
+
+  <xs:group name="statement">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        blockStatement
+        :	localVariableDeclaration
+        |	classOrInterfaceDeclaration
+        |	statement
+        ;
+
+        statement
+        : block
+        | 'assert' expression (':' expression)? ';'
+        | 'if' parExpression statement (options {k=1;}:'else' statement)?
+        | 'for' '(' forControl ')' statement
+        | 'while' parExpression statement
+        | 'do' statement 'while' parExpression ';'
+        | 'try' block
+        (	catches 'finally' block
+        | catches
+        | 'finally' block
+        )
+        | 'switch' parExpression '{' switchBlockStatementGroups '}'
+        | 'synchronized' parExpression block
+        | 'return' expression? ';'
+        | 'throw' expression ';'
+        | 'break' Identifier? ';'
+        | 'continue' Identifier? ';'
+        | ';'
+        | statementExpression ';'
+        | Identifier ':' statement
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element ref="scope"/>
+
+      <xs:element ref="var-decl"/>
+
+      <xs:group ref="typeDeclaration"/>
+
+      <xs:element ref="snippet-statement"/>
+      <xs:element ref="block"/>
+      <xs:element ref="statement"/>
+      <xs:element ref="assert"/>
+      <xs:element ref="if"/>
+      <xs:element ref="for"/>
+      <xs:element ref="for-each"/>
+      <xs:element ref="while"/>
+      <xs:element ref="do-while"/>
+      <xs:element ref="try"/>
+      <xs:element ref="switch"/>
+      <xs:element ref="synchronized"/>
+      <xs:element ref="return"/>
+      <xs:element ref="throw"/>
+      <xs:element ref="break"/>
+      <xs:element ref="continue"/>
+      <xs:element ref="expression"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="localVariableDeclaration">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+        localVariableDeclaration
+        :	variableModifier* type variableDeclarators ';'
+        ;
+
+        variableModifier
+        :	'final'
+        |   annotation
+        ;
+      ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:sequence>
+          <xs:group ref="annotations"/>
+          <xs:element ref="type"/>
+          <xs:group ref="initialize"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="Identifier" use="required"/>
+        <xs:attributeGroup ref="name-id"/>
+        <xs:attribute name="final" type="xs:boolean"
+          default="false" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="statement">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:attribute name="label" type="Identifier" use="optional"/>
+
+        <xs:attribute name="label-id" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Optional label id.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="blockStatement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:group ref="statement" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="assertStatement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:sequence>
+          <xs:element name="condition">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:group ref="expression"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="message" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:group ref="expression"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ifStatement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:sequence>
+          <xs:element name="condition">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:group ref="expression"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="then">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:group ref="statement" minOccurs="0" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="else" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:group ref="statement" minOccurs="0" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="forStatement">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        statement
+        | 'for' '(' forControl ')' statement
+
+        formalParameter
+        :	variableModifier* type variableDeclaratorId
+        ;
+
+        variableModifier
+        :	'final'
+        |   annotation
+        ;
+
+        variableDeclaratorId
+        :	Identifier ('[' ']')*
+        ;
+
+
+        forControl
+        :	forInit? ';' expression? ';' forUpdate?
+        ;
+
+        forInit
+        :	variableModifier* type variableDeclarators
+        |	expressionList
+        ;
+
+        variableModifier
+        :	'final'
+        |   annotation
+        ;
+
+        forUpdate
+        :	expressionList
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="var-decl">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="java-element">
+                    <xs:sequence>
+                      <xs:group ref="annotations"/>
+                      <xs:element ref="type"/>
+                      <xs:group ref="initialize"/>
+                    </xs:sequence>
+                    <xs:attribute name="name" type="Identifier"
+                      use="required"/>
+                    <xs:attributeGroup ref="name-id"/>
+                    <xs:attribute name="final" type="xs:boolean"
+                      default="false" use="optional"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:group ref="initialize"/>
+          </xs:choice>
+          <xs:element name="condition" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:group ref="expression"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="update" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:group ref="expression"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="block" type="block"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="forEachStatement">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        statement
+        | 'for' '(' forControl ')' statement
+
+        forControl
+        :	forVarControl
+        ;
+
+        variableModifier
+        :	'final'
+        |   annotation
+        ;
+
+        forVarControl
+        :	variableModifier* type Identifier ':' expression
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:sequence>
+          <xs:element name="var-decl">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:group ref="annotations"/>
+                    <xs:element ref="type"/>
+                    <xs:group ref="initialize"/>
+                  </xs:sequence>
+                  <xs:attribute name="name" type="Identifier" use="required"/>
+                  <xs:attributeGroup ref="name-id"/>
+                  <xs:attribute name="final" type="xs:boolean"
+                    default="false" use="optional"/>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="block" type="block"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="whileStatement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:sequence>
+          <xs:element name="condition">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:group ref="expression"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="block" type="block"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="doWhileStatement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:sequence>
+          <xs:element name="condition">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:group ref="expression"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="block" type="block"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="tryStatement">
+    <xs:annotation>
+      <xs:documentation>
+  <![CDATA[
+        statement
+        | 'try' resourceSpecification? block
+        (	catches 'finally' block
+        | catches
+        | 'finally' block
+        ;
+
+        resourceSpecification:
+          ( resources ;? )
+
+        resources:
+          resource
+          resource ; resources
+
+        resource:
+          variableModifiers? type variableDeclaratorId = expression
+
+        catches
+        :	catchClause (catchClause)*
+        ;
+
+        catchClause:
+          'catch' '(' catchFormalParameter ')' block;
+        
+        catchFormalParameter:
+          variableModifiers? catchType variableDeclaratorId;
+
+        catchType:
+          classType
+          classType '|' catchType;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:sequence>
+          <xs:element name="resource" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:element name="var-decl" minOccurs="1" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:complexContent>
+                          <xs:extension base="java-element">
+                            <xs:sequence>
+                              <xs:group ref="annotations"/>
+                              <xs:element ref="type"/>
+                              <xs:element ref="initialize"/>
+                            </xs:sequence>
+                            <xs:attribute name="name" type="Identifier"
+                              use="required"/>
+                            <xs:attributeGroup ref="name-id"/>
+                            <xs:attribute name="final" type="xs:boolean"
+                              default="false" use="optional"/>
+                          </xs:extension>
+                        </xs:complexContent>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>                  
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="block" type="block"/>
+          <xs:element name="catch" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:element name="parameter">
+                      <xs:complexType>
+                        <xs:complexContent>
+                          <xs:extension base="java-element">
+                            <xs:sequence>
+                              <xs:group ref="annotations"/>
+                              <xs:element ref="type" minOccurs="1" maxOccurs="unbounded"/>
+                            </xs:sequence>
+                            <xs:attribute name="name" type="Identifier" use="required"/>
+                            <xs:attributeGroup ref="name-id"/>
+                            <xs:attribute name="final" type="xs:boolean"
+                              default="false" use="optional"/>
+                          </xs:extension>
+                        </xs:complexContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="block" type="block"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="finally" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:group ref="statement" minOccurs="0" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="switchStatement">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        statement
+        : 'switch' parExpression '{' switchBlockStatementGroups '}'
+        ;
+
+        switchBlockStatementGroups
+        :	(switchBlockStatementGroup)*
+        ;
+
+        switchBlockStatementGroup
+        :	switchLabel blockStatement*
+        ;
+
+        switchLabel
+        :	'case' constantExpression ':'
+        |   'case' enumConstantName ':'
+        |   'default' ':'
+        ;
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:sequence>
+          <xs:element name="test">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:group ref="expression"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="case" minOccurs="1" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:element name="value" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:complexContent>
+                          <xs:extension base="java-element">
+                            <xs:sequence>
+                              <xs:group ref="expression"
+                                minOccurs="0" maxOccurs="1"/>
+                            </xs:sequence>
+                            <xs:attribute name="enum" type="enumConstantName"
+                              use="optional"/>
+                          </xs:extension>
+                        </xs:complexContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="block" type="block"
+                      minOccurs="0" maxOccurs="1"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="synchronizedStatement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:sequence>
+          <xs:element name="monitor">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:group ref="expression"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="block" type="block"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="returnStatement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:sequence>
+          <xs:group ref="expression" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="throwStatement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:sequence>
+          <xs:group ref="expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="breakStatement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:attribute name="destination-label" type="Identifier"
+          use="optional"/>
+
+        <xs:attribute name="label-ref" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Optional label reference.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="continueStatement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:attribute name="destination-label" type="Identifier"
+          use="optional"/>
+
+        <xs:attribute name="label-ref" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Optional label reference.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="expressionStatement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:group ref="expression"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- EXPRESSIONS -->
+  <xs:complexType name="expression">
+    <xs:complexContent>
+      <xs:extension base="java-element"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="unary-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:group ref="expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="binary-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:group ref="expression"/>
+          <xs:group ref="expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="condition-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:group ref="expression"/>
+          <xs:group ref="expression"/>
+          <xs:group ref="expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="instance-of-expression">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:element name="value" type="unary-expression"/>
+          <xs:element ref="type"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="cast-expression">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+        castExpression
+        :  '(' primitiveType ')' unaryExpression
+        |  '(' (type | expression) ')' unaryExpressionNotPlusMinus
+        ;
+      ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:element ref="type"/>
+          <xs:element name="value" type="unary-expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="outer-type-expression">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+        'this' ('.' Identifier)*
+      ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:element type="type" name="type" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="outer-this-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:element type="type" name="type"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="outer-super-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:element type="type" name="type"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="class-of-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:choice>
+          <xs:element ref="type"/>
+          <xs:element name="outer-type" type="outer-type-expression"/>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="constructor-expression">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+        'this' arguments
+        | 'super' arguments
+        | 'this' ('.' Identifier)* '.' ('this'|'super') arguments
+        ;
+      ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:group ref="typeList"/>
+          <xs:choice>
+            <xs:element name="this" type="expression"/>
+            <xs:element name="super" type="expression"/>
+            <xs:element name="outer-this" type="outer-this-expression"/>
+            <xs:element name="outer-super" type="outer-super-expression"/>
+          </xs:choice>
+          <xs:element name="arguments" type="arguments"
+            minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="field-reference-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:group ref="expression" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="Identifier" use="required"/>
+        <xs:attributeGroup ref="name-ref"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="variable-reference-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:group ref="expression" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="Identifier" use="required"/>
+        <xs:attributeGroup ref="name-ref"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="new-array-expression">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+        primary
+        :
+        |   'new' creator
+        ;
+
+        creator
+        :	nonWildcardTypeArguments? createdName
+        arrayCreatorRest
+        ;
+
+        createdName
+        :	Identifier typeArgumentsOfDiamond?
+        ('.' Identifier typeArgumentsOfDiamond?)*
+        |	primitiveType
+        ;
+
+        arrayCreatorRest
+        :	'['
+        (   ']' ('[' ']')* arrayInitializer
+        |   expression ']' ('[' expression ']')* ('[' ']')*
+        )
+        ;
+      ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:group ref="typeList"/>
+          <xs:element ref="type"/>
+          <xs:choice>
+            <xs:element name="dimensions">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:group ref="expression"
+                    minOccurs="1" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="array" type="arrayInitializer"/>
+          </xs:choice>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="new-object-expression">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+        primary
+        :
+        |   'new' creator
+        ;
+
+        creator
+        :	nonWildcardTypeArguments? createdName
+        classCreatorRest
+        ;
+
+        createdName
+        :	Identifier typeArguments?
+        ('.' Identifier typeArguments?)*
+        |	primitiveType
+        ;
+
+        classCreatorRest
+        :	arguments classBody?
+        ;
+
+        nonWildcardTypeArguments
+        :	'&lt;' typeList '&gt;'
+        ;
+
+        selector
+        : '.' 'new' (nonWildcardTypeArguments)? innerCreator
+
+        innerCreator
+        :	Identifier nonWildcardTypeArgumentsOrDiamond? classCreatorRest
+        ;
+      ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:group ref="typeList"/>
+          <xs:element ref="type"/>
+          <xs:element name="arguments" type="arguments"
+            minOccurs="0" maxOccurs="1"/>
+          <xs:element name="outer-instance" type="unary-expression"
+            minOccurs="0" maxOccurs="1"/>
+          <xs:element name="declaration" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="java-element">
+                  <xs:sequence>
+                    <xs:group ref="classBody"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="static-field-reference-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:choice minOccurs="0" maxOccurs="1">
+          <xs:element ref="type"/>
+          <xs:element name="value" type="unary-expression"/>
+        </xs:choice>
+        <xs:attribute name="name" type="Identifier" use="required"/>
+        <xs:attributeGroup ref="name-ref"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="invoke-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:group ref="typeList"/>
+          <xs:element name="instance" type="unary-expression"
+            minOccurs="0" maxOccurs="1"/>
+          <xs:element name="arguments" type="arguments"
+            minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="Identifier" use="required"/>
+        <xs:attributeGroup ref="name-ref"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="static-invoke-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:group ref="typeList"/>
+          <xs:choice minOccurs="0" maxOccurs="1">
+            <xs:element ref="type"/>
+            <xs:element name="instance" type="unary-expression"/>
+          </xs:choice>
+          <xs:element name="arguments" type="arguments"
+            minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="Identifier" use="required"/>
+        <xs:attributeGroup ref="name-ref"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="arguments">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+        arguments
+        :	'(' expressionList? ')'
+        ;
+      ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:group ref="expression" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="scope-expression" type="expression">
+    <xs:annotation>
+      <xs:documentation>
+        Logically scopes an expression.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:element name="assign" type="binary-expression"/>
+  <xs:element name="add-to" type="binary-expression"/>
+  <xs:element name="sub-from" type="binary-expression"/>
+  <xs:element name="mul-to" type="binary-expression"/>
+  <xs:element name="div-by" type="binary-expression"/>
+  <xs:element name="and-with" type="binary-expression"/>
+  <xs:element name="or-with" type="binary-expression"/>
+  <xs:element name="xor-with" type="binary-expression"/>
+  <xs:element name="mod-by" type="binary-expression"/>
+  <xs:element name="shl-by" type="binary-expression"/>
+  <xs:element name="shr-by" type="binary-expression"/>
+  <xs:element name="sshr-by" type="binary-expression"/>
+  <xs:element name="condition" type="condition-expression"/>
+  <xs:element name="or" type="binary-expression"/>
+  <xs:element name="and" type="binary-expression"/>
+  <xs:element name="binary-or" type="binary-expression"/>
+  <xs:element name="binary-xor" type="binary-expression"/>
+  <xs:element name="binary-and" type="binary-expression"/>
+  <xs:element name="eq" type="binary-expression"/>
+  <xs:element name="ne" type="binary-expression"/>
+  <xs:element name="instance-of" type="instance-of-expression"/>
+  <xs:element name="le" type="binary-expression"/>
+  <xs:element name="ge" type="binary-expression"/>
+  <xs:element name="lt" type="binary-expression"/>
+  <xs:element name="gt" type="binary-expression"/>
+  <xs:element name="shl" type="binary-expression"/>
+  <xs:element name="sshr" type="binary-expression"/>
+  <xs:element name="shr" type="binary-expression"/>
+  <xs:element name="add" type="binary-expression"/>
+  <xs:element name="sub" type="binary-expression"/>
+  <xs:element name="mul" type="binary-expression"/>
+  <xs:element name="div" type="binary-expression"/>
+  <xs:element name="mod" type="binary-expression"/>
+  <xs:element name="cast" type="cast-expression"/>
+  <xs:element name="plus" type="unary-expression"/>
+  <xs:element name="neg" type="unary-expression"/>
+  <xs:element name="inc" type="unary-expression"/>
+  <xs:element name="dec" type="unary-expression"/>
+  <xs:element name="not" type="unary-expression"/>
+  <xs:element name="binary-not" type="unary-expression"/>
+  <xs:element name="snippet-expression" type="snippetExpression"/>
+  <xs:element name="parens" type="unary-expression"/>
+  <xs:element name="new-array" type="new-array-expression"/>
+  <xs:element name="new-object" type="new-object-expression"/>
+  <xs:element name="class-of" type="class-of-expression"/>
+  <xs:element name="construct" type="constructor-expression"/>
+  <xs:element name="this" type="expression"/>
+  <xs:element name="super" type="expression"/>
+  <xs:element name="outer-this" type="outer-this-expression"/>
+  <xs:element name="var" type="variable-reference-expression"/>
+  <xs:element name="field" type="field-reference-expression"/>
+  <xs:element name="static-field" type="static-field-reference-expression"/>
+  <xs:element name="invoke" type="invoke-expression"/>
+  <xs:element name="static-invoke" type="static-invoke-expression"/>
+  <xs:element name="postfix-inc" type="unary-expression"/>
+  <xs:element name="postfix-dec" type="unary-expression"/>
+  <xs:element name="subscript" type="binary-expression"/>
+
+  <xs:group name="expression">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+      constantExpression
+      :	expression
+      ;
+
+      expression
+      :	conditionalExpression (assignmentOperator expression)?
+      ;
+
+      assignmentOperator
+      :	'='
+      |   '+='
+      |   '-='
+      |   '*='
+      |   '/='
+      |   '&amp;='
+      |   '|='
+      |   '^='
+      |   '%='
+      |   '&lt;' '&lt;' '='
+      |   '&gt;' '&gt;' '='
+      |   '&gt;' '&gt;' '&gt;' '='
+      ;
+
+      conditionalExpression
+      :   conditionalOrExpression ( '?' expression ':' expression )?
+      ;
+
+      conditionalOrExpression
+      :   conditionalAndExpression ( '||' conditionalAndExpression )*
+      ;
+
+      conditionalAndExpression
+      :   inclusiveOrExpression ( '&amp;&amp;' inclusiveOrExpression )*
+      ;
+
+      inclusiveOrExpression
+      :   exclusiveOrExpression ( '|' exclusiveOrExpression )*
+      ;
+
+      exclusiveOrExpression
+      :   andExpression ( '^' andExpression )*
+      ;
+
+      andExpression
+      :   equalityExpression ( '&amp;' equalityExpression )*
+      ;
+
+      equalityExpression
+      :   instanceOfExpression ( ('==' | '!=') instanceOfExpression )*
+      ;
+
+      instanceOfExpression
+      :   relationalExpression ('instanceof' type)?
+      ;
+
+      relationalExpression
+      :   shiftExpression ( relationalOp shiftExpression )*
+      ;
+
+      relationalOp
+      :	('&lt;' '=' | '&gt;' '=' | '&lt;' | '&gt;')
+      ;
+
+      shiftExpression
+      :   additiveExpression ( shiftOp additiveExpression )*
+      ;
+
+      // TODO: need a sem pred to check column on these &gt;&gt;&gt;
+      shiftOp
+      :	('&lt;' '&lt;' | '&gt;' '&gt;' '&gt;' | '&gt;' '&gt;')
+      ;
+
+      additiveExpression
+      :   multiplicativeExpression ( ('+' | '-') multiplicativeExpression )*
+      ;
+
+      multiplicativeExpression
+      :   unaryExpression ( ( '*' | '/' | '%' ) unaryExpression )*
+      ;
+
+      unaryExpression
+      :   '+' unaryExpression
+      |	'-' unaryExpression
+      |   '++' unaryExpression
+      |   '--' unaryExpression
+      |   unaryExpressionNotPlusMinus
+      ;
+
+      unaryExpressionNotPlusMinus
+      :   '~' unaryExpression
+      | 	'!' unaryExpression
+      |   cast-expression
+      |   primary selector* ('++'|'--')?
+      ;
+
+      primary
+      :	parExpression
+      |   nonWildcardTypeArguments
+      (explicitGenericInvocationSuffix | 'this' arguments)
+      |   'this' ('.' Identifier)* (identifierSuffix)?
+      |   'super' superSuffix
+      |   literal
+      |   'new' creator
+      |   Identifier ('.' Identifier)* (identifierSuffix)?
+      |   primitiveType ('[' ']')* '.' 'class'
+      |   'void' '.' 'class'
+      ;
+
+      identifierSuffix
+      :	('[' ']')+ '.' 'class'
+      |	('[' expression ']')+ // can also be matched by selector, but do here
+      |   arguments
+      |   '.' 'class'
+      |   '.' explicitGenericInvocation
+      |   '.' 'this'
+      |   '.' 'super' arguments
+      |   '.' 'new' (nonWildcardTypeArguments)? innerCreator
+      ;
+
+      creator
+      :	nonWildcardTypeArguments? createdName
+      (arrayCreatorRest | classCreatorRest)
+      ;
+
+      createdName
+      :	Identifier typeArguments?
+      ('.' Identifier typeArguments?)*
+      |	primitiveType
+      ;
+
+      innerCreator
+      :	Identifier classCreatorRest
+      ;
+
+      arrayCreatorRest
+      :	'['
+      (   ']' ('[' ']')* arrayInitializer
+      |   expression ']' ('[' expression ']')* ('[' ']')*
+      )
+      ;
+
+      classCreatorRest
+      :	arguments classBody?
+      ;
+
+      explicitGenericInvocation
+      :	nonWildcardTypeArguments explicitGenericInvocationSuffix
+      ;
+
+      nonWildcardTypeArguments
+      :	'&lt;' typeList '&gt;'
+      ;
+
+      explicitGenericInvocationSuffix
+      :	'super' superSuffix
+      |   Identifier arguments
+      ;
+
+      selector
+      :	'.' Identifier (arguments)?
+      |   '.' 'this'
+      |   '.' 'super' superSuffix
+      |   '.' 'new' (nonWildcardTypeArguments)? innerCreator
+      |   '[' expression ']'
+      ;
+
+      superSuffix
+      :	arguments
+      |   '.' Identifier (arguments)?
+      ;
+
+      literal
+      :   integerLiteral
+      |   FloatingPointLiteral
+      |   CharacterLiteral
+      |   StringLiteral
+      |   booleanLiteral
+      |   'null'
+      ;
+
+      integerLiteral
+      :   HexLiteral
+      |   OctalLiteral
+      |   DecimalLiteral
+      ;
+
+      booleanLiteral
+      :   'true'
+      |   'false'
+      ;
+    ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element ref="scope-expression"/>
+
+      <xs:element ref="cast"/>
+
+      <xs:element ref="snippet-expression"/>
+      <xs:element ref="parens"/>
+
+      <xs:element ref="int"/>
+      <xs:element ref="short"/>
+      <xs:element ref="byte"/>
+      <xs:element ref="long"/>
+      <xs:element ref="float"/>
+      <xs:element ref="double"/>
+      <xs:element ref="string"/>
+      <xs:element ref="char"/>
+      <xs:element ref="boolean"/>
+      <xs:element ref="null"/>
+
+      <xs:element ref="new-array"/>
+      <xs:element ref="new-object"/>
+      <xs:element ref="class-of"/>
+      <xs:element ref="construct"/>
+      <xs:element ref="this"/>
+      <xs:element ref="super"/>
+      <xs:element ref="outer-this"/>
+      <xs:element ref="var"/>
+      <xs:element ref="field"/>
+      <xs:element ref="static-field"/>
+      <xs:element ref="invoke"/>
+      <xs:element ref="static-invoke"/>
+      <xs:element ref="postfix-inc"/>
+      <xs:element ref="postfix-dec"/>
+      <xs:element ref="subscript"/>
+
+      <xs:element ref="plus"/>
+      <xs:element ref="neg"/>
+      <xs:element ref="inc"/>
+      <xs:element ref="dec"/>
+      <xs:element ref="not"/>
+      <xs:element ref="binary-not"/>
+
+      <xs:element ref="mul"/>
+      <xs:element ref="div"/>
+      <xs:element ref="mod"/>
+
+      <xs:element ref="add"/>
+      <xs:element ref="sub"/>
+
+      <xs:element ref="shl"/>
+      <xs:element ref="sshr"/>
+      <xs:element ref="shr"/>
+
+      <xs:element ref="le"/>
+      <xs:element ref="ge"/>
+      <xs:element ref="lt"/>
+      <xs:element ref="gt"/>
+
+      <xs:element ref="instance-of"/>
+
+      <xs:element ref="eq"/>
+      <xs:element ref="ne"/>
+
+      <xs:element ref="binary-and"/>
+
+      <xs:element ref="binary-xor"/>
+
+      <xs:element ref="binary-or"/>
+
+      <xs:element ref="and"/>
+
+      <xs:element ref="or"/>
+
+      <xs:element ref="condition"/>
+
+      <xs:element ref="assign"/>
+      <xs:element ref="add-to"/>
+      <xs:element ref="sub-from"/>
+      <xs:element ref="mul-to"/>
+      <xs:element ref="div-by"/>
+      <xs:element ref="and-with"/>
+      <xs:element ref="or-with"/>
+      <xs:element ref="xor-with"/>
+      <xs:element ref="mod-by"/>
+      <xs:element ref="shl-by"/>
+      <xs:element ref="shr-by"/>
+      <xs:element ref="sshr-by"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="expressionList">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+        expressionList
+        :   expression (',' expression)*
+        ;
+      ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:group ref="expression" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:simpleType name="Identifier">
+    <xs:annotation>
+      <xs:documentation><![CDATA[
+        Letter (Letter|JavaIDDigit)*
+      ]]></xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+</xs:schema>

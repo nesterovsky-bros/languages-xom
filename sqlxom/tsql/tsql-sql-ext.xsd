@@ -1,0 +1,878 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  This xml schema defines simplified schema of the tsql statements.
+
+  $Id$
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://www.bphx.com/basic-sql/2008-12-11/tsql"
+  xmlns:tsql="http://www.bphx.com/basic-sql/2008-12-11/tsql"
+  xmlns:sql="http://www.bphx.com/basic-sql/2008-12-11"
+  targetNamespace="http://www.bphx.com/basic-sql/2008-12-11/tsql"
+  elementFormDefault="qualified">
+
+  <xs:import namespace="http://www.bphx.com/basic-sql/2008-12-11"
+    schemaLocation="../basic-sql.xsd"/>
+
+  <xs:group name="var-or-name">
+    <xs:choice>
+      <xs:element ref="sql:var"/>
+      <xs:element ref="name"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="var-or-qualified-name">
+    <xs:choice>
+      <xs:element ref="sql:var"/>
+      <xs:element name="name" type="qualified-name"/>
+    </xs:choice>
+  </xs:group>
+
+  <!-- query extensions. -->
+  <xs:group name="top-clause">
+    <xs:sequence>
+      <xs:element name="top" type="top-clause"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="for-browse-clause">
+    <xs:sequence>
+      <xs:element name="for-browse" type="sql:sql-element"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="for-xml-clause">
+    <xs:sequence>
+      <xs:element name="for-xml" type="for-xml-clause"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="query-option-clause">
+    <xs:sequence>
+      <xs:element name="option" type="query-option-clause"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:simpleType name="join-hint">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="loop"/>
+      <xs:enumeration value="merge"/>
+      <xs:enumeration value="hash"/>
+      <xs:enumeration value="remote"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:attributeGroup name="join-attributes">
+    <xs:attribute name="hint" type="join-hint"/>
+  </xs:attributeGroup>
+
+  <xs:group name="table-with-clause">
+    <xs:sequence>
+      <xs:element name="with" type="table-with-clause"/>
+    </xs:sequence>
+  </xs:group>
+
+  <!-- Table sources. -->
+  <xs:group name="source">
+    <xs:sequence>
+      <xs:element name="table-var" type="table-var-source"/>
+      <xs:element name="execute-source" type="execute-source"/>
+    </xs:sequence>    
+  </xs:group>
+  
+  <xs:group name="update-set-clause">
+    <xs:choice>
+      <xs:element ref="set-var"/>
+      <xs:element ref="set-property"/>
+      <xs:element ref="set-method"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="table-hint">
+    <xs:choice>
+      <xs:element name="no-expand" type="table-hint-clause"/>
+      <xs:element name="force-scan" type="table-hint-clause"/>
+      <xs:element name="force-seek" type="table-hint-clause"/>
+      <xs:element name="hold-lock" type="table-hint-clause"/>
+      <xs:element name="table-index" type="table-hint-index-clause"/>
+      <xs:element name="no-lock" type="table-hint-clause"/>
+      <xs:element name="no-wait" type="table-hint-clause"/>
+      <xs:element name="page-lock" type="table-hint-clause"/>
+      <xs:element name="read-commited" type="table-hint-clause"/>
+      <xs:element name="read-committed-lock" type="table-hint-clause"/>
+      <xs:element name="read-past" type="table-hint-clause"/>
+      <xs:element name="read-uncommitted" type="table-hint-clause"/>
+      <xs:element name="repeatable-read" type="table-hint-clause"/>
+      <xs:element name="row-lock" type="table-hint-clause"/>
+      <xs:element name="serializable" type="table-hint-clause"/>
+      <xs:element name="spatial-window-max-cells"
+        type="table-hint-spatial-window-max-cells-clause"/>
+      <xs:element name="table-lock" type="table-hint-clause"/>
+      <xs:element name="table-lock-x" type="table-hint-clause"/>
+      <xs:element name="update-lock" type="table-hint-clause"/>
+      <xs:element name="x-lock" type="table-hint-clause"/>
+      <xs:element name="keep-identity" type="table-hint-clause"/>
+      <xs:element name="keep-defaults" type="table-hint-clause"/>
+      <xs:element name="ignore-constraints" type="table-hint-clause"/>
+      <xs:element name="ignore-triggers" type="table-hint-clause"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="table-with-clause">
+    <xs:complexContent>
+      <xs:extension base="sql:sql-element">
+        <xs:group ref="table-hint"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:group name="query-hint">
+    <xs:choice>
+      <xs:element name="hash-group" type="query-hint-clause"/>
+      <xs:element name="order-group" type="query-hint-clause"/>
+      <xs:element name="concat-union" type="query-hint-clause"/>
+      <xs:element name="hash-union" type="query-hint-clause"/>
+      <xs:element name="merge-union" type="query-hint-clause"/>
+      <xs:element name="loop-join" type="query-hint-clause"/>
+      <xs:element name="merge-join" type="query-hint-clause"/>
+      <xs:element name="hash-join" type="query-hint-clause"/>
+      <xs:element name="expand-views" type="query-hint-clause"/>
+      <xs:element name="force-order" type="query-hint-clause"/>
+      <xs:element name="ignore-non-clustered-column-store-index" type="query-hint-clause"/>
+      <xs:element name="keep-plan" type="query-hint-clause"/>
+      <xs:element name="keep-fixed-plan" type="query-hint-clause"/>
+      <xs:element name="simple-parametrization" type="query-hint-clause"/>
+      <xs:element name="forced-parametrization" type="query-hint-clause"/>
+      <xs:element name="recompile" type="query-hint-clause"/>
+      <xs:element name="robust-plan" type="query-hint-clause"/>
+      <xs:element name="fast-rows" type="query-hint-fast-rows-clause"/>
+      <xs:element name="max-dop" type="query-hint-max-dop-clause"/>
+      <xs:element name="max-recursion" type="query-hint-max-recursion-clause"/>
+      <xs:element name="optimize" type="query-hint-optimize-clause"/>
+      <xs:element name="use-plan" type="query-hint-use-plan-clause"/>
+      <xs:element name="table-hint" type="query-hint-table-hint-clause"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="query-option-clause">
+    <xs:complexContent>
+      <xs:extension base="sql:sql-element">
+        <xs:group ref="query-hint"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Statements. -->
+  <xs:element name="label" type="label-statement"/>
+  <xs:element name="block" type="block-statement"/>
+  <xs:element name="try" type="try-statement"/>
+  <xs:element name="if" type="if-statement"/>
+  <xs:element name="while" type="while-statement"/>
+  <xs:element name="break" type="sql:statement"/>
+  <xs:element name="continue" type="sql:statement"/>
+  <xs:element name="goto" type="goto-statement"/>
+  <xs:element name="declare-var" type="declare-var-statement"/>
+  <xs:element name="set-var" type="set-var-statement"/>
+  <xs:element name="set-property" type="set-property-statement"/>
+  <xs:element name="set-method" type="set-method-statement"/>
+  <xs:element name="set-ansi-defaults" type="set-option-statement"/>
+  <xs:element name="set-ansi-null-dflt-off" type="set-option-statement"/>
+  <xs:element name="set-ansi-null-dflt-on" type="set-option-statement"/>
+  <xs:element name="set-ansi-nulls" type="set-option-statement"/>
+  <xs:element name="set-ansi-padding" type="set-option-statement"/>
+  <xs:element name="set-ansi-warnings" type="set-option-statement"/>
+  <xs:element name="set-arithabort" type="set-option-statement"/>
+  <xs:element name="set-arithignore" type="set-option-statement"/>
+  <xs:element name="set-concat-null-yields-null" type="set-option-statement"/>
+  <xs:element name="set-context-info" type="set-option-statement"/>
+  <xs:element name="set-cursor-close-on-commit" type="set-option-statement"/>
+  <xs:element name="set-datefirst" type="set-option-statement"/>
+  <xs:element name="set-dateformat" type="set-option-statement"/>
+  <xs:element name="set-deadlock-priority" type="set-option-statement"/>
+  <xs:element name="set-fips-flagger" type="set-option-statement"/>
+  <xs:element name="set-fmtonly" type="set-option-statement"/>
+  <xs:element name="set-forceplan" type="set-option-statement"/>
+  <xs:element name="set-identity-insert" type="set-option-statement"/>
+  <xs:element name="set-implicit-transactions" type="set-option-statement"/>
+  <xs:element name="set-language" type="set-option-statement"/>
+  <xs:element name="set-lock-timeout" type="set-option-statement"/>
+  <xs:element name="set-nocount" type="set-option-statement"/>
+  <xs:element name="set-noexec" type="set-option-statement"/>
+  <xs:element name="set-numeric-roundabort" type="set-option-statement"/>
+  <xs:element name="set-offsets" type="set-option-statement"/>
+  <xs:element name="set-parseonly" type="set-option-statement"/>
+  <xs:element name="set-query-governor-cost-limit" 
+    type="set-option-statement"/>
+  <xs:element name="set-quoted-identifier" type="set-option-statement"/>
+  <xs:element name="set-remote-proc-transactions" type="set-option-statement"/>
+  <xs:element name="set-rowcount" type="set-option-statement"/>
+  <xs:element name="set-showplan-all" type="set-option-statement"/>
+  <xs:element name="set-showplan-text" type="set-option-statement"/>
+  <xs:element name="set-showplan-xml" type="set-option-statement"/>
+  <xs:element name="set-statistics-io" type="set-option-statement"/>
+  <xs:element name="set-statistics-profile" type="set-option-statement"/>
+  <xs:element name="set-statistics-time" type="set-option-statement"/>
+  <xs:element name="set-statistics-xml" type="set-option-statement"/>
+  <xs:element name="set-textsize" type="set-option-statement"/>
+  <xs:element name="set-transaction-isolation-level"
+    type="set-option-statement"/>
+  <xs:element name="set-xact-abort" type="set-option-statement"/>
+  <xs:element name="print" type="print-statement"/>
+  <xs:element name="raiserror" type="raiserror-statement"/>
+  <xs:element name="throw" type="throw-statement"/>
+  <xs:element name="declare-cursor" type="declare-cursor-statement"/>
+  <xs:element name="open" type="open-statement"/>
+  <xs:element name="close" type="close-statement"/>
+  <xs:element name="fetch" type="fetch-statement"/>
+  <xs:element name="deallocate" type="deallocate-statement"/>
+  <xs:element name="execute" type="execute-statement"/>
+  <xs:element name="begin-transaction" type="begin-transaction-statement"/>
+  <xs:element name="commit" type="commit-statement"/>
+  <xs:element name="rollback" type="rollback-statement"/>
+  <xs:element name="save-transaction" type="save-transaction-statement"/>
+
+  <!-- DDL -->
+
+  <!-- Expressions. -->
+  <xs:element name="name" type="sql:var-expression"/>
+  <xs:element name="next-value-for" type="next-value-for-expression"/>
+  <xs:element name="convert" type="convert-expression"/>
+  <xs:element name="try-convert" type="convert-expression"/>
+  <xs:element name="try-cast" type="sql:cast-expression"/>
+  <xs:element name="parse" type="parse-expression"/>
+  <xs:element name="try-parse" type="parse-expression"/>
+  <xs:element name="collation" type="collation-expression"/>
+  <xs:element name="system-var" type="sql:var-expression"/>
+  <xs:element name="iif" type="iif-expression"/>
+  <xs:element name="simple-case" type="simple-case-expression"/>
+  <xs:element name="search-case" type="search-case-expression"/>
+  <xs:element name="method" type="method-expression"/>
+  <xs:element name="property" type="property-expression"/>
+
+  <xs:complexType name="qualified-name">
+    <xs:complexContent>
+      <xs:extension base="sql:sql-element">
+        <xs:attributeGroup ref="sql:qualified-name"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="top-clause">
+    <xs:complexContent>
+      <xs:extension base="sql:unary-expression">
+        <xs:attribute name="percent" type="xs:boolean"
+          use="optional" default="false"/>
+        <xs:attribute name="with-ties" type="xs:boolean"
+          use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="for-xml-clause">
+    <xs:complexContent>
+      <xs:extension base="sql:sql-element">
+        <xs:attribute name="mode">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="raw"/>
+              <xs:enumeration value="auto"/>
+              <xs:enumeration value="explicit"/>
+              <xs:enumeration value="path"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="xmldata" type="xs:boolean"/>
+        <xs:attribute name="xmlschema" type="xs:string"/>
+        <xs:attribute name="elements">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="xsnil"/>
+              <xs:enumeration value="absent"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="root" type="xs:string"/>
+        <xs:attribute name="type" type="xs:boolean"/>
+        <xs:attribute name="binary-base64" type="xs:boolean"/>
+        <xs:attribute name="element-name" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="table-hint-clause">
+    <xs:complexContent>
+      <xs:extension base="sql:sql-element"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="table-hint-index-clause">
+    <xs:complexContent>
+      <xs:extension base="table-hint-clause">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="table-hint-spatial-window-max-cells-clause">
+    <xs:complexContent>
+      <xs:extension base="table-hint-clause">
+        <xs:attribute name="value" type="xs:integer" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="query-hint-clause">
+    <xs:complexContent>
+      <xs:extension base="sql:sql-element"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="query-hint-fast-rows-clause">
+    <xs:complexContent>
+      <xs:extension base="query-hint-clause">
+        <xs:attribute name="value" type="xs:integer" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="query-hint-max-dop-clause">
+    <xs:complexContent>
+      <xs:extension base="query-hint-clause">
+        <xs:attribute name="value" type="xs:integer" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+          
+  <xs:complexType name="query-hint-max-recursion-clause">
+    <xs:complexContent>
+      <xs:extension base="query-hint-clause">
+        <xs:attribute name="value" type="xs:integer" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="query-hint-optimize-clause">
+    <xs:complexContent>
+      <xs:extension base="query-hint-clause">
+        <xs:sequence>
+          <xs:element name="for" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="sql:sql-element">
+                  <xs:sequence>
+                    <xs:element ref="sql:var"/>
+                    <xs:group ref="sql:expression"
+                      minOccurs="0" maxOccurs="1"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="query-hint-use-plan-clause">
+    <xs:complexContent>
+      <xs:extension base="query-hint-clause">
+        <xs:attribute name="value" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="query-hint-table-hint-clause">
+    <xs:complexContent>
+      <xs:extension base="query-hint-clause">
+        <xs:sequence>
+          <xs:group ref="table-hint" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="table-var-source">
+    <xs:complexContent>
+      <xs:extension base="sql:source">
+        <xs:sequence>
+          <xs:element ref="sql:var"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="execute-source">
+    <xs:complexContent>
+      <xs:extension base="sql:source">
+        <xs:sequence>
+          <xs:element ref="execute"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="default-expression">
+    <xs:complexContent>
+      <xs:extension base="sql:expression"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="collation-expression">
+    <xs:complexContent>
+      <xs:extension base="sql:unary-expression">
+        <xs:attribute name="name" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="label-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:group ref="sql:statement"/>
+        <xs:attribute name="label" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="block-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:group ref="sql:statement" maxOccurs="unbounded"/>
+        <xs:attribute name="logical-scope" type="xs:boolean"
+          use="optional" default="false"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="try-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:sequence>
+          <xs:element ref="block"/>
+          <xs:element name="catch" type="block-statement"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="if-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:sequence>
+          <xs:element name="condition" type="sql:unary-expression"/>
+          <xs:element name="then" type="block-statement"/>
+          <xs:element name="else" type="block-statement"
+            minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="while-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:sequence>
+          <xs:element name="condition" type="sql:unary-expression"/>
+          <xs:element name="body" type="block-statement"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="goto-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:attribute name="destination-label" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="declare-var-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:sequence>
+          <xs:group ref="sql:type"/>
+          <xs:element name="default" type="sql:unary-expression"
+            minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="set-var-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:group ref="sql:expression"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="set-property-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:sequence>
+          <xs:element ref="property"/>
+          <xs:group ref="sql:expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="set-method-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:sequence>
+          <xs:element ref="method"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="declare-cursor-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:sequence>
+          <xs:group ref="sql:query"/>
+          <xs:element name="for-update" minOccurs="0">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="sql:sql-element">
+                  <xs:sequence>
+                    <xs:element ref="sql:field"
+                      minOccurs="0" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="iso" type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="scroll" type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="forward-only" type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="scope" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="local"/>
+              <xs:enumeration value="global"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="implementation" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="intensive"/>
+              <xs:enumeration value="static"/>
+              <xs:enumeration value="keyset"/>
+              <xs:enumeration value="dynamic"/>
+              <xs:enumeration value="fast-forward"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="access" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="readonly"/>
+              <xs:enumeration value="scroll-locks"/>
+              <xs:enumeration value="optimistic"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="type-warning" type="xs:boolean" use="optional" default="false"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="deallocate-statement">
+    <xs:annotation>
+      <xs:documentation>
+        <![CDATA[
+DEALLOCATE { { [ GLOBAL ] cursor_name } | @cursor_variable_name }
+        ]]>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:group ref="tsql:var-or-name"/>
+        <xs:attribute name="global" type="xs:boolean" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="open-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:group ref="tsql:var-or-name"/>
+        <xs:attribute name="global" type="xs:boolean" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="close-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:group ref="tsql:var-or-name"/>
+        <xs:attribute name="global" type="xs:boolean" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="fetch-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:sequence>
+          <xs:element name="offset" type="sql:unary-expression" minOccurs="0"/>
+          <xs:group ref="tsql:var-or-name"/>
+          <xs:element ref="sql:into"/>
+        </xs:sequence>
+        <xs:attribute name="global" type="xs:boolean" use="optional"/>
+        <xs:attribute name="direction" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="next"/>
+              <xs:enumeration value="prior"/>
+              <xs:enumeration value="first"/>
+              <xs:enumeration value="last"/>
+              <xs:enumeration value="absolute"/>
+              <xs:enumeration value="relative"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="execute-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:sequence>
+          <xs:group ref="tsql:var-or-qualified-name"/>
+          <xs:element name="return" minOccurs="0">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="sql:sql-element">
+                  <xs:sequence>
+                    <xs:element ref="sql:var"/>
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="param" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="sql:unary-expression">
+                  <xs:attribute name="name" type="xs:string" use="optional"/>
+                  <xs:attribute name="output" type="xs:boolean"
+                    use="optional" default="false"/>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="with-recompile" type="xs:boolean"
+          use="optional" default="false"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Expressions. -->
+  <xs:complexType name="next-value-for-expression">
+    <xs:complexContent>
+      <xs:extension base="sql:expression">
+        <xs:group ref="sql:over-clause" minOccurs="0"/>
+        <xs:attributeGroup ref="sql:qualified-name"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+
+  <xs:complexType name="convert-expression">
+    <xs:complexContent>
+      <xs:extension base="sql:expression">
+        <xs:sequence>
+          <xs:group ref="sql:type"/>
+          <xs:element name="value" type="sql:unary-expression"/>
+          <xs:element name="style" type="sql:unary-expression" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="parse-expression">
+    <xs:complexContent>
+      <xs:extension base="sql:expression">
+        <xs:sequence>
+          <xs:group ref="sql:type"/>
+          <xs:element name="value" type="sql:unary-expression"/>
+          <xs:element name="culutre" type="sql:unary-expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="iif-expression">
+    <xs:complexContent>
+      <xs:extension base="sql:expression">
+        <xs:sequence>
+          <xs:element name="condition" type="sql:unary-expression"/>
+          <xs:element name="then" type="sql:unary-expression"/>
+          <xs:element name="else" type="sql:unary-expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="simple-case-expression">
+    <xs:complexContent>
+      <xs:extension base="sql:expression">
+        <xs:sequence>
+          <xs:element name="value" type="sql:unary-expression"/>
+          <xs:element name="when" type="sql:unary-expression"
+            maxOccurs="unbounded"/>
+          <xs:element name="else" type="sql:unary-expression" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="search-case-expression">
+    <xs:complexContent>
+      <xs:extension base="sql:expression">
+        <xs:sequence>
+          <xs:element name="when" type="sql:binary-expression"
+            maxOccurs="unbounded"/>
+          <xs:element name="else" type="sql:unary-expression" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="method-expression">
+    <xs:complexContent>
+      <xs:extension base="sql:expression">
+        <xs:sequence>
+          <xs:choice>
+            <xs:element name="instance" type="sql:unary-expression"/>
+            <xs:group ref="sql:type"/>
+          </xs:choice>
+          <xs:element name="arguments" type="sql:expression-list" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="property-expression">
+    <xs:complexContent>
+      <xs:extension base="sql:unary-expression">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Statements -->
+  
+  <xs:complexType name="set-option-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:sequence>
+          <xs:choice>
+            <xs:element name="on" type="sql:sql-element"/>
+            <xs:element name="off" type="sql:sql-element"/>
+            
+            <xs:element name="low" type="sql:sql-element"/>
+            <xs:element name="normal" type="sql:sql-element"/>
+            <xs:element name="high" type="sql:sql-element"/>
+
+            <xs:element ref="sql:number"/>
+            <xs:element ref="sql:string"/>
+            <xs:element ref="sql:var"/>
+
+            <xs:element name="read-uncommitted" type="sql:sql-element"/>
+            <xs:element name="read-committed" type="sql:sql-element"/>
+            <xs:element name="repeatable-read" type="sql:sql-element"/>
+            <xs:element name="snapshot" type="sql:sql-element"/>
+            <xs:element name="serializable" type="sql:sql-element"/>
+          </xs:choice>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="print-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:group ref="sql:expression"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="raiserror-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:sequence>
+          <xs:element name="message" type="sql:unary-expression"/>
+          <xs:element name="argument" type="sql:unary-expression"
+            minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="severity" type="xs:integer"/>
+        <xs:attribute name="state" type="xs:integer"/>
+        <xs:attribute name="log" type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="nowait" type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="seterror" type="xs:boolean" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="throw-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:sequence minOccurs="0">
+          <xs:element name="error-number" type="sql:unary-expression"/>
+          <xs:element name="message" type="sql:unary-expression"/>
+          <xs:element name="state" type="sql:unary-expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="begin-transaction-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:group ref="tsql:var-or-name" minOccurs="0"/>
+        <xs:attribute name="distributed" type="xs:boolean"
+          use="optional" default="false"/>
+        <xs:attribute name="description" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="commit-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:group ref="tsql:var-or-name" minOccurs="0"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="rollback-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:group ref="tsql:var-or-name" minOccurs="0"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="save-transaction-statement">
+    <xs:complexContent>
+      <xs:extension base="sql:statement">
+        <xs:group ref="tsql:var-or-name"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+</xs:schema>
