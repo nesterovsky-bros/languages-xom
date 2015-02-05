@@ -85,13 +85,13 @@
 
     <xsl:variable name="join-tables-list" as="element()*">
       <xsl:if test="
-        every $item in $columns/sql:column satisfies
+        every $item in $columns/self::sql:column satisfies
           $item[not(xs:boolean(@wildcard))]">
 
         <xsl:variable name="aliases" as="xs:string*" select="
           distinct-values
           (
-            $columns/sql:column//sql:field
+            $columns/self::sql:column//sql:field
             [
               every $field in $joins/sql:field[1] satisfies
                 (@field-id != $field/@field-id) or
@@ -219,7 +219,7 @@
     <xsl:param name="columns-closure" as="element()*"/>
 
     <xsl:variable name="columns" as="element()*"
-      select="$columns-closure[self::sql:column]"/>
+      select="$columns-closure/self::sql:column"/>
     <xsl:variable name="host-expressions" as="element()*"
       select="$columns-closure[self::sql:into]/sql:host-expression"/>
 
