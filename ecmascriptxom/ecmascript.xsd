@@ -276,13 +276,13 @@ ExportDeclaration : 	See 15.2.3
 
   <xs:group name="identifier-reference">
     <xs:choice>
-      <xs:group ref="var-ref"/>
+      <xs:group ref="ref"/>
     </xs:choice>
   </xs:group>
 
-  <xs:group name="var-ref">
+  <xs:group name="ref">
     <xs:sequence>
-      <xs:element ref="var-ref"/>
+      <xs:element ref="ref"/>
     </xs:sequence>
   </xs:group>
 
@@ -1030,7 +1030,9 @@ ExportDeclaration : 	See 15.2.3
 
   <xs:group name="formal-parameters">
     <xs:sequence>
-      <xs:element name="parameters" type="formal-parameters"/>
+      <xs:group ref="formal-parameter"
+         minOccurs="0" maxOccurs="unbounded"/>
+      <xs:group ref="formal-rest-parameter" minOccurs="0"/>
     </xs:sequence>
   </xs:group>
 
@@ -1775,18 +1777,6 @@ ExportDeclaration : 	See 15.2.3
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="formal-parameters">
-    <xs:complexContent>
-      <xs:extension base="base-element">
-        <xs:sequence>
-          <xs:group ref="formal-parameter"
-             minOccurs="0" maxOccurs="unbounded"/>
-          <xs:group ref="formal-rest-parameter" minOccurs="0"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
   <xs:complexType name="base-formal-parameter">
     <xs:complexContent>
       <xs:extension base="base-element"/>
@@ -2162,7 +2152,7 @@ ExportDeclaration : 	See 15.2.3
   <xs:element name="null" type="expression"/>
   <xs:element name="this" type="expression"/>
   <xs:element name="super" type="expression"/>
-  <xs:element name="var-ref"  type="ref"/>
+  <xs:element name="ref"  type="ref"/>
   <xs:element name="boolean" type="boolean"/>
   <xs:element name="number" type="number"/>
   <xs:element name="string" type="string"/>

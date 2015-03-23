@@ -1,5 +1,239 @@
 <?xml version="1.0" encoding="utf-8"?>
 <script xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+  <comment>
+    Code from http://www.nesterovsky-bros.com/weblog/2015/02/02/CancelAngularjsResourceRequest.aspx
+  </comment>
+  <expression>
+    <call>
+      <member-ref name="controller">
+        <call>
+          <member-ref name="factory">
+            <call>
+              <member-ref name="module">
+                <ref name="angular"/>
+              </member-ref>
+              <arguments>
+                <string value="app"/>
+                <array>
+                  <string value="ngResource"/>
+                </array>
+              </arguments>
+            </call>
+          </member-ref>
+          <arguments>
+            <string value="services"/>
+            <array>
+              <string value="$resource"/>
+              <function>
+                <parameter>
+                  <ident name="$resource"/>
+                </parameter>
+                <body>
+                  <function>
+                    <ident name="resolveAction"/>
+                    <parameter>
+                      <ident name="resolve"/>
+                    </parameter>
+                    <body>
+                      <if>
+                        <condition>
+                          <member-ref name="params">
+                            <this/>
+                          </member-ref>
+                        </condition>
+                        <then>
+                          <expression>
+                            <assign>
+                              <member-ref name="timeout">
+                                <this/>
+                              </member-ref>
+                              <member-ref name="timeout">
+                                <member-ref name="param">
+                                  <this/>
+                                </member-ref>
+                              </member-ref>
+                            </assign>
+                          </expression>
+                          <expression>
+                            <assign>
+                              <member-ref name="timeout">
+                                <member-ref name="param">
+                                  <this/>
+                                </member-ref>
+                              </member-ref>
+                              <null/>
+                            </assign>
+                          </expression>
+                        </then>
+                      </if>
+
+                      <expression>
+                        <assign>
+                          <member-ref name="then">
+                            <this/>
+                          </member-ref>
+                          <null/>
+                        </assign>
+                      </expression>
+
+                      <expression>
+                        <call>
+                          <ref name="resolve"/>
+                          <arguments>
+                            <this/>
+                          </arguments>
+                        </call>
+                      </expression>
+                    </body>
+                  </function>
+
+                  <return>
+                    <call>
+                      <ref name="$resource"/>
+                      <arguments>
+                        <string value="http://md5.jsontest.com/"/>
+                        <object/>
+                        <object>
+                          <property>
+                            <ident name="MD5"/>
+                            <object>
+                              <property>
+                                <ident name="method"/>
+                                <string value="GET"/>
+                              </property>
+                              <property>
+                                <ident name="params"/>
+                                <object>
+                                  <property>
+                                    <ident name="text"/>
+                                    <null/>
+                                  </property>
+                                </object>
+                              </property>
+                              <property>
+                                <ident name="then"/>
+                                <ref name="resolveAction"/>
+                              </property>
+                            </object>
+                          </property>
+                        </object>
+                      </arguments>
+                    </call>
+                  </return>
+                </body>
+              </function>
+            </array>
+          </arguments>
+        </call>
+      </member-ref>
+      <arguments>
+        <string value="Test"/>
+        <array>
+          <string value="services"/>
+          <string value="$q"/>
+          <string value="$timeout"/>
+          <function>
+            <parameter>
+              <ident name="services"/>
+            </parameter>
+            <parameter>
+              <ident name="$q"/>
+            </parameter>
+            <parameter>
+              <ident name="$timeout"/>
+            </parameter>
+            <body>
+              <expression>
+                <assign>
+                  <member-ref name="value">
+                    <this/>
+                  </member-ref>
+                  <string value="Sample text"/>
+                </assign>
+              </expression>
+              <expression>
+                <assign>
+                  <member-ref name="requestTimeout">
+                    <this/>
+                  </member-ref>
+                  <number value="100"/>
+                </assign>
+              </expression>
+
+              <expression>
+                <assign>
+                  <member-ref name="call">
+                    <this/>
+                  </member-ref>
+
+                  <function>
+                    <body>
+                      <var>
+                        <ident name="self"/>
+                        <initialize>
+                          <this/>
+                        </initialize>
+                      </var>
+
+                      <expression>
+                        <assign>
+                          <member-ref name="result">
+                            <ref name="self"/>
+                          </member-ref>
+
+                          <call>
+                            <member-ref name="MD5">
+                              <ref name="services"/>
+                            </member-ref>
+                            <arguments>
+                              <object>
+                                <property>
+                                  <ident name="text"/>
+                                  <member-ref name="value">
+                                    <ref name="self"/>
+                                  </member-ref>
+                                </property>
+                                <property>
+                                  <ident name="timeout"/>
+                                  <call>
+                                    <ref name="$q"/>
+                                    <arguments>
+                                      <function>
+                                        <parameter>
+                                          <ident name="resolve"/>
+                                        </parameter>
+                                        <body>
+                                          <expression>
+                                            <call>
+                                              <ref name="$timeout"/>
+                                              <arguments>
+                                                <ref name="resolve"/>
+                                                <member-ref name="requestTimeout">
+                                                  <ref name="self"/>
+                                                </member-ref>
+                                              </arguments>
+                                            </call>
+                                          </expression>
+                                        </body>
+                                      </function>
+                                    </arguments>
+                                  </call>
+                                </property>
+                              </object>
+                            </arguments>
+                          </call>
+                        </assign>
+                      </expression>
+                    </body>
+                  </function>
+                </assign>
+              </expression>
+            </body>
+          </function>
+        </array>
+      </arguments>
+    </call>
+  </expression>
 </script>
   
   
