@@ -5,20 +5,19 @@
       document.getElementById("demo").innerHTML = "Paragraph changed.";
     }
   </comment>
-  <function id="myFunction">
+  <function>
+    <name value="myFunction"/>
     <body>
       <expression>
         <assign>
-          <member-ref name="innerHTML">
+          <ref name="innerHTML">
             <call>
-              <member-ref name="getElementById">
+              <ref name="getElementById">
                 <ref name="document"/>
-              </member-ref>
-              <arguments>
-                <string value="demo"/>
-              </arguments>
+              </ref>
+              <string value="demo"/>
             </call>
-          </member-ref>
+          </ref>
           <string value="Paragraph changed."/>
         </assign>
       </expression>

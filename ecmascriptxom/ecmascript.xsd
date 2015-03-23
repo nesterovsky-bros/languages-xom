@@ -10,6 +10,105 @@
     </xs:documentation>
   </xs:annotation>
 
+  <xs:element name="meta" type="meta"/>
+  <xs:element name="comment" type="comment"/>
+
+  <xs:element name="script" type="script"/>
+  <xs:element name="module" type="module"/>
+
+  <xs:element name="function" type="function-declaration"/>
+  <xs:element name="generator-function" type="function-declaration"/>
+  <xs:element name="class" type="class-declaration"/>
+  <xs:element name="let" type="lexical-declaration"/>
+  <xs:element name="const" type="lexical-declaration"/>
+  
+  <xs:element name="var" type="variable-statement"/>
+  <xs:element name="block" type="block-statement"/>
+  <xs:element name="statement" type="statement"/>
+  <xs:element name="expression" type="expression-statement"/>
+  <xs:element name="if" type="if-statement"/>
+  <xs:element name="switch" type="switch-statement"/>
+  <xs:element name="do-while" type="do-while-statement"/>
+  <xs:element name="while" type="while-statement"/>
+  <xs:element name="for" type="for-statement"/>
+  <xs:element name="for-in" type="for-key-value-statement"/>
+  <xs:element name="for-of" type="for-key-value-statement"/>
+  <xs:element name="continue" type="continue-or-break-statement"/>
+  <xs:element name="break" type="continue-or-break-statement"/>
+  <xs:element name="return" type="return-statement"/>
+  <xs:element name="with" type="with-statement"/>
+  <xs:element name="label" type="labelled-statement"/>
+  <xs:element name="throw" type="throw-statement"/>
+  <xs:element name="try" type="try-statement"/>
+  <xs:element name="debugger" type="statement"/>
+
+  <xs:element name="null" type="expression"/>
+  <xs:element name="this" type="expression"/>
+  <xs:element name="super" type="expression"/>
+  <xs:element name="ref"  type="ref"/>
+  <xs:element name="boolean" type="boolean"/>
+  <xs:element name="number" type="number"/>
+  <xs:element name="string" type="string"/>
+  <xs:element name="regex" type="regex"/>
+  <xs:element name="template" type="template"/>
+  <xs:element name="parens" type="parens"/>
+  <xs:element name="array" type="array"/>
+  <xs:element name="object" type="object"/>
+  <xs:element name="conditional" type="conditional"/>
+  <xs:element name="or" type="or"/>
+  <xs:element name="and" type="and"/>
+  <xs:element name="bitwise-or" type="bitwise-or"/>
+  <xs:element name="bitwise-xor" type="bitwise-xor"/>
+  <xs:element name="bitwise-and" type="bitwise-and"/>
+  <xs:element name="eq" type="equality-expression"/>
+  <xs:element name="ne" type="equality-expression"/>
+  <xs:element name="strict-eq" type="equality-expression"/>
+  <xs:element name="strict-ne" type="equality-expression"/>
+  <xs:element name="lt" type="relational-expression"/>
+  <xs:element name="gt" type="relational-expression"/>
+  <xs:element name="le" type="relational-expression"/>
+  <xs:element name="ge" type="relational-expression"/>
+  <xs:element name="instanceof" type="relational-expression"/>
+  <xs:element name="in" type="relational-expression"/>
+  <xs:element name="left-shift" type="shift-expression"/>
+  <xs:element name="right-shift" type="shift-expression"/>
+  <xs:element name="unsigned-right-shift" type="shift-expression"/>
+  <xs:element name="add" type="additive-expression"/>
+  <xs:element name="sub" type="additive-expression"/>
+  <xs:element name="mul" type="multiplicative-expression"/>
+  <xs:element name="div" type="multiplicative-expression"/>
+  <xs:element name="mod" type="multiplicative-expression"/>
+  <xs:element name="delete" type="unary-expression"/>
+  <xs:element name="void" type="unary-expression"/>
+  <xs:element name="typeof" type="unary-expression"/>
+  <xs:element name="inc" type="unary-expression"/>
+  <xs:element name="dec" type="unary-expression"/>
+  <xs:element name="plus" type="unary-expression"/>
+  <xs:element name="neg" type="unary-expression"/>
+  <xs:element name="inv" type="unary-expression"/>
+  <xs:element name="not" type="unary-expression"/>
+  <xs:element name="post-inc" type="postfix-expression"/>
+  <xs:element name="post-dec" type="postfix-expression"/>
+  <xs:element name="subscript" type="subscript"/>
+  <xs:element name="tag" type="tag"/>
+  <xs:element name="new-target" type="expression"/>
+  <xs:element name="new" type="call"/>
+  <xs:element name="call" type="call"/>
+  <xs:element name="yield" type="yield"/>
+  <xs:element name="arrow-function" type="arrow-function"/>
+  <xs:element name="assign" type="assignment-expression"/>
+  <xs:element name="mul-to" type="assignment-expression"/>
+  <xs:element name="div-by" type="assignment-expression"/>
+  <xs:element name="mod-by" type="assignment-expression"/>
+  <xs:element name="add-to" type="assignment-expression"/>
+  <xs:element name="sub-from" type="assignment-expression"/>
+  <xs:element name="left-shift-by" type="assignment-expression"/>
+  <xs:element name="right-shift-by" type="assignment-expression"/>
+  <xs:element name="unsigned-right-shift-by" type="assignment-expression"/>
+  <xs:element name="and-with" type="assignment-expression"/>
+  <xs:element name="xor-with" type="assignment-expression"/>
+  <xs:element name="or-with" type="assignment-expression"/>
+
   <xs:simpleType name="identifier">
     <xs:restriction base="xs:string"/>
   </xs:simpleType>
@@ -25,47 +124,6 @@
     </xs:attribute>
   </xs:attributeGroup>
 
-  <xs:complexType name="ident">
-    <xs:attribute name="name" type="identifier" use="required"/>
-  </xs:complexType>
-
-  <xs:complexType name="base-element">
-    <xs:annotation>
-      <xs:documentation>
-        Base element of the ecmascript xml object model.
-      </xs:documentation>
-    </xs:annotation>
-    <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element ref="meta"/>
-      <xs:element ref="comment"/>
-    </xs:choice>
-    <xs:attribute name="id" type="xs:ID" use="optional"/>
-    <xs:attribute name="ref" type="xs:IDREF" use="optional"/>
-    <xs:anyAttribute processContents="skip"/>
-  </xs:complexType>
-
-  <xs:element name="meta">
-    <xs:annotation>
-      <xs:documentation>
-        Meta information, allowing to attach custom information to any element.
-      </xs:documentation>
-    </xs:annotation>
-    <xs:complexType mixed="true">
-      <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:any processContents="skip"/>
-      </xs:choice>
-      <xs:anyAttribute processContents="skip"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="comment">
-    <xs:complexType mixed="true">
-      <xs:group ref="comment-element" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:attribute name="doc" type="xs:boolean"
-        default="false" use="optional"/>
-    </xs:complexType>
-  </xs:element>
-
   <xs:group name="comment-element">
     <xs:choice>
       <!--<xs:element ref="meta"/>-->
@@ -74,9 +132,9 @@
     </xs:choice>
   </xs:group>
 
-  <xs:group name="ident">
+  <xs:group name="name">
     <xs:sequence>
-      <xs:element name="ident" type="ident"/>
+      <xs:element name="name" type="name"/>
     </xs:sequence>
   </xs:group>
 
@@ -146,7 +204,7 @@
 
   <xs:group name="import-default-binding">
     <xs:sequence>
-      <xs:group ref="ident"/>
+      <xs:group ref="name"/>
     </xs:sequence>
   </xs:group>
 
@@ -158,8 +216,7 @@
 
   <xs:group name="named-imports-exports">
     <xs:sequence>
-      <xs:group ref="import-export-specifier"
-        minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="names" type="named-imports-exports"/>
     </xs:sequence>
   </xs:group>
 
@@ -181,14 +238,6 @@
     </xs:sequence>
   </xs:group>
 
-
-  <!--
-ExportDeclaration : 	See 15.2.3
-  export *  FromClause ;
-  export  ExportClause  FromClause ;
-  export  ExportClause  ;
-  -->
-  
   <xs:group name="declaration">
     <xs:choice>
       <xs:group ref="hoistable-declaration"/>
@@ -217,25 +266,20 @@ ExportDeclaration : 	See 15.2.3
     </xs:choice>
   </xs:group>
 
-  <xs:group name="ident-lexical-declaration-content">
+  <xs:group name="lexical-declaration-content">
+    <xs:annotation>
+      <xs:documentation>
+        NOTE: in case of name production binding-initialize is optional;
+        otherwise it's requires.
+      </xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:group ref="ident"/>
+      <xs:choice>
+        <xs:group ref="name"/>
+        <xs:group ref="binding-pattern"/>
+      </xs:choice>
       <xs:group ref="binding-initialize" minOccurs="0"/>
     </xs:sequence>
-  </xs:group>
-
-  <xs:group name="binding-pattern-lexical-declaration-content">
-    <xs:sequence>
-      <xs:group ref="binding-pattern"/>
-      <xs:group ref="binding-initialize"/>
-    </xs:sequence>
-  </xs:group>
-
-  <xs:group name="lexical-declaration-content">
-    <xs:choice>
-      <xs:group ref="ident-lexical-declaration-content"/>
-      <xs:group ref="binding-pattern-lexical-declaration-content"/>
-    </xs:choice>
   </xs:group>
 
   <xs:group name="breakable-statement">
@@ -359,15 +403,7 @@ ExportDeclaration : 	See 15.2.3
 
   <xs:group name="spread">
     <xs:sequence>
-      <xs:element name="spread">
-        <xs:complexType>
-          <xs:complexContent>
-            <xs:extension base="base-element">
-              <xs:group ref="assignment-expression"/>
-            </xs:extension>
-          </xs:complexContent>
-        </xs:complexType>
-      </xs:element>
+      <xs:element name="spread" type="spread"/>
     </xs:sequence>
   </xs:group>
 
@@ -397,41 +433,20 @@ ExportDeclaration : 	See 15.2.3
 
   <xs:group name="property-definition">
     <xs:choice>
-      <xs:group ref="property"/>
+      <xs:group ref="member-definition"/>
       <xs:group ref="method-definition"/>
     </xs:choice>
   </xs:group>
 
   <xs:group name="property-name">
-    <xs:choice>
-      <xs:group ref="ident"/>
-      <xs:group ref="computed-property-name"/>
-    </xs:choice>
-  </xs:group>
-
-  <xs:group name="computed-property-name">
     <xs:sequence>
-      <xs:element name="name" type="computed-property-name"/>
-    </xs:sequence>    
-  </xs:group>
-
-  <xs:group name="ident-property">
-    <xs:sequence>
-      <xs:group ref="ident"/>
-      <xs:group ref="assignment-expression" minOccurs="0"/>
+      <xs:element name="name" type="property-name"/>
     </xs:sequence>
   </xs:group>
 
-  <xs:group name="computed-property">
+  <xs:group name="member-definition">
     <xs:sequence>
-      <xs:group ref="computed-property-name"/>
-      <xs:group ref="assignment-expression"/>
-    </xs:sequence>
-  </xs:group>
-
-  <xs:group name="property">
-    <xs:sequence>
-      <xs:element name="property" type="property"/>
+      <xs:element name="property" type="member-definition"/>
     </xs:sequence>
   </xs:group>
   
@@ -571,13 +586,13 @@ ExportDeclaration : 	See 15.2.3
 
   <xs:group name="postfix-expression">
     <xs:choice>
-      <xs:group ref="left-hand-side-expression"/>
+      <xs:group ref="lefthand-side-expression"/>
       <xs:group ref="post-inc"/>
       <xs:group ref="post-dec"/>
     </xs:choice>
   </xs:group>
 
-  <xs:group name="left-hand-side-expression">
+  <xs:group name="lefthand-side-expression">
     <xs:annotation>
       <xs:documentation>
         Fused into member expression.
@@ -605,11 +620,13 @@ ExportDeclaration : 	See 15.2.3
         SuperProperty production is moved to PrimaryExpression as 
         a sibling of "this" production.
       </xs:documentation>
+      <xs:documentation>
+        ref and member-ref productions are fused.
+      </xs:documentation>
     </xs:annotation>
     <xs:choice>
       <xs:group ref="primary-expression"/>
       <xs:group ref="subscript"/>
-      <xs:group ref="member-ref"/>
       <xs:group ref="tag"/>
       <xs:group ref="meta-property"/>
       <xs:group ref="new"/>
@@ -888,12 +905,6 @@ ExportDeclaration : 	See 15.2.3
     </xs:sequence>
   </xs:group>
 
-  <xs:group name="member-ref">
-    <xs:sequence>
-      <xs:element ref="member-ref"/>
-    </xs:sequence>
-  </xs:group>
-
   <xs:group name="tag">
     <xs:sequence>
       <xs:element ref="tag"/>
@@ -920,7 +931,10 @@ ExportDeclaration : 	See 15.2.3
 
   <xs:group name="arguments">
     <xs:sequence>
-      <xs:element name="arguments" type="arguments"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="spread"/>
+        <xs:group ref="assignment-expression"/>
+      </xs:choice>
     </xs:sequence>
   </xs:group>
 
@@ -1022,7 +1036,7 @@ ExportDeclaration : 	See 15.2.3
 
   <xs:group name="function-declaration-content">
     <xs:sequence>
-      <xs:group ref="ident" minOccurs="0"/>
+      <xs:group ref="name" minOccurs="0"/>
       <xs:group ref="formal-parameters" minOccurs="0"/>
       <xs:group ref="function-body" minOccurs="0"/>
     </xs:sequence>
@@ -1056,7 +1070,7 @@ ExportDeclaration : 	See 15.2.3
 
   <xs:group name="class-declaration-content">
     <xs:sequence>
-      <xs:group ref="ident" minOccurs="0"/>
+      <xs:group ref="name" minOccurs="0"/>
       <xs:group ref="class-heritage" minOccurs="0"/>
       <xs:group ref="class-body" minOccurs="0"/>
     </xs:sequence>
@@ -1305,10 +1319,57 @@ ExportDeclaration : 	See 15.2.3
     </xs:sequence>
   </xs:group>
 
-  <xs:complexType name="computed-property-name">
+  <xs:complexType name="meta" mixed="true">
+    <xs:annotation>
+      <xs:documentation>
+        Meta information, allowing to attach custom information to any element.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:any processContents="skip"/>
+    </xs:choice>
+    <xs:anyAttribute processContents="skip"/>
+  </xs:complexType>
+
+  <xs:complexType name="comment" mixed="true">
+    <xs:group ref="comment-element" minOccurs="0" maxOccurs="unbounded"/>
+    <xs:attribute name="doc" type="xs:boolean"
+      default="false" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="base-element">
+    <xs:annotation>
+      <xs:documentation>
+        Base element of the ecmascript xml object model.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="meta"/>
+      <xs:element ref="comment"/>
+    </xs:choice>
+    <xs:attribute name="id" type="xs:ID" use="optional"/>
+    <xs:attribute name="ref" type="xs:IDREF" use="optional"/>
+    <xs:anyAttribute processContents="skip"/>
+  </xs:complexType>
+
+  <xs:complexType name="name">
     <xs:complexContent>
       <xs:extension base="base-element">
-        <xs:group ref="assignment-expression"/>
+        <xs:attribute name="value" type="identifier" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="property-name">
+    <xs:annotation>
+      <xs:documentation>
+        NOTE: either value or assignment-expression is required.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:group ref="assignment-expression" minOccurs="0"/>
+        <xs:attribute name="value" type="identifier" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1319,13 +1380,19 @@ ExportDeclaration : 	See 15.2.3
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="property">
+  <xs:complexType name="member-definition">
+    <xs:annotation>
+      <xs:documentation>
+        NOTE: assignment-expression is optional in case of name identifier;
+        otherwise it's required.
+      </xs:documentation>
+    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="member">
-        <xs:choice>
-          <xs:group ref="ident-property"/>
-          <xs:group ref="computed-property"/>
-        </xs:choice>
+        <xs:sequence>
+          <xs:group ref="property-name"/>
+          <xs:group ref="assignment-expression" minOccurs="0"/>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1375,6 +1442,7 @@ ExportDeclaration : 	See 15.2.3
   <xs:complexType name="ref">
     <xs:complexContent>
       <xs:extension base="expression">
+        <xs:group ref="member-expression" minOccurs="0"/>
         <xs:attribute name="name" type="identifier" use="required"/>
       </xs:extension>
     </xs:complexContent>
@@ -1443,6 +1511,14 @@ ExportDeclaration : 	See 15.2.3
     <xs:complexContent>
       <xs:extension base="expression">
         <xs:group ref="expression"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="spread">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:group ref="assignment-expression"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1595,7 +1671,7 @@ ExportDeclaration : 	See 15.2.3
   <xs:complexType name="postfix-expression">
     <xs:complexContent>
       <xs:extension base="expression">
-        <xs:group ref="left-hand-side-expression"/>
+        <xs:group ref="lefthand-side-expression"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1607,14 +1683,6 @@ ExportDeclaration : 	See 15.2.3
           <xs:group ref="member-expression"/>
           <xs:group ref="expression"/>
         </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="member-ref">
-    <xs:complexContent>
-      <xs:extension base="ref">
-        <xs:group ref="member-expression"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1637,17 +1705,6 @@ ExportDeclaration : 	See 15.2.3
           <xs:group ref="member-expression"/>
           <xs:group ref="arguments" minOccurs="0"/>
         </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="arguments">
-    <xs:complexContent>
-      <xs:extension base="expression">
-        <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:group ref="spread"/>
-          <xs:group ref="assignment-expression"/>
-        </xs:choice>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1680,7 +1737,7 @@ ExportDeclaration : 	See 15.2.3
     <xs:complexContent>
       <xs:extension base="expression">
         <xs:sequence>
-          <xs:group ref="left-hand-side-expression"/>
+          <xs:group ref="lefthand-side-expression"/>
           <xs:group ref="assignment-expression"/>
         </xs:sequence>
       </xs:extension>
@@ -1701,7 +1758,7 @@ ExportDeclaration : 	See 15.2.3
         <xs:sequence>
           <xs:group ref="property-name"/>
           <xs:choice minOccurs="0">
-            <xs:group ref="ident"/>
+            <xs:group ref="ref"/>
             <xs:group ref="binding-pattern"/>
           </xs:choice>
           <xs:group ref="binding-initialize" minOccurs="0"/>
@@ -1743,7 +1800,7 @@ ExportDeclaration : 	See 15.2.3
       <xs:extension base="base-binding-element">
         <xs:sequence>
           <xs:choice>
-            <xs:group ref="ident"/>
+            <xs:group ref="name"/>
             <xs:group ref="binding-pattern"/>
           </xs:choice>
           <xs:group ref="binding-initialize" minOccurs="0"/>
@@ -1755,7 +1812,7 @@ ExportDeclaration : 	See 15.2.3
   <xs:complexType name="binding-rest-element">
     <xs:complexContent>
       <xs:extension base="base-binding-element">
-        <xs:group ref="ident"/>
+        <xs:group ref="name"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1788,7 +1845,7 @@ ExportDeclaration : 	See 15.2.3
       <xs:extension base="base-formal-parameter">
         <xs:sequence>
           <xs:choice>
-            <xs:group ref="ident"/>
+            <xs:group ref="name"/>
             <xs:group ref="binding-pattern"/>
           </xs:choice>
           <xs:group ref="binding-initialize" minOccurs="0"/>
@@ -1800,7 +1857,7 @@ ExportDeclaration : 	See 15.2.3
   <xs:complexType name="formal-rest-parameter">
     <xs:complexContent>
       <xs:extension base="base-formal-parameter">
-        <xs:group ref="ident"/>
+        <xs:group ref="name"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1825,7 +1882,7 @@ ExportDeclaration : 	See 15.2.3
   <xs:complexType name="class-heritage">
     <xs:complexContent>
       <xs:extension base="base-element">
-        <xs:group ref="left-hand-side-expression"/>
+        <xs:group ref="lefthand-side-expression"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1982,7 +2039,7 @@ ExportDeclaration : 	See 15.2.3
   <xs:complexType name="continue-or-break-statement">
     <xs:complexContent>
       <xs:extension base="statement">
-        <xs:group ref="ident" minOccurs="0"/>
+        <xs:group ref="name" minOccurs="0"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -2010,7 +2067,7 @@ ExportDeclaration : 	See 15.2.3
     <xs:complexContent>
       <xs:extension base="statement">
         <xs:sequence>
-          <xs:group ref="ident"/>
+          <xs:group ref="name"/>
           <xs:choice>
             <xs:group ref="statement"/>
             <xs:group ref="function-declaration"/>
@@ -2053,7 +2110,7 @@ ExportDeclaration : 	See 15.2.3
     <xs:complexContent>
       <xs:extension base="base-element">
         <xs:choice>
-          <xs:group ref="ident"/>
+          <xs:group ref="name"/>
           <xs:group ref="binding-pattern"/>
         </xs:choice>
       </xs:extension>
@@ -2125,7 +2182,16 @@ ExportDeclaration : 	See 15.2.3
   <xs:complexType name="namespace-import">
     <xs:complexContent>
       <xs:extension base="base-element">
-        <xs:group ref="ident"/>
+        <xs:group ref="name"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="named-imports-exports">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:group ref="import-export-specifier"
+          minOccurs="0" maxOccurs="unbounded"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -2134,7 +2200,7 @@ ExportDeclaration : 	See 15.2.3
     <xs:complexContent>
       <xs:extension base="base-element">
         <xs:sequence>
-          <xs:group ref="ident"/>
+          <xs:group ref="name"/>
           <xs:group ref="import-export-specifier-as" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
@@ -2144,103 +2210,9 @@ ExportDeclaration : 	See 15.2.3
   <xs:complexType name="import-export-specifier-as">
     <xs:complexContent>
       <xs:extension base="base-element">
-        <xs:group ref="ident"/>
+        <xs:group ref="name"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-
-  <xs:element name="null" type="expression"/>
-  <xs:element name="this" type="expression"/>
-  <xs:element name="super" type="expression"/>
-  <xs:element name="ref"  type="ref"/>
-  <xs:element name="boolean" type="boolean"/>
-  <xs:element name="number" type="number"/>
-  <xs:element name="string" type="string"/>
-  <xs:element name="regex" type="regex"/>
-  <xs:element name="template" type="template"/>
-  <xs:element name="parens" type="parens"/>
-  <xs:element name="array" type="array"/>
-  <xs:element name="object" type="object"/>
-  <xs:element name="conditional" type="conditional"/>
-  <xs:element name="or" type="or"/>
-  <xs:element name="and" type="and"/>
-  <xs:element name="bitwise-or" type="bitwise-or"/>
-  <xs:element name="bitwise-xor" type="bitwise-xor"/>
-  <xs:element name="bitwise-and" type="bitwise-and"/>
-  <xs:element name="eq" type="equality-expression"/>
-  <xs:element name="ne" type="equality-expression"/>
-  <xs:element name="strict-eq" type="equality-expression"/>
-  <xs:element name="strict-ne" type="equality-expression"/>
-  <xs:element name="lt" type="relational-expression"/>
-  <xs:element name="gt" type="relational-expression"/>
-  <xs:element name="le" type="relational-expression"/>
-  <xs:element name="ge" type="relational-expression"/>
-  <xs:element name="instanceof" type="relational-expression"/>
-  <xs:element name="in" type="relational-expression"/>
-  <xs:element name="left-shift" type="shift-expression"/>
-  <xs:element name="right-shift" type="shift-expression"/>
-  <xs:element name="unsigned-right-shift" type="shift-expression"/>
-  <xs:element name="add" type="additive-expression"/>
-  <xs:element name="sub" type="additive-expression"/>
-  <xs:element name="mul" type="multiplicative-expression"/>
-  <xs:element name="div" type="multiplicative-expression"/>
-  <xs:element name="mod" type="multiplicative-expression"/>
-  <xs:element name="delete" type="unary-expression"/>
-  <xs:element name="void" type="unary-expression"/>
-  <xs:element name="typeof" type="unary-expression"/>
-  <xs:element name="inc" type="unary-expression"/>
-  <xs:element name="dec" type="unary-expression"/>
-  <xs:element name="plus" type="unary-expression"/>
-  <xs:element name="neg" type="unary-expression"/>
-  <xs:element name="inv" type="unary-expression"/>
-  <xs:element name="not" type="unary-expression"/>
-  <xs:element name="post-inc" type="postfix-expression"/>
-  <xs:element name="post-dec" type="postfix-expression"/>
-  <xs:element name="subscript" type="subscript"/>
-  <xs:element name="member-ref" type="member-ref"/>
-  <xs:element name="tag" type="tag"/>
-  <xs:element name="new-target" type="expression"/>
-  <xs:element name="new" type="call"/>
-  <xs:element name="call" type="call"/>
-  <xs:element name="yield" type="yield"/>
-  <xs:element name="arrow-function" type="arrow-function"/>
-  <xs:element name="assign" type="assignment-expression"/>
-  <xs:element name="mul-to" type="assignment-expression"/>
-  <xs:element name="div-by" type="assignment-expression"/>
-  <xs:element name="mod-by" type="assignment-expression"/>
-  <xs:element name="add-to" type="assignment-expression"/>
-  <xs:element name="sub-from" type="assignment-expression"/>
-  <xs:element name="left-shift-by" type="assignment-expression"/>
-  <xs:element name="right-shift-by" type="assignment-expression"/>
-  <xs:element name="unsigned-right-shift-by" type="assignment-expression"/>
-  <xs:element name="and-with" type="assignment-expression"/>
-  <xs:element name="xor-with" type="assignment-expression"/>
-  <xs:element name="or-with" type="assignment-expression"/>
-  <xs:element name="function" type="function-declaration"/>
-  <xs:element name="generator-function" type="function-declaration"/>
-  <xs:element name="class" type="class-declaration"/>
-  <xs:element name="let" type="lexical-declaration"/>
-  <xs:element name="const" type="lexical-declaration"/>
-  <xs:element name="var" type="variable-statement"/>
-  <xs:element name="block" type="block-statement"/>
-  <xs:element name="statement" type="statement"/>
-  <xs:element name="expression" type="expression-statement"/>
-  <xs:element name="if" type="if-statement"/>
-  <xs:element name="switch" type="switch-statement"/>
-  <xs:element name="do-while" type="do-while-statement"/>
-  <xs:element name="while" type="while-statement"/>
-  <xs:element name="for" type="for-statement"/>
-  <xs:element name="for-in" type="for-key-value-statement"/>
-  <xs:element name="for-of" type="for-key-value-statement"/>
-  <xs:element name="continue" type="continue-or-break-statement"/>
-  <xs:element name="break" type="continue-or-break-statement"/>
-  <xs:element name="return" type="return-statement"/>
-  <xs:element name="with" type="with-statement"/>
-  <xs:element name="label" type="labelled-statement"/>
-  <xs:element name="throw" type="throw-statement"/>
-  <xs:element name="try" type="try-statement"/>
-  <xs:element name="debugger" type="statement"/>
-  <xs:element name="script" type="script"/>
-  <xs:element name="module" type="module"/>
 
 </xs:schema>
