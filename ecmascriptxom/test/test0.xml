@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<script xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+  <comment>
+    function myFunction() {
+      document.getElementById("demo").innerHTML = "Paragraph changed.";
+    }
+  </comment>
+  <function id="myFunction">
+    <body>
+      <expression>
+        <assign>
+          <member-ref name="innerHTML">
+            <call>
+              <member-ref name="getElementById">
+                <ref name="document"/>
+              </member-ref>
+              <arguments>
+                <string value="demo"/>
+              </arguments>
+            </call>
+          </member-ref>
+          <string value="Paragraph changed."/>
+        </assign>
+      </expression>
+    </body>
+  </function>
+</script>
