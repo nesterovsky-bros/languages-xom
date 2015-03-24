@@ -88,49 +88,39 @@
   <xsl:template mode="t:get-children-statements" match="*"/>
 
   <!--
-    Mode "t:get-children-statements". function, generator-function.
+    Mode "t:get-children-statements".
   -->
-  <xsl:template mode="t:get-children-statements" 
-    match="function | generator-function">
-    <xsl:sequence select="body/t:get-elements(.)"/>
+  <xsl:template mode="t:get-children-statements" match="
+    script | 
+    module |
+    function | 
+    generator-function |
+    while | 
+    do-while | 
+    for | 
+    for-in | 
+    for-of | 
+    with |
+    if |
+    switch |
+    switch/case |
+    try |
+    try/catch">
+    <xsl:apply-templates/>
   </xsl:template>
 
   <!--
-    Mode "t:get-children-statements". label, block, body.
+    Mode "t:get-children-statements".
   -->
-  <xsl:template mode="t:get-children-statements" match="block | label">
+  <xsl:template mode="t:get-children-statements" match="
+    block | 
+    label | 
+    body | 
+    switch/default |
+    if/then |
+    if/else |
+    try/finally">
     <xsl:sequence select="t:get-elements(.)"/>
-  </xsl:template>
-
-  <!--
-    Mode "t:get-children-statements". if.
-  -->
-  <xsl:template mode="t:get-children-statements" match="if">
-    <xsl:sequence select="(then, else)/t:get-elements(.)"/>
-  </xsl:template>
-
-  <!--
-    Mode "t:get-children-statements". switch.
-  -->
-  <xsl:template mode="t:get-children-statements" match="switch">
-    <xsl:sequence select="(case/block | default)/t:get-elements(.)"/>
-  </xsl:template>
-
-  <!--
-    Mode "t:get-children-statements". 
-    while, do-while, for, for-in, for-of, with.
-  -->
-  <xsl:template mode="t:get-children-statements" 
-    match="while | do-while | for | for-in | for-of | with">
-    <xsl:sequence select="block/t:get-elements(.)"/>
-  </xsl:template>
-
-  <!--
-    Mode "t:get-children-statements". try.
-  -->
-  <xsl:template mode="t:get-children-statements" match="try">
-    <xsl:sequence 
-      select="(try/block | catch/block | finally)/t:get-elements(.)"/>
   </xsl:template>
 
 </xsl:stylesheet>

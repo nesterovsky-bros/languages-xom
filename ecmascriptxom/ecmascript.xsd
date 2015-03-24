@@ -114,13 +114,19 @@
   </xs:simpleType>
 
   <xs:attributeGroup name="export">
-    <xs:attribute name="export" type="xs:boolean"
-      use="optional" default="false">
+    <xs:attribute name="export" use="optional" default="false">
       <xs:annotation>
         <xs:documentation>
           NOTE: This attribute is permitted in export production only.
         </xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="true"/>
+          <xs:enumeration value="false"/>
+          <xs:enumeration value="default"/>
+        </xs:restriction>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
 
@@ -194,6 +200,26 @@
     </xs:sequence>
   </xs:group>
 
+  <xs:group name="export-namespace-declaration">
+    <xs:sequence>
+      <xs:group ref="export-namespace"/>
+      <xs:group ref="from-clause"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="export-clause-declaration">
+    <xs:sequence>
+      <xs:group ref="member-specifier" minOccurs="1" maxOccurs="unbounded"/>
+      <xs:group ref="from-clause" minOccurs="0"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="export-namespace">
+    <xs:sequence>
+      <xs:element name="namespace" type="base-element"/>
+    </xs:sequence>
+  </xs:group>
+
   <xs:group name="import-default-binding">
     <xs:sequence>
       <xs:group ref="name"/>
@@ -206,21 +232,9 @@
     </xs:sequence>
   </xs:group>
 
-  <xs:group name="named-imports-exports">
+  <xs:group name="member-specifier">
     <xs:sequence>
-      <xs:element name="names" type="named-imports-exports"/>
-    </xs:sequence>
-  </xs:group>
-
-  <xs:group name="import-export-specifier">
-    <xs:sequence>
-      <xs:element name="name" type="import-export-specifier"/>
-    </xs:sequence>
-  </xs:group>
-
-  <xs:group name="import-export-specifier-as">
-    <xs:sequence>
-      <xs:element name="as" type="import-export-specifier-as"/>
+      <xs:element name="ref" type="member-specifier"/>
     </xs:sequence>
   </xs:group>
 
@@ -319,6 +333,12 @@
   <xs:group name="ref">
     <xs:sequence>
       <xs:element ref="ref"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="simple-ref">
+    <xs:sequence>
+      <xs:element name="ref" type="simple-ref"/>
     </xs:sequence>
   </xs:group>
 
@@ -443,12 +463,12 @@
   </xs:group>
   
   <xs:group name="method-definition">
-    <xs:sequence>
+    <xs:choice>
       <xs:element name="function" type="method"/>
       <xs:element name="get-function" type="method"/>
       <xs:element name="set-function" type="method"/>
       <xs:element name="generator-function" type="method"/>
-    </xs:sequence>
+    </xs:choice>
   </xs:group>
 
   <xs:group name="assignment-expression">
@@ -1454,11 +1474,18 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="ref">
+  <xs:complexType name="simple-ref">
     <xs:complexContent>
       <xs:extension base="expression">
-        <xs:group ref="member-expression" minOccurs="0"/>
         <xs:attribute name="name" type="identifier" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ref">
+    <xs:complexContent>
+      <xs:extension base="simple-ref">
+        <xs:group ref="member-expression" minOccurs="0"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1781,7 +1808,7 @@
         <xs:sequence>
           <xs:group ref="property-name"/>
           <xs:choice minOccurs="0">
-            <xs:group ref="ref"/>
+            <xs:group ref="simple-ref"/>
             <xs:group ref="binding-pattern"/>
           </xs:choice>
           <xs:group ref="binding-initialize" minOccurs="0"/>
@@ -1844,7 +1871,6 @@
     <xs:complexContent>
       <xs:extension base="expression">
         <xs:group ref="function-declaration-content"/>
-        <xs:attributeGroup ref="export"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1966,6 +1992,21 @@
     <xs:complexContent>
       <xs:extension base="statement">
         <xs:group ref="expression"/>
+        <xs:attribute name="export" use="optional" default="false">
+          <xs:annotation>
+            <xs:documentation>
+              NOTE: This attribute is permitted in export production only.
+              In case of export is default, expression can be 
+              assignment-expression only.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="false"/>
+              <xs:enumeration value="default"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -2180,8 +2221,11 @@
       <xs:extension base="base-element">
         <xs:sequence>
           <xs:group ref="import-default-binding" minOccurs="0"/>
-          <xs:group ref="namespace-import" minOccurs="0"/>
-          <xs:group ref="named-imports-exports" minOccurs="0"/>
+          <xs:choice minOccurs="0">
+            <xs:group ref="namespace-import"/>
+            <xs:group ref="member-specifier" 
+              minOccurs="1" maxOccurs="unbounded"/>
+          </xs:choice>
           <xs:group ref="from-clause"/>
         </xs:sequence>
       </xs:extension>
@@ -2191,10 +2235,10 @@
   <xs:complexType name="export-declaration">
     <xs:complexContent>
       <xs:extension base="base-element">
-        <xs:sequence>
-          <xs:group ref="named-imports-exports" minOccurs="0"/>
-          <xs:group ref="from-clause" minOccurs="0"/>
-        </xs:sequence>
+        <xs:choice>
+          <xs:group ref="export-namespace-declaration"/>
+          <xs:group ref="export-clause-declaration"/>
+        </xs:choice>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -2215,32 +2259,12 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="named-imports-exports">
+  <xs:complexType name="member-specifier">
     <xs:complexContent>
-      <xs:extension base="base-element">
-        <xs:group ref="import-export-specifier"
-          minOccurs="0" maxOccurs="unbounded"/>
+      <xs:extension base="simple-ref">
+        <xs:group ref="name" minOccurs="0"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
   
-  <xs:complexType name="import-export-specifier">
-    <xs:complexContent>
-      <xs:extension base="base-element">
-        <xs:sequence>
-          <xs:group ref="name"/>
-          <xs:group ref="import-export-specifier-as" minOccurs="0"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="import-export-specifier-as">
-    <xs:complexContent>
-      <xs:extension base="base-element">
-        <xs:group ref="name"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
 </xs:schema>
