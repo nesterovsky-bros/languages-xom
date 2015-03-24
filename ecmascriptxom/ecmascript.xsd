@@ -942,6 +942,12 @@
     </xs:sequence>
   </xs:group>
 
+  <xs:group name="arrow-expression-body">
+    <xs:sequence>
+      <xs:element name="expression" type="arrow-expression-body"/>
+    </xs:sequence>
+  </xs:group>
+
   <xs:group name="assign">
     <xs:sequence>
       <xs:element ref="assign"/>
@@ -1181,7 +1187,7 @@
     </xs:sequence>
   </xs:group>
 
-  <xs:group name="for-iteration">
+  <xs:group name="contained-statements">
     <xs:sequence>
       <xs:element name="block" type="statement-container"/>
     </xs:sequence>
@@ -1225,6 +1231,12 @@
     </xs:sequence>
   </xs:group>
 
+  <xs:group name="case-value">
+    <xs:sequence>
+      <xs:element name="value" type="expression-container"/>
+    </xs:sequence>
+  </xs:group>
+
   <xs:group name="switch-default">
     <xs:sequence>
       <xs:element name="default" type="switch-default"/>
@@ -1255,6 +1267,12 @@
     </xs:sequence>
   </xs:group>
 
+  <xs:group name="with-scope">
+    <xs:sequence>
+      <xs:element name="scope" type="expression-container"/>
+    </xs:sequence>
+  </xs:group>
+
   <xs:group name="labelled-statement">
     <xs:sequence>
       <xs:element ref="label"/>
@@ -1270,10 +1288,6 @@
   <xs:group name="try-statement">
     <xs:sequence>
       <xs:element ref="try"/>
-      <xs:choice>
-        <xs:group ref="catch-finally"/>
-        <xs:group ref="finally"/>
-      </xs:choice>
     </xs:sequence>
   </xs:group>
 
@@ -1283,9 +1297,15 @@
     </xs:sequence>
   </xs:group>
 
+  <xs:group name="catch-parameter">
+    <xs:sequence>
+      <xs:element name="parameter" type="catch-parameter"/>
+    </xs:sequence>
+  </xs:group>
+
   <xs:group name="finally">
     <xs:sequence>
-      <xs:element name="finally" type="finally"/>
+      <xs:element name="finally" type="statement-container"/>
     </xs:sequence>
   </xs:group>
 
@@ -1325,7 +1345,8 @@
 
   <xs:complexType name="comment" mixed="true">
     <xs:sequence>
-      <xs:any namespace="##any" processContents="skip"/>
+      <xs:any namespace="##any" processContents="skip" 
+        minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
     <xs:attribute name="doc" type="xs:boolean"
       default="false" use="optional"/>
@@ -1720,9 +1741,17 @@
           <xs:group ref="formal-parameters" minOccurs="0"/>
           <xs:choice>
             <xs:group ref="function-body"/>
-            <xs:group ref="assignment-expression"/>
+            <xs:group ref="arrow-expression-body"/>
           </xs:choice>
         </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="arrow-expression-body">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:group ref="assignment-expression"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1920,6 +1949,15 @@
     <xs:complexContent>
       <xs:extension base="statement">
         <xs:group ref="statement-list"/>
+        <xs:attribute name="scope" type="xs:boolean"
+          default="false" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              NOTE: when scope is true then the block statement is 
+              a logical scope that does not appear in the serialization.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1967,8 +2005,8 @@
     <xs:complexContent>
       <xs:extension base="base-element">
         <xs:sequence>
-          <xs:element name="value" type="expression-container"/>
-          <xs:group ref="statement-list"/>
+          <xs:group ref="case-value"/>
+          <xs:group ref="contained-statements"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -1986,7 +2024,7 @@
     <xs:complexContent>
       <xs:extension base="base-element">
         <xs:sequence>
-          <xs:group ref="statement"/>
+          <xs:group ref="contained-statements"/>
           <xs:element name="condition" type="expression-container"/>
         </xs:sequence>
       </xs:extension>
@@ -1998,7 +2036,7 @@
       <xs:extension base="base-element">
         <xs:sequence>
           <xs:element name="condition" type="expression-container"/>
-          <xs:group ref="statement"/>
+          <xs:group ref="contained-statements"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -2011,7 +2049,7 @@
           <xs:group ref="for-initialize" minOccurs="0"/>
           <xs:group ref="for-condition" minOccurs="0"/>
           <xs:group ref="for-update" minOccurs="0"/>
-          <xs:group ref="for-iteration"/>
+          <xs:group ref="contained-statements"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -2023,7 +2061,7 @@
         <xs:sequence>
           <xs:sequence>
             <xs:group ref="for-source"/>
-            <xs:group ref="for-iteration"/>
+            <xs:group ref="contained-statements"/>
           </xs:sequence>
         </xs:sequence>
       </xs:extension>
@@ -2050,8 +2088,8 @@
     <xs:complexContent>
       <xs:extension base="statement">
         <xs:sequence>
-          <xs:group ref="expression"/>
-          <xs:group ref="statement"/>
+          <xs:group ref="with-scope"/>
+          <xs:group ref="contained-statements"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -2083,7 +2121,11 @@
     <xs:complexContent>
       <xs:extension base="statement">
         <xs:sequence>
-          <xs:group ref="block-statement"/>
+          <xs:group ref="contained-statements"/>
+          <xs:choice>
+            <xs:group ref="catch-finally"/>
+            <xs:group ref="finally"/>
+          </xs:choice>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -2093,8 +2135,8 @@
     <xs:complexContent>
       <xs:extension base="statement">
         <xs:sequence>
-          <xs:element name="parameter" type="catch-parameter"/>
-          <xs:group ref="statement-list"/>
+          <xs:group ref="catch-parameter"/>
+          <xs:group ref="contained-statements"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -2107,14 +2149,6 @@
           <xs:group ref="name"/>
           <xs:group ref="binding-pattern"/>
         </xs:choice>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="finally">
-    <xs:complexContent>
-      <xs:extension base="statement">
-        <xs:group ref="statement-list"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
