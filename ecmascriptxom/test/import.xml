@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+  <comment xml:space="preserve">
+hoisted(); // logs "foo"
+
+function hoisted() {
+  console.log("foo");
+}
+
+notHoisted(); // TypeError: notHoisted is not a function
+
+var notHoisted = function() {
+   console.log("bar");
+};
+
+function calc_sales(units_a, units_b, units_c) {
+   return units_a*79 + units_b * 129 + units_c * 699;
+}
+
+function* idMaker(){
+    var index = 0;
+    while(true)
+        yield index++;
+}
+
+var gen = idMaker();
+
+console.log(gen.next().value); // 0
+console.log(gen.next().value); // 1
+console.log(gen.next().value); // 2
+
+function* anotherGenerator(i) {
+  yield i + 1;
+  yield i + 2;
+  yield i + 3;
+}
+function* generator(i){
+  yield i;
+  yield* anotherGenerator(i);
+  yield i + 10;
+}
+
+var gen = generator(10);
+
+console.log(gen.next().value); // 10
+console.log(gen.next().value); // 11
+console.log(gen.next().value); // 12
+console.log(gen.next().value); // 13
+console.log(gen.next().value); // 20
+  </comment>
+
+  <expression>
+    <comment>logs "foo"</comment>
+    <call>
+      <ref name="hoisted"/>
+    </call>
+  </expression>
+
+  <function>
+    <name value="hoisted"/>
+    <body>
+      <expression>
+        <call>
+          <ref name="log">
+            <ref name="console"/>
+          </ref>
+          <string value="foo"/>
+        </call>
+      </expression>
+    </body>
+  </function>
+
+  <expression>
+    <comment>TypeError: notHoisted is not a function</comment>
+    <call>
+      <ref name="notHoisted"/>
+    </call>
+  </expression>
+
+  <var>
+    <name value="notHoisted"/>
+    <initialize>
+      <function>
+        <body>
+          <expression>
+            <call>
+              <ref name="log">
+                <ref name="console"/>
+              </ref>
+              <string value="bar"/>
+            </call>
+          </expression>
+        </body>
+      </function>
+    </initialize>
+  </var>
+
+  <function>
+    <name value="calc_sales"/>
+    <parameter>
+      <name value="units_a"/>
+    </parameter>
+    <parameter>
+      <name value="units_b"/>
+    </parameter>
+    <parameter>
+      <name value="units_c"/>
+    </parameter>
+    <body>
+      <return>
+        <add>
+          <add>
+            <mul>
+              <ref name="units_a"/>
+              <number value="79"/>
+            </mul>
+            <mul>
+              <ref name="units_b"/>
+              <number value="129"/>
+            </mul>
+          </add>
+          <mul>
+            <ref name="units_c"/>
+            <number value="699"/>
+          </mul>
+        </add>
+      </return>
+    </body>
+  </function>
+
+  <generator-function>
+    <name value="idMarker"/>
+    <body>
+      <var>
+        <name value="index"/>
+        <initialize>
+          <number value="0"/>
+        </initialize>
+      </var>
+
+      <while>
+        <condition>
+          <boolean value="true"/>
+        </condition>
+        <block>
+          <expression>
+            <yield>
+              <post-inc>
+                <ref name="index"/>
+              </post-inc>
+            </yield>
+          </expression>
+        </block>
+      </while>
+    </body>
+  </generator-function>
+
+  <var>
+    <name value="gen"/>
+    <initialize>
+      <call>
+        <ref name="idMarker"/>
+      </call>
+    </initialize>
+  </var>
+
+  <expression>
+    <comment>0</comment>
+    <call>
+      <ref name="log">
+        <ref name="console"/>
+      </ref>
+      <ref name="value">
+        <call>
+          <ref name="next">
+            <ref name="gen"/>
+          </ref>
+        </call>
+      </ref>
+    </call>
+  </expression>
+  <expression>
+    <comment>1</comment>
+    <call>
+      <ref name="log">
+        <ref name="console"/>
+      </ref>
+      <ref name="value">
+        <call>
+          <ref name="next">
+            <ref name="gen"/>
+          </ref>
+        </call>
+      </ref>
+    </call>
+  </expression>
+  <expression>
+    <comment>2</comment>
+    <call>
+      <ref name="log">
+        <ref name="console"/>
+      </ref>
+      <ref name="value">
+        <call>
+          <ref name="next">
+            <ref name="gen"/>
+          </ref>
+        </call>
+      </ref>
+    </call>
+  </expression>
+
+  <generator-function>
+    <name value="anotherGenerator"/>
+    <parameter>
+      <name value="i"/>
+    </parameter>
+    <body>
+      <expression>
+        <yield>
+          <add>
+            <ref name="i"/>
+            <number value="1"/>
+          </add>
+        </yield>
+      </expression>
+      <expression>
+        <yield>
+          <add>
+            <ref name="i"/>
+            <number value="2"/>
+          </add>
+        </yield>
+      </expression>
+      <expression>
+        <yield>
+          <add>
+            <ref name="i"/>
+            <number value="3"/>
+          </add>
+        </yield>
+      </expression>
+    </body>
+  </generator-function>
+
+  <generator-function>
+    <name value="generator"/>
+    <parameter>
+      <name value="i"/>
+    </parameter>
+    <body>
+      <expression>
+        <yield>
+          <ref name="i"/>
+        </yield>
+      </expression>
+      <expression>
+        <yield delegate="true">
+          <call>
+            <ref name="anotherGenerator"/>
+            <ref name="i"/>
+          </call>
+        </yield>
+      </expression>
+      <expression>
+        <yield>
+          <add>
+            <ref name="i"/>
+            <number value="10"/>
+          </add>
+        </yield>
+      </expression>
+    </body>
+  </generator-function>
+
+  <var>
+    <name value="gen"/>
+    <initialize>
+      <call>
+        <ref name="generator"/>
+        <number value="10"/>
+      </call>
+    </initialize>
+  </var>
+
+  <expression>
+    <comment>10</comment>
+    <call>
+      <ref name="log">
+        <ref name="console"/>
+      </ref>
+      <ref name="value">
+        <call>
+          <ref name="next">
+            <ref name="gen"/>
+          </ref>
+        </call>
+      </ref>
+    </call>
+  </expression>
+  <expression>
+    <comment>11</comment>
+    <call>
+      <ref name="log">
+        <ref name="console"/>
+      </ref>
+      <ref name="value">
+        <call>
+          <ref name="next">
+            <ref name="gen"/>
+          </ref>
+        </call>
+      </ref>
+    </call>
+  </expression>
+  <expression>
+    <comment>12</comment>
+    <call>
+      <ref name="log">
+        <ref name="console"/>
+      </ref>
+      <ref name="value">
+        <call>
+          <ref name="next">
+            <ref name="gen"/>
+          </ref>
+        </call>
+      </ref>
+    </call>
+  </expression>
+  <expression>
+    <comment>13</comment>
+    <call>
+      <ref name="log">
+        <ref name="console"/>
+      </ref>
+      <ref name="value">
+        <call>
+          <ref name="next">
+            <ref name="gen"/>
+          </ref>
+        </call>
+      </ref>
+    </call>
+  </expression>
+  <expression>
+    <comment>20</comment>
+    <call>
+      <ref name="log">
+        <ref name="console"/>
+      </ref>
+      <ref name="value">
+        <call>
+          <ref name="next">
+            <ref name="gen"/>
+          </ref>
+        </call>
+      </ref>
+    </call>
+  </expression>
+
+</script>
+
+

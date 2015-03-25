@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+  <comment>
+//------ main.js ------
+import { square, diag } from 'lib';
+console.log(square(11)); // 121
+console.log(diag(4, 3)); // 5
+  </comment>
+
+  <import>
+    <ref name="square"/>
+    <ref name="diag"/>
+    <from>
+      <string value="lib"/>
+    </from>
+  </import>
+
+  <expression>
+    <call>
+      <ref name="log">
+        <ref name="console"/>
+      </ref>
+      <call>
+        <ref name="square"/>
+        <number value="11"/>
+      </call>
+    </call>
+  </expression>
+
+  <expression>
+    <call>
+      <ref name="log">
+        <ref name="console"/>
+      </ref>
+      <call>
+        <ref name="diag"/>
+        <number value="4"/>
+        <number value="3"/>
+      </call>
+    </call>
+  </expression>
+
+  <!--import * as lib from 'lib';
+  console.log(lib.square(11)); // 121
+  console.log(lib.diag(4, 3)); // 5-->
+  <import>
+    <namespace>
+      <name value="lib"/>
+    </namespace>
+    <from>
+      <string value="lib"/>
+    </from>
+  </import>
+
+  <expression>
+    <call>
+      <ref name="log">
+        <ref name="console"/>
+      </ref>
+      <call>
+        <ref name="square">
+          <ref name="lib"/>
+        </ref>
+        <number value="11"/>
+      </call>
+    </call>
+  </expression>
+
+  <expression>
+    <call>
+      <ref name="log">
+        <ref name="console"/>
+      </ref>
+      <call>
+        <ref name="diag">
+          <ref name="lib"/>
+        </ref>
+        <number value="4"/>
+        <number value="3"/>
+      </call>
+    </call>
+  </expression>
+
+  <!--import { square, diag } from 'lib';-->
+  <import>
+    <ref name="square">
+      <name value="sq"/>
+    </ref>
+    <ref name="diag">
+      <name value="dg"/>
+    </ref>
+    <from>
+      <string value="lib"/>
+    </from>
+  </import>
+
+</module>
+
+

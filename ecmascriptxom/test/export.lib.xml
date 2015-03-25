@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+  <comment>
+//------ lib.js ------
+export const sqrt = Math.sqrt;
+
+export function square(x) {
+  return x * x;
+}
+
+export function diag(x, y) {
+  return sqrt(square(x) + square(y));
+}
+
+export { sqrt as S };
+
+  </comment>
+
+  <const export="true">
+    <name value="sqrt"/>
+    <initialize>
+      <ref name="sqrt">
+        <ref name="Math"/>
+      </ref>
+    </initialize>
+  </const>
+
+  <function export="true">
+    <name value="square"/>
+    <parameter>
+      <name value="x"/>
+    </parameter>
+    <body>
+      <return>
+        <mul>
+          <ref name="x"/>
+          <ref name="x"/>
+        </mul>
+      </return>
+    </body>
+  </function>
+
+  <function export="true">
+    <name value="diag"/>
+    <parameter>
+      <name value="x"/>
+    </parameter>
+    <parameter>
+      <name value="y"/>
+    </parameter>
+    <body>
+      <return>
+        <call>
+          <ref name="sqrt"/>
+          <add>
+            <call>
+              <ref name="square"/>
+              <ref name="x"/>
+            </call>
+            <call>
+              <ref name="square"/>
+              <ref name="y"/>
+            </call>
+          </add>
+        </call>        
+      </return>
+    </body>
+  </function>
+
+  <export>
+    <ref name="square">
+      <name value="S"/>
+    </ref>
+  </export>
+</module>
+
+

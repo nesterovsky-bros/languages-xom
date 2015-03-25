@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+  <comment>
+    //------ main2.js ------
+    import MyClass from 'MyClass';
+    let inst = new MyClass();
+  </comment>
+
+  <import>
+    <name value="MyClass"/>
+    <from>
+      <string value="MyClass"/>
+    </from>
+  </import>
+
+  <let>
+    <name value="inst"/>
+    <initialize>
+      <new>
+        <ref name="MyClass"/>
+      </new>
+    </initialize>
+  </let>
+
+</module>
+
+

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+  <comment>
+    //------ myFunc.js ------
+    export default function () { ... };
+  </comment>
+
+  <function export="default">
+    <body>
+      <return>
+        <number value="1"/>
+      </return>
+    </body>
+  </function>
+
+</module>
+
+

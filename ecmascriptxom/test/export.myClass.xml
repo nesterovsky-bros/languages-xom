@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+  <comment>
+    //------ MyClass.js ------
+    export default class { return null; };
+  </comment>
+
+  <class export="default">
+    <function>
+      <name value="func"/>
+      <body>
+        <return>
+          <null/>
+        </return>
+      </body>
+    </function>
+  </class>
+  
+</module>
+
+

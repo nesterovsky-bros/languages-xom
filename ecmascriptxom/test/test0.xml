@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <script xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
-  <comment>
+  <comment xml:space="preserve">
     function myFunction() {
       document.getElementById("demo").innerHTML = "Paragraph changed.";
     }

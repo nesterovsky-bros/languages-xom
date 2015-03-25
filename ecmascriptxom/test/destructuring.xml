@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<script xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+  <comment xml:space="preserve">
+// list matching
+var [a, , b] = [1,2,3];
+
+// object matching
+var { op: a, lhs: { op: b }, rhs: c }
+       = getASTNode()
+
+// object matching shorthand
+// binds `op`, `lhs` and `rhs` in scope
+var {op, lhs, rhs} = getASTNode()
+
+// Can be used in parameter position
+function g({name: x}) {
+  console.log(x);
+}
+g({name: 5})
+
+// Fail-soft destructuring
+var [a] = [];
+a === undefined;
+
+// Fail-soft destructuring with defaults
+var [a = 1] = [];
+a === 1;      
+  </comment>
+
+  <var>
+    <array>
+      <element>
+        <name value="a"/>
+      </element>
+      <elision/>
+      <element>
+        <name value="b"/>
+      </element>
+    </array>
+    <initialize>
+      <array>
+        <number value="1"/>
+        <number value="2"/>
+        <number value="3"/>
+      </array>
+    </initialize>
+  </var>
+
+  <var>
+    <object>
+      <property>
+        <name value="op"/>
+        <ref name="a"/>
+      </property>
+      <property>
+        <name value="lhs"/>
+        <object>
+          <property>
+            <name value="op"/>
+            <ref name="b"/>
+          </property>
+        </object>
+      </property>
+      <property>
+        <name value="rhs"/>
+        <ref name="c"/>
+      </property>
+    </object>
+    <initialize>
+      <call>
+        <ref name="getASTNode"/>
+      </call>
+    </initialize>
+  </var>
+
+  <var>
+    <object>
+      <property>
+        <name value="op"/>
+      </property>
+      <property>
+        <name value="lhs"/>
+      </property>
+      <property>
+        <name value="rhs"/>
+      </property>
+    </object>
+    <initialize>
+      <call>
+        <ref name="getASTNode"/>
+      </call>
+    </initialize>
+  </var>
+
+  <function>
+    <name value="g"/>
+    <parameter>
+      <object>
+        <property>
+          <name value="name"/>
+          <ref name="x"/>
+        </property>
+      </object>
+    </parameter>
+    <body>
+      <expression>
+        <call>
+          <ref name="log">
+            <ref name="console"/>
+          </ref>
+          <ref name="x"/>
+        </call>
+      </expression>
+    </body>
+  </function>
+
+  <expression>
+    <call>
+      <ref name="g"/>
+      <object>
+        <property>
+          <name value="name"/>
+          <number value="5"/>
+        </property>
+      </object>
+    </call>
+  </expression>
+
+  <var>
+    <array>
+      <element>
+        <name value="a"/>
+      </element>
+    </array>
+    <initialize>
+      <array/>
+    </initialize>
+  </var>
+
+  <expression>
+    <strict-eq>
+      <ref name="a"/>
+      <ref name="undefined"/>
+    </strict-eq>
+  </expression>
+
+  <var>
+    <array>
+      <element>
+        <name value="a"/>
+        <initialize>
+          <number value="1"/>
+        </initialize>
+      </element>
+    </array>
+    <initialize>
+      <array/>
+    </initialize>
+  </var>
+
+  <expression>
+    <strict-eq>
+      <ref name="a"/>
+      <number value="1"/>
+    </strict-eq>
+  </expression>
+</script>

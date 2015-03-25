@@ -1,0 +1,190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<script xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+  <comment xml:space="preserve">
+// Expression bodies
+var odds = evens.map(v => v + 1);
+var nums = evens.map((v, i) => v + i);
+var pairs = evens.map(v => ({even: v, odd: v + 1}));
+
+// Statement bodies
+nums.forEach(v => {
+  if (v % 5 === 0)
+    fives.push(v);
+});
+
+// Lexical this
+var bob = {
+  _name: "Bob",
+  _friends: [],
+  printFriends() {
+    this._friends.forEach(f =>
+      console.log(this._name + " knows " + f));
+  }
+}
+  </comment>
+
+  <var>
+    <name value="odds"/>
+    <initialize>
+      <call>
+        <ref name="map">
+          <ref name="evens"/>
+        </ref>
+        <arrow-function>
+          <parameter>
+            <name value="v"/>
+          </parameter>
+          <expression>
+            <add>
+              <ref name="v"/>
+              <number value="1"/>
+            </add>
+          </expression>
+        </arrow-function>
+      </call>
+    </initialize>
+  </var>
+
+  <var>
+    <name value="nums"/>
+    <initialize>
+      <call>
+        <ref name="map">
+          <ref name="evens"/>
+        </ref>
+        <arrow-function>
+          <parameter>
+            <name value="v"/>
+          </parameter>
+          <parameter>
+            <name value="i"/>
+          </parameter>
+          <expression>
+            <add>
+              <ref name="v"/>
+              <ref name="i"/>
+            </add>
+          </expression>
+        </arrow-function>
+      </call>
+    </initialize>
+  </var>
+
+  <var>
+    <name value="pairs"/>
+    <initialize>
+      <call>
+        <ref name="map">
+          <ref name="evens"/>
+        </ref>
+        <arrow-function>
+          <parameter>
+            <name value="v"/>
+          </parameter>
+          <expression>
+            <object>
+              <property>
+                <name value="even"/>
+                <ref name="v"/>
+              </property>
+              <property>
+                <name value="odd"/>
+                <add>
+                  <ref name="v"/>
+                  <number value="1"/>
+                </add>
+              </property>
+            </object>
+          </expression>
+        </arrow-function>
+      </call>
+    </initialize>
+  </var>
+
+  <expression>
+    <call>
+      <ref name="forEach">
+        <ref name="nums"/>
+      </ref>
+      <arrow-function>
+        <parameter>
+          <name value="v"/>
+        </parameter>
+        <body>
+          <if>
+            <condition>
+              <strict-eq>
+                <mod>
+                  <ref name="v"/>
+                  <number value="5"/>
+                </mod>
+                <number value="0"/>
+              </strict-eq>
+            </condition>
+            <then>
+              <expression>
+                <call>
+                  <ref name="push">
+                    <ref name="fives"/>
+                  </ref>
+                </call>
+              </expression>
+            </then>
+          </if>
+        </body>
+      </arrow-function>
+    </call>
+  </expression>
+
+  <var>
+    <name value="bob"/>
+    <initialize>
+      <object>
+        <property>
+          <name value="_name"/>
+          <string value="Bob"/>
+        </property>
+        <property>
+          <name value="_friends"/>
+          <array/>
+        </property>
+
+        <function>
+          <name value="printFriends"/>
+          <body>
+            <expression>
+              <call>
+                <ref name="forEach">
+                  <ref name="_friends">
+                    <this/>
+                  </ref>
+                </ref>
+                <arrow-function>
+                  <parameter>
+                    <name value="f"/>
+                  </parameter>
+                  <expression>
+                    <call>
+                      <ref name="log">
+                        <ref name="console"/>
+                      </ref>
+                      <add>
+                        <add>
+                          <ref name="_name">
+                            <this/>
+                          </ref>
+                          <string value=" knows "/>
+                        </add>
+                        <ref name="f"/>
+                      </add>
+                    </call>
+                  </expression>
+                </arrow-function>
+              </call>
+            </expression>
+          </body>
+        </function>
+      </object>
+    </initialize>
+  </var>
+</script>

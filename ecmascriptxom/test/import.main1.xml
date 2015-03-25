@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+  <comment>
+  //------ main1.js ------
+  import myFunc from 'myFunc';
+  myFunc();
+  </comment>
+
+  <import>
+    <name value="myFunc"/>
+    <from>
+      <string value="myFunc"/>
+    </from>
+  </import>
+
+  <expression>
+    <call>
+      <ref name="myFunc"/>
+    </call>
+  </expression>
+
+</module>
+
+

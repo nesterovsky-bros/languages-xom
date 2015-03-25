@@ -24,6 +24,15 @@
   
   <xs:element name="var" type="variable-statement"/>
   <xs:element name="block" type="block-statement"/>
+  
+  <xs:element name="scope" type="block-statement">
+    <xs:annotation>
+      <xs:documentation>
+        A transparent scope.
+      </xs:documentation>
+    </xs:annotation>  
+  </xs:element>
+  
   <xs:element name="statement" type="statement"/>
   <xs:element name="expression" type="expression-statement"/>
   <xs:element name="if" type="if-statement"/>
@@ -184,10 +193,18 @@
     <xs:choice>
       <xs:group ref="import-declaration"/>
       <xs:group ref="export-declaration"/>
-      <xs:group ref="statement-list"/>
+      <xs:group ref="statement"/>
+      <xs:group ref="declaration"/>
+      <xs:group ref="module-scope"/>
     </xs:choice>
   </xs:group>
 
+  <xs:group name="module-scope">
+    <xs:sequence>
+      <xs:element name="scope" type="module-scope"/>
+    </xs:sequence>
+  </xs:group>
+  
   <xs:group name="import-declaration">
     <xs:sequence>
       <xs:element name="import" type="import-declaration"/>
@@ -443,11 +460,18 @@
     </xs:sequence>
   </xs:group>
 
-  <xs:group name="property-definition">
+  <xs:group name="object-member">
     <xs:choice>
       <xs:group ref="member-definition"/>
       <xs:group ref="method-definition"/>
+      <xs:group ref="object-member-scope"/>
     </xs:choice>
+  </xs:group>
+
+  <xs:group name="object-member-scope">
+    <xs:sequence>
+      <xs:element name="scope" type="object-member-scope"/>
+    </xs:sequence>
   </xs:group>
 
   <xs:group name="property-name">
@@ -461,7 +485,7 @@
       <xs:element name="property" type="member-definition"/>
     </xs:sequence>
   </xs:group>
-  
+
   <xs:group name="method-definition">
     <xs:choice>
       <xs:element name="function" type="method"/>
@@ -1090,7 +1114,7 @@
     <xs:sequence>
       <xs:group ref="name" minOccurs="0"/>
       <xs:group ref="class-heritage" minOccurs="0"/>
-      <xs:group ref="class-body" minOccurs="0"/>
+      <xs:group ref="class-body" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:group>
 
@@ -1101,8 +1125,21 @@
   </xs:group>
 
   <xs:group name="class-body">
+    <xs:choice>
+      <xs:group ref="method-definition"/>
+      <xs:group ref="class-body-scope"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="class-body-scope">
     <xs:sequence>
-      <xs:group ref="method-definition" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="scope" type="class-body-scope"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="scope">
+    <xs:sequence>
+      <xs:element ref="scope"/>
     </xs:sequence>
   </xs:group>
 
@@ -1347,6 +1384,7 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:group ref="statement"/>
         <xs:group ref="declaration"/>
+        <xs:group ref="scope"/>
       </xs:choice>
     </xs:sequence>
   </xs:group>
@@ -1450,6 +1488,22 @@
             </xs:documentation>
           </xs:annotation>
         </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="object-member-scope">
+    <xs:complexContent>
+      <xs:extension base="member">
+        <xs:group ref="object-member" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:complexType name="class-body-scope">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:group ref="class-body" minOccurs="0" maxOccurs="unbounded"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1576,7 +1630,7 @@
   <xs:complexType name="object">
     <xs:complexContent>
       <xs:extension base="expression">
-        <xs:group ref="property-definition" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:group ref="object-member" minOccurs="0" maxOccurs="unbounded"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1778,6 +1832,11 @@
   <xs:complexType name="arrow-expression-body">
     <xs:complexContent>
       <xs:extension base="statement">
+        <xs:annotation>
+          <xs:documentation>
+            NOTE: wrap object literal in parens.
+          </xs:documentation>
+        </xs:annotation>
         <xs:group ref="assignment-expression"/>
       </xs:extension>
     </xs:complexContent>
@@ -1975,15 +2034,6 @@
     <xs:complexContent>
       <xs:extension base="statement">
         <xs:group ref="statement-list"/>
-        <xs:attribute name="scope" type="xs:boolean"
-          default="false" use="optional">
-          <xs:annotation>
-            <xs:documentation>
-              NOTE: when scope is true then the block statement is 
-              a logical scope that does not appear in the serialization.
-            </xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -2211,6 +2261,14 @@
   <xs:complexType name="module">
     <xs:complexContent>
       <xs:extension base="base-program">
+        <xs:group ref="module-item" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="module-scope">
+    <xs:complexContent>
+      <xs:extension base="base-element">
         <xs:group ref="module-item" minOccurs="0" maxOccurs="unbounded"/>
       </xs:extension>
     </xs:complexContent>
