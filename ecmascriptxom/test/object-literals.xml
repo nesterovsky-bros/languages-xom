@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<script xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+  <comment xml:space="preserve">
+var obj = {
+    // __proto__
+    __proto__: theProtoObj,
+    // Shorthand for ‘handler: handler’
+    handler,
+    // Methods
+    toString() {
+     // Super calls
+     return "d " + super.toString();
+    },
+    // Computed (dynamic) property names
+    [ 'prop_' + (() => 42)() ]: 42
+};
+  </comment>
+
+  <var>
+    <name value="obj"/>
+    <initialize>
+      <object>
+        <property>
+          <name value="__proto__"/>
+          <ref name="theProtoObj"/>
+        </property>
+        <property>
+          <name value="handler"/>
+        </property>
+
+        <function>
+          <name value="toString"/>
+          <body>
+            <return>
+              <add>
+                <string value="d "/>
+                <call>
+                  <ref name="toString">
+                    <super/>
+                  </ref>
+                </call>
+              </add>
+            </return>
+          </body>
+        </function>
+
+        <property>
+          <name>
+            <add>
+              <string value="prop_"/>
+              <call>
+                <parens>
+                  <arrow-function>
+                    <expression>
+                      <number value="42"/>
+                    </expression>
+                  </arrow-function>
+                </parens>
+              </call>
+            </add>
+          </name>
+          <number value="42"/>
+        </property>
+      </object>
+    </initialize>
+  </var>
+</script>

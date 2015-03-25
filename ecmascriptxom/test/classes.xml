@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<script xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+  <comment xml:space="preserve">
+class SkinnedMesh extends THREE.Mesh {
+  constructor(geometry, materials) {
+    super(geometry, materials);
+
+    this.idMatrix = SkinnedMesh.defaultMatrix();
+    this.bones = [];
+    this.boneMatrices = [];
+    //...
+  }
+  update(camera) {
+    //...
+    super.update();
+  }
+  get boneCount() {
+    return this.bones.length;
+  }
+  set matrixType(matrixType) {
+    this.idMatrix = SkinnedMesh[matrixType]();
+  }
+  static defaultMatrix() {
+    return new THREE.Matrix4();
+  }
+}
+  </comment>
+  <class>
+    <name value="SkinnedMesh"/>
+    <extends>
+      <ref name="Mesh">
+        <ref name="THREE"/>
+      </ref>
+    </extends>
+
+    <function>
+      <name value="constructor"/>
+      <parameter>
+        <name value="geometry"/>
+      </parameter>
+      <parameter>
+        <name value="materials"/>
+      </parameter>
+      <body>
+        <expression>
+          <call>
+            <super/>
+            <ref name="geometry"/>
+            <ref name="materials"/>
+          </call>
+        </expression>
+
+        <expression>
+          <assign>
+            <ref name="idMatrix">
+              <this/>
+            </ref>
+            <call>
+              <ref name="defaultMatrix">
+                <ref name="SkinnedMesh"/>
+              </ref>
+            </call>
+          </assign>
+        </expression>
+
+        <expression>
+          <assign>
+            <ref name="bones">
+              <this/>
+            </ref>
+            <array/>
+          </assign>
+        </expression>
+
+        <expression>
+          <assign>
+            <ref name="boneMatrices">
+              <this/>
+            </ref>
+            <array/>
+          </assign>
+        </expression>
+      </body>
+    </function>
+
+    <function>
+      <name value="update"/>
+      <body>
+        <expression>
+          <call>
+            <ref name="update">
+              <super/>
+            </ref>
+          </call>
+        </expression>
+      </body>
+    </function>
+    <get-function>
+      <name value="boneCount"/>
+      <body>
+        <return>
+          <ref name="length">
+            <ref name="bones">
+              <this/>
+            </ref>
+          </ref>
+        </return>
+      </body>
+    </get-function>
+
+    <set-function>
+      <name value="matrixType"/>
+      <parameter>
+        <name value="matrixType"/>
+      </parameter>
+      <body>
+        <expression>
+          <assign>
+            <ref name="idMatrix">
+              <this/>
+            </ref>
+            <call>
+              <subscript>
+                <ref name="SkinnedMesh"/>
+                <ref name="matrixType"/>
+              </subscript>
+            </call>
+          </assign>
+        </expression>
+      </body>
+    </set-function>
+
+    <function static="true">
+      <name value="defaultMatrix"/>
+      <body>
+        <return>
+          <new>
+            <ref name="Matrix4">
+              <ref name="THREE"/>
+            </ref>
+          </new>
+        </return>
+      </body>
+    </function>
+  </class>
+</script>

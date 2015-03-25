@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<script xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+  <comment xml:space="preserve">
+// Basic literal string creation
+`In JavaScript '\n' is a line-feed.`
+
+// Multiline strings
+`In JavaScript this is
+ not legal.`
+
+// String interpolation
+var name = "Bob", time = "today";
+`Hello ${name}, how are you ${time}?`
+
+// Construct an HTTP request prefix is used to interpret the replacements and construction
+GET`http://foo.org/bar?a=${a}&amp;b=${b}
+    Content-Type: application/json
+    X-Credentials: ${credentials}
+    { "foo": ${foo},
+      "bar": ${bar}}`(myOnReadyStateChangeHandler);
+  </comment>
+
+  <expression>
+    <template>
+      <string value="In JavaScript '\n' is a line-feed."/>
+    </template>
+  </expression>
+
+  <expression>
+    <template>
+      <string value="In JavaScript this is
+ not legal."/>
+    </template>
+  </expression>
+
+  <var>
+    <name value="name"/>
+    <initialize>
+      <string value="Bob"/>
+    </initialize>
+  </var>
+  <var>
+    <name value="time"/>
+    <initialize>
+      <string value="today"/>
+    </initialize>
+  </var>
+
+  <expression>
+    <template>
+      <string value="Hello "/>
+      <ref name="name"/>
+      <string value=", how are you "/>
+      <ref name="time"/>
+      <string value="?"/>
+    </template>
+  </expression>
+
+  <expression>
+    <comment xml:space="preserve">
+GET`http://foo.org/bar?a=${a}&amp;b=${b}
+    Content-Type: application/json
+    X-Credentials: ${credentials}
+    { "foo": ${foo},
+      "bar": ${bar}}`(myOnReadyStateChangeHandler);
+  </comment>
+
+    <call>
+      <tag>
+        <ref name="GET"/>
+        <template>
+          <string value="http://foo.org/bar?a="/>
+          <ref name="a"/>
+          <string value="&amp;b="/>
+          <ref name="b"/>
+          <string value="
+    Content-Type: application/json
+    X-Credentials: "/>
+          <ref name="credentials"/>
+          <string value='
+    { "foo": '/>
+          <ref name="foo"/>
+          <string value=',
+      "bar": '/>
+          <ref name='bar'/>
+          <string value="}"/>
+        </template>
+      </tag>
+      <ref name="myOnReadyStateChangeHandler"/>
+    </call>
+  </expression>
+</script>

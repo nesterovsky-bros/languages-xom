@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<script xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+  <comment xml:space="preserve">
+function f(x, y=12) {
+  // y is 12 if not passed (or passed as undefined)
+  return x + y;
+}
+f(3) == 15
+
+function f(x, ...y) {
+  // y is an Array
+  return x * y.length;
+}
+f(3, "hello", true) == 6
+
+function f(x, y, z) {
+  return x + y + z;
+}
+// Pass each elem of array as argument
+f(...[1,2,3]) == 6
+  </comment>
+
+  <function>
+    <name value="f"/>
+    <parameter>
+      <name value="x"/>
+    </parameter>
+    <parameter>
+      <name value="y"/>
+      <initialize>
+        <number value="12"/>
+      </initialize>
+    </parameter>
+    <body>
+      <return>
+        <add>
+          <ref name="x"/>
+          <ref name="y"/>
+        </add>
+      </return>
+    </body>
+  </function>
+
+  <expression>
+    <eq>
+      <call>
+        <ref name="f"/>
+        <number value="3"/>
+      </call>
+      <number value="15"/>
+    </eq>
+  </expression>
+
+  <function>
+    <name value="f"/>
+    <parameter>
+      <name value="x"/>
+    </parameter>
+    <rest-parameter>
+      <name value="y"/>
+    </rest-parameter>
+    <body>
+      <return>
+        <mul>
+          <ref name="x"/>
+          <ref name="length">
+            <ref name="y"/>
+          </ref>
+        </mul>
+      </return>
+    </body>
+  </function>
+
+  <expression>
+    <eq>
+      <call>
+        <ref name="f"/>
+        <number value="3"/>
+        <string value="hello"/>
+        <boolean value="true"/>
+      </call>
+      <number value="6"/>
+    </eq>
+  </expression>
+
+  <function>
+    <name value="f"/>
+    <parameter>
+      <name value="x"/>
+    </parameter>
+    <parameter>
+      <name value="y"/>
+    </parameter>
+    <parameter>
+      <name value="z"/>
+    </parameter>
+    <body>
+      <return>
+        <add>
+          <add>
+            <ref name="x"/>
+            <ref name="y"/>
+          </add>
+          <ref name="z"/>
+        </add>
+      </return>
+    </body>
+  </function>
+
+  <expression>
+    <eq>
+      <call>
+        <ref name="f"/>
+        <spread>
+          <array>
+            <number value="1"/>
+            <number value="2"/>
+            <number value="3"/>
+          </array>
+        </spread>
+      </call>
+      <number value="6"/>
+    </eq>
+  </expression>
+</script>
