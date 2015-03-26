@@ -8,6 +8,9 @@
     <xs:documentation>
       This xml schema is based on the ECMA-262 6th Edition (Draft February 20, 2015)
     </xs:documentation>
+    <xs:documentation>
+      To better understand the schema please look at samples at "test" folder.
+    </xs:documentation>
   </xs:annotation>
 
   <xs:element name="meta" type="meta"/>
@@ -28,7 +31,7 @@
   <xs:element name="scope" type="block-statement">
     <xs:annotation>
       <xs:documentation>
-        A transparent scope.
+        A transparent scope used for logical grouping of statements.
       </xs:documentation>
     </xs:annotation>  
   </xs:element>
@@ -201,7 +204,13 @@
 
   <xs:group name="module-scope">
     <xs:sequence>
-      <xs:element name="scope" type="module-scope"/>
+      <xs:element name="scope" type="module-scope">
+        <xs:annotation>
+          <xs:documentation>
+            A transparent scope used for logical grouping of module items.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:group>
   
@@ -470,7 +479,13 @@
 
   <xs:group name="object-member-scope">
     <xs:sequence>
-      <xs:element name="scope" type="object-member-scope"/>
+      <xs:element name="scope" type="object-member-scope">
+        <xs:annotation>
+          <xs:documentation>
+            A transparent scope used for logical grouping object members.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:group>
 
@@ -1133,7 +1148,13 @@
 
   <xs:group name="class-body-scope">
     <xs:sequence>
-      <xs:element name="scope" type="class-body-scope"/>
+      <xs:element name="scope" type="class-body-scope">
+        <xs:annotation>
+          <xs:documentation>
+            A transparent scope used for logical grouping of class members.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:group>
 
@@ -2162,7 +2183,7 @@
   <xs:complexType name="continue-or-break-statement">
     <xs:complexContent>
       <xs:extension base="statement">
-        <xs:group ref="name" minOccurs="0"/>
+        <xs:group ref="simple-ref" minOccurs="0"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

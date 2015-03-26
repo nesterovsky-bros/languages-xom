@@ -47,7 +47,7 @@
   -->
 
   <!--
-    Varifies whether the name normalization is required.
+    Verifies whether the name normalization is required.
       $scope - a scope to check.
       Returns true if name normalization is required, and false otherwise.
   -->
@@ -66,7 +66,7 @@
   </xsl:function>
 
   <!--
-    Normalizes names in a give scope.
+    Normalizes names in a given scope.
       $scope - a scope to check.
       $names - a name pool.
       $name-max-length - a longest allowable name length.
@@ -82,7 +82,7 @@
   </xsl:function>
 
   <!--
-    Normalizes names in a give scope.
+    Normalizes names in a given scope.
       $scope - a scope to check.
       $names - a name pool.
       $name-max-length - a longest allowable name length.

@@ -4,8 +4,8 @@
 -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:t="http://www.nesterovsky-bros.com/ecmascript"
   xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20"
+  xmlns:t="http://www.nesterovsky-bros.com/ecmascript"
   xpath-default-namespace="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20"
   exclude-result-prefixes="xs t">
 
@@ -60,14 +60,12 @@
 
     <xsl:sequence select="
       for $element in $scope/* return
-        if (xs:boolean($element/self::block/@scope)) then
+        if ($element/self::scope)) then
           t:get-scope-elements($element, $include-comments-and-meta)
+        else if ($include-comments-and-meta) 
+          $element[not(self::comment or self::meta)]
         else
-          $element
-          [
-            $include-comments-and-meta or
-            not(self::comment or self::meta)
-          ]"/>
+          $element"/>
   </xsl:function>
 
   <!--
@@ -113,6 +111,7 @@
     Mode "t:get-children-statements".
   -->
   <xsl:template mode="t:get-children-statements" match="
+    scope |
     block | 
     label | 
     body | 
