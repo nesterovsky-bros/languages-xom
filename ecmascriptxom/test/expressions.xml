@@ -1,0 +1,1266 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<script xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+
+  <var>
+    <name value="obj"/>
+    <initialize>
+      <object>
+        <property>
+          <name value="item"/>
+          <null/>
+        </property>
+        <property>
+          <name value="setItem"/>
+          <function>
+            <parameter>
+              <name value ="item"/>
+            </parameter>
+            <body>
+              <expression>
+                <ref name="item">
+                  <this/>
+                </ref>
+                <ref name="item"/>
+              </expression>
+            </body>
+          </function>
+        </property>
+
+        <function>
+          <name value="toString"/>
+          <body>
+            <expression>
+              <call>
+                <ref name="toString">
+                  <super/>
+                </ref>
+              </call>
+            </expression>
+          </body>
+        </function>
+      </object>
+    </initialize>
+  </var>
+
+  <var>
+    <name value="f"/>
+    <initialize>
+      <boolean value="false"/>
+    </initialize>
+  </var>
+
+  <var>
+    <name value="t"/>
+    <initialize>
+      <boolean value="true"/>
+    </initialize>
+  </var>
+
+  <var>
+    <name value="pi"/>
+    <initialize>
+      <number value="3.1415926"/>
+    </initialize>
+  </var>
+
+  <var>
+    <name value="index"/>
+    <initialize>
+      <number value="35"/>
+    </initialize>
+  </var>
+
+  <var>
+    <name value="indexHex"/>
+    <initialize>
+      <number value="35" form="binary"/>
+    </initialize>
+  </var>
+
+  <var>
+    <name value="indexHex"/>
+    <initialize>
+      <number value="35" form="hex"/>
+    </initialize>
+  </var>
+
+  <var>
+    <name value="indexOctal"/>
+    <initialize>
+      <number value="35" form="octal"/>
+    </initialize>
+  </var>
+
+  <var>
+    <name value="stringValue"/>
+    <initialize>
+      <string value="test"/>
+    </initialize>
+  </var>
+
+  <var>
+    <name value="regexValue"/>
+    <initialize>
+      <regex value="A.*" flags="i"/>
+    </initialize>
+  </var>
+
+  <var>
+    <name value="name"/>
+    <initialize>
+      <string value="Bob"/>
+    </initialize>
+  </var>
+  <var>
+    <name value="time"/>
+    <initialize>
+      <string value="today"/>
+    </initialize>
+  </var>
+
+  <expression>
+    <template>
+      <string value="Hello "/>
+      <ref name="name"/>
+      <string value=", how are you "/>
+      <ref name="time"/>
+      <string value="?"/>
+    </template>
+  </expression>
+
+  <var>
+    <name value="condition"/>
+    <initialize>
+      <conditional>
+        <eq>
+          <null/>
+          <ref name="undefined"/>
+        </eq>
+        <null/>
+        <number value="1"/>
+      </conditional>
+    </initialize>
+  </var>
+
+  <if>
+    <condition>
+      <or>
+        <eq>
+          <ref name="x"/>
+          <number value="1"/>
+        </eq>
+        <and>
+          <ref name="y"/>
+          <string value="1"/>
+        </and>
+      </or>
+    </condition>
+    <then>
+      <debugger/>
+    </then>
+  </if>
+
+  <var>
+    <name value="anchor"/>
+    <initialize>
+      <object>
+        <property>
+          <name value="left"/>
+          <number value="1"/>
+        </property>
+        <property>
+          <name value="top"/>
+          <number value="2"/>
+        </property>
+        <property>
+          <name value="right"/>
+          <number value="4"/>
+        </property>
+        <property>
+          <name value="bottom"/>
+          <number value="8"/>
+        </property>
+      </object>
+    </initialize>
+  </var>
+
+  <if>
+    <condition>
+      <bitwise-and>
+        <ref name="position"/>
+        <parens>
+          <bitwise-or>
+            <ref name="left">
+              <ref name="anchor"/>
+            </ref>
+            <ref name="right">
+              <ref name="anchor"/>
+            </ref>
+          </bitwise-or>
+        </parens>
+      </bitwise-and>
+    </condition>
+    <then>
+      <expression>
+        <call>
+          <ref name="align"/>
+          <ref name="position"/>
+        </call>
+      </expression>
+    </then>
+  </if>
+
+  <expression>
+    <assign>
+      <ref name="position"/>
+      <bitwise-xor>
+        <ref name="position"/>
+        <parens>
+          <bitwise-or>
+            <ref name="left">
+              <ref name="anchor"/>
+            </ref>
+            <ref name="right">
+              <ref name="anchor"/>
+            </ref>
+          </bitwise-or>
+        </parens>
+      </bitwise-xor>
+    </assign>
+  </expression>
+
+  <if>
+    <condition>
+      <eq>
+        <ref name="a"/>
+        <ref name="b"/>
+      </eq>
+    </condition>
+    <then>
+      <expression>
+        <call>
+          <ref name="func"/>
+        </call>
+      </expression>
+    </then>
+  </if>
+
+  <if>
+    <condition>
+      <ne>
+        <ref name="a"/>
+        <ref name="b"/>
+      </ne>
+    </condition>
+    <then>
+      <expression>
+        <call>
+          <ref name="func"/>
+        </call>
+      </expression>
+    </then>
+  </if>
+
+  <if>
+    <condition>
+      <strict-eq>
+        <ref name="a"/>
+        <ref name="b"/>
+      </strict-eq>
+    </condition>
+    <then>
+      <expression>
+        <call>
+          <ref name="func"/>
+        </call>
+      </expression>
+    </then>
+  </if>
+
+  <if>
+    <condition>
+      <strict-ne>
+        <ref name="a"/>
+        <ref name="b"/>
+      </strict-ne>
+    </condition>
+    <then>
+      <expression>
+        <call>
+          <ref name="func"/>
+        </call>
+      </expression>
+    </then>
+  </if>
+
+  <if>
+    <condition>
+      <lt>
+        <ref name="a"/>
+        <ref name="b"/>
+      </lt>
+    </condition>
+    <then>
+      <expression>
+        <call>
+          <ref name="func"/>
+        </call>
+      </expression>
+    </then>
+  </if>
+
+  <if>
+    <condition>
+      <gt>
+        <ref name="a"/>
+        <ref name="b"/>
+      </gt>
+    </condition>
+    <then>
+      <expression>
+        <call>
+          <ref name="func"/>
+        </call>
+      </expression>
+    </then>
+  </if>
+
+  <if>
+    <condition>
+      <le>
+        <ref name="a"/>
+        <ref name="b"/>
+      </le>
+    </condition>
+    <then>
+      <expression>
+        <call>
+          <ref name="func"/>
+        </call>
+      </expression>
+    </then>
+  </if>
+
+  <if>
+    <condition>
+      <ge>
+        <ref name="a"/>
+        <ref name="b"/>
+      </ge>
+    </condition>
+    <then>
+      <expression>
+        <call>
+          <ref name="func"/>
+        </call>
+      </expression>
+    </then>
+  </if>
+
+  <if>
+    <condition>
+      <instanceof>
+        <ref name="a"/>
+        <ref name="MyClass">
+          <ref name="MyNamespace"/>
+        </ref>
+      </instanceof>
+    </condition>
+    <then>
+      <expression>
+        <call>
+          <ref name="func"/>
+        </call>
+      </expression>
+    </then>
+  </if>
+
+  <var>
+    <name value="mycar"/>
+    <initialize>
+      <object>
+        <property>
+          <name value="make"/>
+          <string value="Honda"/>
+        </property>
+        <property>
+          <name value="model"/>
+          <string value="Accord"/>
+        </property>
+        <property>
+          <name value="year"/>
+          <number value="1998"/>
+        </property>
+      </object>
+    </initialize>
+  </var>
+
+  <expression>
+    <comment>
+      returns false
+    </comment>
+    <in>
+      <string value="make"/>
+      <ref name="mycar"/>
+    </in>
+  </expression>
+
+  <expression>
+    <comment>
+      9 &lt;&lt; 2 yields 36
+    </comment>
+    <eq>
+      <left-shift>
+        <number value="9"/>
+        <number value="2"/>
+      </left-shift>
+      <number value="36"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <comment>
+      9 &gt;&gt; 2 yields 2
+    </comment>
+    <eq>
+      <right-shift>
+        <number value="9"/>
+        <number value="2"/>
+      </right-shift>
+      <number value="2"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <comment>
+      -9 &gt;&gt; 2 yields 1073741821
+    </comment>
+    <eq>
+      <unsigned-right-shift>
+        <number value="9"/>
+        <number value="2"/>
+      </unsigned-right-shift>
+      <number value="1073741821"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <comment>Number + Number -> addition</comment>
+    <eq>
+      <add>
+        <number value="1"/>
+        <number value="2"/>
+      </add>
+      <number value="3"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <comment>Boolean + Number -> addition</comment>
+    <eq>
+      <add>
+        <boolean value="true"/>
+        <number value="1"/>
+      </add>
+      <number value="2"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <comment>false + false // 0</comment>
+    <eq>
+      <add>
+        <boolean value="false"/>
+        <boolean value="false"/>
+      </add>
+      <number value="0"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <comment>Number + String -> concatenation</comment>
+    <eq>
+      <add>
+        <number value="5"/>
+        <string value="foo"/>
+      </add>
+      <string value="5foo"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <comment>String + Boolean -> concatenation</comment>
+    <eq>
+      <add>
+        <string value="foo"/>
+        <boolean value="false"/>
+      </add>
+      <string value="foofalse"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <comment>String + String -> concatenation</comment>
+    <eq>
+      <add>
+        <string value="foo"/>
+        <string value="bar"/>
+      </add>
+      <string value="foobar"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <comment>5 - 3 // 2</comment>
+    <eq>
+      <sub>
+        <number value="5"/>
+        <number value="3"/>
+      </sub>
+      <number value="2"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <comment>3 - 5 // -2</comment>
+    <eq>
+      <sub>
+        <number value="3"/>
+        <number value="5"/>
+      </sub>
+      <number value="-2"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <comment>"foo" - 3 // NaN</comment>
+    <call>
+      <ref name="isNaN"/>
+      <sub>
+        <string value="foo"/>
+        <number value="-3"/>
+      </sub>
+    </call>
+  </expression>
+
+  <expression>
+    <eq>
+      <div>
+        <number value="1"/>
+        <number value="2"/>
+      </div>
+      <number value="0.5"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <eq>
+      <div>
+        <number value="2.0"/>
+        <number value="0"/>
+      </div>
+      <ref name="Infinity"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <eq>
+      <div>
+        <number value="2.0"/>
+        <number value="-0.0"/>
+      </div>
+      <neg>
+        <ref name="Infinity"/>
+      </neg>
+    </eq>
+  </expression>
+
+  <expression>
+    <eq>
+      <mul>
+        <number value="2"/>
+        <number value="2"/>
+      </mul>
+      <number value="4"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <eq>
+      <mul>
+        <number value="-2"/>
+        <number value="2"/>
+      </mul>
+      <number value="-4"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <call>
+      <ref name="isNaN"/>
+      <mul>
+        <ref name="Infinity"/>
+        <number value="0"/>
+      </mul>
+    </call>
+  </expression>
+
+  <expression>
+    <eq>
+      <mul>
+        <ref name="Infinity"/>
+        <ref name="Infinity"/>
+      </mul>
+      <ref name="Infinity"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <call>
+      <ref name="isNaN"/>
+      <mul>
+        <string value="foo"/>
+        <number value="2"/>
+      </mul>
+    </call>
+  </expression>
+
+  <expression>
+    <eq>
+      <mod>
+        <number value="12"/>
+        <number value="5"/>
+      </mod>
+      <number value="2"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <eq>
+      <mod>
+        <number value="-1"/>
+        <number value="2"/>
+      </mod>
+      <number value="-1"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <call>
+      <ref name="isNaN"/>
+      <mul>
+        <ref name="NaN"/>
+        <number value="2"/>
+      </mul>
+    </call>
+  </expression>
+
+  <scope>
+    <expression>
+      <comment>creates the property x on the global object</comment>
+      <assign>
+        <ref name="x"/>
+        <number value="42"/>
+      </assign>
+    </expression>
+
+    <var>
+      <comment>
+        creates the property y on the global object, and marks it as non-configurable
+      </comment>
+      <name value="y"/>
+      <initialize>
+        <number value="43"/>
+      </initialize>
+    </var>
+
+    <expression>
+      <assign>
+        <ref name="myObj"/>
+        <object>
+          <property>
+            <name value="h"/>
+            <number value="4"/>
+          </property>
+          <property>
+            <name value="k"/>
+            <number value="5"/>
+          </property>
+        </object>
+      </assign>
+    </expression>
+
+    <expression>
+      <comment>x is a property of the global object and can be deleted</comment>
+      <comment>returns true</comment>
+      <delete>
+        <ref name="x"/>
+      </delete>
+    </expression>
+
+    <expression>
+      <comment>y is not configurable, so it cannot be deleted</comment>
+      <comment>returns false</comment>
+      <delete>
+        <ref name="y"/>
+      </delete>
+    </expression>
+
+    <expression>
+      <comment>delete doesn't affect certain predefined properties</comment>
+      <comment>returns false</comment>
+      <delete>
+        <ref name="PI">
+          <ref name="Math"/>
+        </ref>
+      </delete>
+    </expression>
+
+    <expression>
+      <comment>user-defined properties can be deleted</comment>
+      <comment>returns true</comment>
+      <delete>
+        <ref name="myObj">
+          <ref name="h"/>
+        </ref>
+      </delete>
+    </expression>
+
+    <expression>
+      <comment>myobj is a property of the global object, not a variable, so it can be deleted</comment>
+      <comment>returns true</comment>
+      <delete>
+        <ref name="myObj"/>
+      </delete>
+    </expression>
+
+    <function>
+      <name value="f"/>
+      <body>
+        <expression>
+          <assign>
+            <ref name="z"/>
+            <number value="44"/>
+          </assign>
+        </expression>
+
+        <expression>
+          <comment>delete doesn't affect local variable names</comment>
+          <comment>returns false</comment>
+          <delete>
+            <ref name="z"/>
+          </delete>
+        </expression>
+      </body>
+    </function>
+  </scope>
+
+  <expression>
+    <strict-eq>
+      <void>
+        <number value="0"/>
+      </void>
+      <ref name="undefined"/>
+    </strict-eq>
+  </expression>
+
+  <scope>
+    <scope>
+      <comment>Numbers</comment>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <number value="37"/>
+          </typeof>
+          <string value="number"/>
+        </strict-eq>
+      </expression>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <number value="3.14"/>
+          </typeof>
+          <string value="number"/>
+        </strict-eq>
+      </expression>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <ref name="LN2">
+              <ref name="Math"/>
+            </ref>
+          </typeof>
+          <string value="number"/>
+        </strict-eq>
+      </expression>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <ref name="Infinity"/>
+          </typeof>
+          <string value="number"/>
+        </strict-eq>
+      </expression>
+
+      <expression>
+        <comment>Despite being "Not-A-Number"</comment>
+        <strict-eq>
+          <typeof>
+            <ref name="NaN"/>
+          </typeof>
+          <string value="number"/>
+        </strict-eq>
+      </expression>
+
+      <expression>
+        <comment>but never use this form!</comment>
+        <strict-eq>
+          <typeof>
+            <call>
+              <ref name="Number"/>
+              <number value="1"/>
+            </call>
+          </typeof>
+          <string value="number"/>
+        </strict-eq>
+      </expression>
+    </scope>
+
+    <scope>
+      <comment>Strings</comment>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <string value=""/>
+          </typeof>
+          <string value="string"/>
+        </strict-eq>
+      </expression>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <string value="bla"/>
+          </typeof>
+          <string value="string"/>
+        </strict-eq>
+      </expression>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <typeof>
+              <number value="1"/>
+            </typeof>
+          </typeof>
+          <string value="string"/>
+        </strict-eq>
+      </expression>
+
+      <expression>
+        <comment>but never use this form!</comment>
+        <strict-eq>
+          <typeof>
+            <call>
+              <ref name="String"/>
+              <string value="abc"/>
+            </call>
+          </typeof>
+          <string value="string"/>
+        </strict-eq>
+      </expression>
+    </scope>
+
+    <scope>
+      <comment>Booleans</comment>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <boolean value="true"/>
+          </typeof>
+          <string value="boolean"/>
+        </strict-eq>
+      </expression>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <boolean value="false"/>
+          </typeof>
+          <string value="boolean"/>
+        </strict-eq>
+      </expression>
+
+      <expression>
+        <comment>but never use this form!</comment>
+        <strict-eq>
+          <typeof>
+            <call>
+              <ref name="Boolean"/>
+              <boolean value="true"/>
+            </call>
+          </typeof>
+          <string value="boolean"/>
+        </strict-eq>
+      </expression>
+    </scope>
+
+    <scope>
+      <comment>Symbols</comment>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <call>
+              <ref name="Symbol"/>
+            </call>
+          </typeof>
+          <string value="symbol"/>
+        </strict-eq>
+      </expression>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <call>
+              <ref name="Symbol"/>
+              <string value="foo"/>
+            </call>
+          </typeof>
+          <string value="symbol"/>
+        </strict-eq>
+      </expression>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <ref name="iterator">
+              <ref name="Symbol"/>
+            </ref>
+          </typeof>
+          <string value="symbol"/>
+        </strict-eq>
+      </expression>
+    </scope>
+
+    <scope>
+      <comment>Undefined</comment>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <ref name="undefined"/>
+          </typeof>
+          <string value="undefined"/>
+        </strict-eq>
+      </expression>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <ref name="blabla"/>
+          </typeof>
+          <string value="undefined"/>
+        </strict-eq>
+      </expression>
+    </scope>
+
+    <scope>
+      <comment>Objects</comment>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <object>
+              <property>
+                <name value="a"/>
+                <number value="1"/>
+              </property>
+            </object>
+          </typeof>
+          <string value="object"/>
+        </strict-eq>
+      </expression>
+
+      <expression>
+        <comment>
+          use Array.isArray or Object.prototype.toString.call
+          to differentiate regular objects from arrays
+        </comment>
+        <strict-eq>
+          <typeof>
+            <array>
+              <number value="1"/>
+              <number value="2"/>
+              <number value="4"/>
+            </array>
+          </typeof>
+          <string value="object"/>
+        </strict-eq>
+      </expression>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <new>
+              <ref name="Date"/>
+            </new>
+          </typeof>
+          <string value="object"/>
+        </strict-eq>
+      </expression>
+
+      <scope>
+        <comment>The following is confusing. Don't use!</comment>
+
+        <expression>
+          <strict-eq>
+            <typeof>
+              <new>
+                <ref name="Boolean"/>
+                <boolean value="true"/>
+              </new>
+            </typeof>
+            <string value="object"/>
+          </strict-eq>
+        </expression>
+
+        <expression>
+          <strict-eq>
+            <typeof>
+              <new>
+                <ref name="Number"/>
+                <boolean value="1"/>
+              </new>
+            </typeof>
+            <string value="object"/>
+          </strict-eq>
+        </expression>
+
+        <expression>
+          <strict-eq>
+            <typeof>
+              <new>
+                <ref name="String"/>
+                <boolean value="abc"/>
+              </new>
+            </typeof>
+            <string value="object"/>
+          </strict-eq>
+        </expression>
+      </scope>
+    </scope>
+
+    <scope>
+      <comment>Functions</comment>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <function/>
+          </typeof>
+          <string value="function"/>
+        </strict-eq>
+      </expression>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <ref name="sin">
+              <ref name="Math"/>
+            </ref>
+          </typeof>
+          <string value="function"/>
+        </strict-eq>
+      </expression>
+    </scope>
+
+    <scope>
+      <comment>null</comment>
+
+      <expression>
+        <strict-eq>
+          <typeof>
+            <null/>
+          </typeof>
+          <string value="object"/>
+        </strict-eq>
+      </expression>
+    </scope>
+  </scope>
+
+  <scope>
+    <var>
+      <name value="x"/>
+      <initialize>
+        <number value="3"/>
+      </initialize>
+    </var>
+
+    <expression>
+      <comment>y = 3, x = 4</comment>
+      <assign>
+        <ref name="y"/>
+        <post-inc>
+          <ref name="x"/>
+        </post-inc>
+      </assign>
+    </expression>
+
+    <expression>
+      <comment>a = 3, b = 3</comment>
+      <assign>
+        <ref name="b"/>
+        <inc>
+          <ref name="a"/>
+        </inc>
+      </assign>
+    </expression>
+  </scope>
+
+  <scope>
+    <var>
+      <name value="x"/>
+      <initialize>
+        <number value="3"/>
+      </initialize>
+    </var>
+
+    <expression>
+      <comment>y = 3, x = 2</comment>
+      <assign>
+        <ref name="y"/>
+        <post-dec>
+          <ref name="x"/>
+        </post-dec>
+      </assign>
+    </expression>
+
+    <expression>
+      <comment>a = 1, b = 1</comment>
+      <assign>
+        <ref name="b"/>
+        <inc>
+          <ref name="a"/>
+        </inc>
+      </assign>
+    </expression>
+  </scope>
+
+  <scope>
+    <expression>
+      <comment>3</comment>
+      <plus>
+        <number value="3"/>
+      </plus>
+    </expression>
+    <expression>
+      <comment>3</comment>
+      <plus>
+        <string value="3"/>
+      </plus>
+    </expression>
+    <expression>
+      <comment>1</comment>
+      <plus>
+        <boolean value="true"/>
+      </plus>
+    </expression>
+    <expression>
+      <comment>0</comment>
+      <plus>
+        <boolean value="false"/>
+      </plus>
+    </expression>
+    <expression>
+      <comment>0</comment>
+      <plus>
+        <null/>
+      </plus>
+    </expression>
+  </scope>
+
+  <scope>
+    <comment xml:space="preserve">
+var x = 3;
+y = -x; // y = -3, x = 3      
+    </comment>
+
+    <var>
+      <name value="x"/>
+      <initialize>
+        <number value="3"/>
+      </initialize>
+    </var>
+
+    <expression>
+      <ref name="y"/>
+      <neg>
+        <ref name="x"/>
+      </neg>
+    </expression>
+  </scope>
+
+  <expression>
+    <comment>
+      ~9 = -10
+    </comment>
+    <eq>
+      <inv>
+        <number value="9"/>
+      </inv>
+      <number value="-10"/>
+    </eq>
+  </expression>
+
+  <expression>
+    <comment>
+      !a
+    </comment>
+    <not>
+      <ref name="a"/>
+    </not>
+  </expression>
+
+  <scope>
+    <comment xml:space="preserve">
+var object = {};
+object['1'] = 'value';
+alert(object[1]);      
+    </comment>
+
+    <var>
+      <name value="object"/>
+      <initialize>
+        <object/>
+      </initialize>
+    </var>
+
+    <expression>
+      <assign>
+        <subscript>
+          <ref name="object"/>
+          <string value="1"/>
+        </subscript>
+        <string value="value"/>
+      </assign>
+    </expression>
+
+    <expression>
+      <call>
+        <ref name="alert"/>
+        <subscript>
+          <ref name="object"/>
+          <number value="1"/>
+        </subscript>
+      </call>
+    </expression>
+  </scope>
+
+</script>

@@ -109,17 +109,18 @@
   <xs:element name="yield" type="yield"/>
   <xs:element name="arrow-function" type="arrow-function"/>
   <xs:element name="assign" type="assignment-expression"/>
-  <xs:element name="mul-to" type="assignment-expression"/>
-  <xs:element name="div-by" type="assignment-expression"/>
-  <xs:element name="mod-by" type="assignment-expression"/>
-  <xs:element name="add-to" type="assignment-expression"/>
-  <xs:element name="sub-from" type="assignment-expression"/>
-  <xs:element name="left-shift-by" type="assignment-expression"/>
-  <xs:element name="right-shift-by" type="assignment-expression"/>
-  <xs:element name="unsigned-right-shift-by" type="assignment-expression"/>
-  <xs:element name="and-with" type="assignment-expression"/>
-  <xs:element name="xor-with" type="assignment-expression"/>
-  <xs:element name="or-with" type="assignment-expression"/>
+  <xs:element name="mul-to" type="assignment-operator-expression"/>
+  <xs:element name="div-by" type="assignment-operator-expression"/>
+  <xs:element name="mod-by" type="assignment-operator-expression"/>
+  <xs:element name="add-to" type="assignment-operator-expression"/>
+  <xs:element name="sub-from" type="assignment-operator-expression"/>
+  <xs:element name="left-shift-by" type="assignment-operator-expression"/>
+  <xs:element name="right-shift-by" type="assignment-operator-expression"/>
+  <xs:element name="unsigned-right-shift-by" 
+    type="assignment-operator-expression"/>
+  <xs:element name="and-with" type="assignment-operator-expression"/>
+  <xs:element name="xor-with" type="assignment-operator-expression"/>
+  <xs:element name="or-with" type="assignment-operator-expression"/>
 
   <xs:simpleType name="identifier">
     <xs:restriction base="xs:string"/>
@@ -637,7 +638,7 @@
 
   <xs:group name="postfix-expression">
     <xs:choice>
-      <xs:group ref="lefthand-side-expression"/>
+      <xs:group ref="member-expression"/>
       <xs:group ref="post-inc"/>
       <xs:group ref="post-dec"/>
     </xs:choice>
@@ -646,12 +647,23 @@
   <xs:group name="lefthand-side-expression">
     <xs:annotation>
       <xs:documentation>
-        Fused into member expression.
+        Modified (simplified) compared with spec production.
       </xs:documentation>
     </xs:annotation>
-    <xs:sequence>
-      <xs:group ref="member-expression"/>
-    </xs:sequence>
+    <xs:choice>
+      <xs:choice>
+        <xs:group ref="identifier-reference"/>
+        <xs:group ref="parens">
+          <xs:annotation>
+            <xs:documentation>
+              Expression in parens should belong to 
+              lefthand-side-expression group.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:group>
+        <xs:group ref="subscript"/>
+      </xs:choice>
+    </xs:choice>
   </xs:group>
 
   <xs:group name="new-expression">
@@ -700,13 +712,13 @@
 
   <xs:group name="object-binding-pattern">
     <xs:sequence>
-      <xs:element name="object" type="object-binding-pattern"/>
+      <xs:element name="object-pattern" type="object-binding-pattern"/>
     </xs:sequence>    
   </xs:group>
 
   <xs:group name="array-binding-pattern">
     <xs:sequence>
-      <xs:element name="array" type="array-binding-pattern"/>
+      <xs:element name="array-pattern" type="array-binding-pattern"/>
     </xs:sequence>
   </xs:group>
 
@@ -1196,39 +1208,39 @@
 
   <xs:group name="iteration-statement">
     <xs:choice>
-      <xs:group ref="do-while"/>
-      <xs:group ref="while"/>
-      <xs:group ref="for"/>
-      <xs:group ref="for-in"/>
-      <xs:group ref="for-of"/>
+      <xs:group ref="do-while-statement"/>
+      <xs:group ref="while-statement"/>
+      <xs:group ref="for-statement"/>
+      <xs:group ref="for-in-statement"/>
+      <xs:group ref="for-of-statement"/>
     </xs:choice>
   </xs:group>
 
-  <xs:group name="do-while">
+  <xs:group name="do-while-statement">
     <xs:sequence>
       <xs:element ref="do-while"/>
     </xs:sequence>
   </xs:group>
 
-  <xs:group name="while">
+  <xs:group name="while-statement">
     <xs:sequence>
       <xs:element ref="while"/>
     </xs:sequence>
   </xs:group>
 
-  <xs:group name="for">
+  <xs:group name="for-statement">
     <xs:sequence>
       <xs:element ref="for"/>
     </xs:sequence>
   </xs:group>
 
-  <xs:group name="for-in">
+  <xs:group name="for-in-statement">
     <xs:sequence>
       <xs:element ref="for-in"/>
     </xs:sequence>
   </xs:group>
 
-  <xs:group name="for-of">
+  <xs:group name="for-of-statement">
     <xs:sequence>
       <xs:element ref="for-of"/>
     </xs:sequence>
@@ -1864,6 +1876,20 @@
   </xs:complexType>
 
   <xs:complexType name="assignment-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:choice>
+            <xs:group ref="binding-pattern"/>
+            <xs:group ref="lefthand-side-expression"/>
+          </xs:choice>
+          <xs:group ref="assignment-expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="assignment-operator-expression">
     <xs:complexContent>
       <xs:extension base="expression">
         <xs:sequence>

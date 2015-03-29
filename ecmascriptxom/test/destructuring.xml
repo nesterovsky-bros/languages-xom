@@ -47,7 +47,7 @@ a === 1;
   </var>
 
   <var>
-    <object>
+    <object-pattern>
       <property>
         <name value="op"/>
         <ref name="a"/>
@@ -65,7 +65,7 @@ a === 1;
         <name value="rhs"/>
         <ref name="c"/>
       </property>
-    </object>
+    </object-pattern>
     <initialize>
       <call>
         <ref name="getASTNode"/>
@@ -74,7 +74,7 @@ a === 1;
   </var>
 
   <var>
-    <object>
+    <object-pattern>
       <property>
         <name value="op"/>
       </property>
@@ -84,7 +84,7 @@ a === 1;
       <property>
         <name value="rhs"/>
       </property>
-    </object>
+    </object-pattern>
     <initialize>
       <call>
         <ref name="getASTNode"/>
@@ -95,12 +95,12 @@ a === 1;
   <function>
     <name value="g"/>
     <parameter>
-      <object>
+      <object-pattern>
         <property>
           <name value="name"/>
           <ref name="x"/>
         </property>
-      </object>
+      </object-pattern>
     </parameter>
     <body>
       <expression>
@@ -127,11 +127,11 @@ a === 1;
   </expression>
 
   <var>
-    <array>
+    <array-pattern>
       <element>
         <name value="a"/>
       </element>
-    </array>
+    </array-pattern>
     <initialize>
       <array/>
     </initialize>
@@ -145,14 +145,14 @@ a === 1;
   </expression>
 
   <var>
-    <array>
+    <array-pattern>
       <element>
         <name value="a"/>
         <initialize>
           <number value="1"/>
         </initialize>
       </element>
-    </array>
+    </array-pattern>
     <initialize>
       <array/>
     </initialize>

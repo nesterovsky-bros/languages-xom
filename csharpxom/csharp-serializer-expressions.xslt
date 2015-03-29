@@ -733,22 +733,18 @@
                   (
                     replace
                     (
-                      replace($value, '\\', '\\\\', 'm'),
+                      replace($value, '\', '\\'),
                       '&quot;',
-                      '\\&quot;',
-                      'm'
+                      '\&quot;'
                     ),
-                    '\t',
-                    '\\t',
-                    'm'
+                    '&#9;',
+                    '\t'
                   ),
-                  '\n',
-                  '\\n',
-                  'm'
+                  '&#10;',
+                  '\n'
                 ),
-                '\r',
-                '\\r',
-                'm'
+                '&#13;',
+                '\r'
               ),
               '&quot;'
             )"/>
@@ -961,7 +957,7 @@
   <xsl:template mode="t:expression" match="post-inc">
     <xsl:variable name="expression" as="element()" select="t:get-elements(.)"/>
 
-    <xsl:sequence select="t:get-nested-expression(t:get-elements(.))"/>
+    <xsl:sequence select="t:get-nested-expression($expression)"/>
     <xsl:sequence select="'++'"/>
   </xsl:template>
 
@@ -969,7 +965,7 @@
   <xsl:template mode="t:expression" match="post-dec">
     <xsl:variable name="expression" as="element()" select="t:get-elements(.)"/>
 
-    <xsl:sequence select="t:get-nested-expression(t:get-elements(.))"/>
+    <xsl:sequence select="t:get-nested-expression($expression)"/>
     <xsl:sequence select="'--'"/>
   </xsl:template>
 
