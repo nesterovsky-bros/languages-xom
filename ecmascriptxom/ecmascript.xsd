@@ -20,7 +20,6 @@
   <xs:element name="module" type="module"/>
 
   <xs:element name="function" type="function-declaration"/>
-  <xs:element name="generator-function" type="function-declaration"/>
   <xs:element name="class" type="class-declaration"/>
   <xs:element name="let" type="lexical-declaration"/>
   <xs:element name="const" type="lexical-declaration"/>
@@ -128,11 +127,6 @@
 
   <xs:attributeGroup name="export">
     <xs:attribute name="export" use="optional" default="false">
-      <xs:annotation>
-        <xs:documentation>
-          NOTE: This attribute is permitted in export production only.
-        </xs:documentation>
-      </xs:annotation>
       <xs:simpleType>
         <xs:restriction base="xs:string">
           <xs:enumeration value="true"/>
@@ -155,12 +149,10 @@
     </xs:choice>
   </xs:group>
 
-  <xs:group name="statement">
+  <xs:group name="statement-base">
     <xs:choice>
       <xs:group ref="block-statement"/>
-      <xs:group ref="variable-statement"/>
       <xs:group ref="empty-statement"/>
-      <xs:group ref="expression-statement"/>
       <xs:group ref="if-statement"/>
       <xs:group ref="breakable-statement"/>
       <xs:group ref="continue-statement"/>
@@ -171,6 +163,22 @@
       <xs:group ref="throw-statement"/>
       <xs:group ref="try-statement"/>
       <xs:group ref="debugger-statement"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="statement">
+    <xs:choice>
+      <xs:group ref="statement-base"/>
+      <xs:group ref="variable-statement"/>
+      <xs:group ref="expression-statement"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="module-statement">
+    <xs:choice>
+      <xs:group ref="statement-base"/>
+      <xs:group ref="module-variable-statement"/>
+      <xs:group ref="module-expression-statement"/>
     </xs:choice>
   </xs:group>
 
@@ -197,8 +205,8 @@
     <xs:choice>
       <xs:group ref="import-declaration"/>
       <xs:group ref="export-declaration"/>
-      <xs:group ref="statement"/>
-      <xs:group ref="declaration"/>
+      <xs:group ref="module-statement"/>
+      <xs:group ref="module-declaration"/>
       <xs:group ref="module-scope"/>
     </xs:choice>
   </xs:group>
@@ -279,11 +287,24 @@
     </xs:choice>
   </xs:group>
 
-  <xs:group name="hoistable-declaration">
+  <xs:group name="module-declaration">
     <xs:choice>
-      <xs:group ref="function-declaration"/>
-      <xs:group ref="generator-declaration"/>
+      <xs:group ref="module-hoistable-declaration"/>
+      <xs:group ref="module-class-declaration"/>
+      <xs:group ref="module-lexical-declaration"/>
     </xs:choice>
+  </xs:group>
+
+  <xs:group name="hoistable-declaration">
+    <xs:sequence>
+      <xs:group ref="function-declaration"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="module-hoistable-declaration">
+    <xs:sequence>
+      <xs:group ref="module-function-declaration"/>
+    </xs:sequence>
   </xs:group>
 
   <xs:group name="class-declaration">
@@ -292,10 +313,23 @@
     </xs:sequence>
   </xs:group>
 
+  <xs:group name="module-class-declaration">
+    <xs:sequence>
+      <xs:element name="class" type="module-class-declaration"/>
+    </xs:sequence>
+  </xs:group>
+
   <xs:group name="lexical-declaration">
     <xs:choice>
       <xs:element ref="let"/>
       <xs:element ref="const"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="module-lexical-declaration">
+    <xs:choice>
+      <xs:element name="let" type="module-lexical-declaration"/>
+      <xs:element name="const" type="module-lexical-declaration"/>
     </xs:choice>
   </xs:group>
 
@@ -307,10 +341,7 @@
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
-      <xs:choice>
-        <xs:group ref="name"/>
-        <xs:group ref="binding-pattern"/>
-      </xs:choice>
+      <xs:group ref="name-or-pattern"/>
       <xs:group ref="binding-initialize" minOccurs="0"/>
     </xs:sequence>
   </xs:group>
@@ -332,7 +363,6 @@
       <xs:group ref="object-literal"/>
       <xs:group ref="function-expression"/>
       <xs:group ref="class-expression"/>
-      <xs:group ref="generator-expression"/>
       <xs:group ref="regex-literal"/>
       <xs:group ref="template-literal"/>
       <xs:group ref="parens"/>
@@ -458,12 +488,6 @@
     </xs:sequence>
   </xs:group>
 
-  <xs:group name="generator-expression">
-    <xs:sequence>
-      <xs:element name="generator-function" type="function-expression"/>
-    </xs:sequence>
-  </xs:group>
-
   <xs:group name="class-expression">
     <xs:sequence>
       <xs:element name="class" type="class-expression"/>
@@ -503,12 +527,15 @@
   </xs:group>
 
   <xs:group name="method-definition">
-    <xs:choice>
+    <xs:sequence>
       <xs:element name="function" type="method"/>
-      <xs:element name="get-function" type="method"/>
-      <xs:element name="set-function" type="method"/>
-      <xs:element name="generator-function" type="method"/>
-    </xs:choice>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="class-method-definition">
+    <xs:sequence>
+      <xs:element name="function" type="class-method"/>
+    </xs:sequence>
   </xs:group>
 
   <xs:group name="assignment-expression">
@@ -703,7 +730,20 @@
     </xs:choice>
   </xs:group>
 
+  <xs:group name="name-or-pattern">
+    <xs:choice>
+      <xs:group ref="name"/>
+      <xs:group ref="binding-pattern"/>
+    </xs:choice>
+  </xs:group>
+
   <xs:group name="binding-pattern">
+    <xs:sequence>
+      <xs:element name="pattern" type="binding-pattern"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="binding-pattern-content">
     <xs:choice>
       <xs:group ref="object-binding-pattern"/>
       <xs:group ref="array-binding-pattern"/>
@@ -712,13 +752,13 @@
 
   <xs:group name="object-binding-pattern">
     <xs:sequence>
-      <xs:element name="object-pattern" type="object-binding-pattern"/>
+      <xs:element name="object" type="object-binding-pattern"/>
     </xs:sequence>    
   </xs:group>
 
   <xs:group name="array-binding-pattern">
     <xs:sequence>
-      <xs:element name="array-pattern" type="array-binding-pattern"/>
+      <xs:element name="array" type="array-binding-pattern"/>
     </xs:sequence>
   </xs:group>
 
@@ -730,7 +770,7 @@
 
   <xs:group name="binding-elision">
     <xs:sequence>
-      <xs:element name="elision" type="base-binding-element"/>
+      <xs:element name="elision" type="base-element"/>
     </xs:sequence>
   </xs:group>
 
@@ -740,9 +780,9 @@
     </xs:sequence>
   </xs:group>
 
-  <xs:group name="binding-rest-element">
+  <xs:group name="binding-spread">
     <xs:sequence>
-      <xs:element name="rest" type="binding-rest-element"/>
+      <xs:element name="spread" type="binding-spread"/>
     </xs:sequence>
   </xs:group>
 
@@ -1097,9 +1137,9 @@
     </xs:sequence>
   </xs:group>
 
-  <xs:group name="generator-declaration">
+  <xs:group name="module-function-declaration">
     <xs:sequence>
-      <xs:element ref="generator-function"/>
+      <xs:element name="function" type="module-function-declaration"/>
     </xs:sequence>
   </xs:group>
 
@@ -1153,7 +1193,7 @@
 
   <xs:group name="class-body">
     <xs:choice>
-      <xs:group ref="method-definition"/>
+      <xs:group ref="class-method-definition"/>
       <xs:group ref="class-body-scope"/>
     </xs:choice>
   </xs:group>
@@ -1188,6 +1228,12 @@
     </xs:sequence>
   </xs:group>
 
+  <xs:group name="module-variable-statement">
+    <xs:sequence>
+      <xs:element name="var" type="module-variable-statement"/>
+    </xs:sequence>
+  </xs:group>
+
   <xs:group name="empty-statement">
     <xs:sequence>
       <xs:element ref="statement"/>
@@ -1197,6 +1243,12 @@
   <xs:group name="expression-statement">
     <xs:sequence>
       <xs:element ref="expression"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="module-expression-statement">
+    <xs:sequence>
+      <xs:element name="expression" type="module-expression-statement"/>
     </xs:sequence>
   </xs:group>
 
@@ -1505,22 +1557,25 @@
 
   <xs:complexType name="method">
     <xs:complexContent>
-      <xs:extension base="member">
-        <xs:sequence>
-          <xs:group ref="property-name"/>
-          <xs:group ref="formal-parameters" minOccurs="0"/>
-          <xs:group ref="function-body" minOccurs="0"/>
-        </xs:sequence>
-
-        <xs:attribute name="static" type="xs:boolean"
-          use="optional" default="false">
-          <xs:annotation>
-            <xs:documentation>
-              This attribute is allowed in contexts of class-expression and
-              class-declaration only.
-            </xs:documentation>
-          </xs:annotation>
+      <xs:extension base="function-declaration">
+        <xs:attribute name="type" use="optional" default="method">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="method"/>
+              <xs:enumeration value="getter"/>
+              <xs:enumeration value="setter"/>
+            </xs:restriction>
+          </xs:simpleType>
         </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="class-method">
+    <xs:complexContent>
+      <xs:extension base="method">
+        <xs:attribute name="static" type="xs:boolean"
+          use="optional" default="false"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1555,9 +1610,7 @@
 
   <xs:complexType name="declaration">
     <xs:complexContent>
-      <xs:extension base="statement">
-        <xs:attributeGroup ref="export"/>
-      </xs:extension>
+      <xs:extension base="base-element"/>
     </xs:complexContent>
   </xs:complexType>
 
@@ -1900,6 +1953,14 @@
     </xs:complexContent>
   </xs:complexType>
 
+  <xs:complexType name="binding-pattern">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:group ref="binding-pattern-content"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="object-binding-pattern">
     <xs:complexContent>
       <xs:extension base="base-element">
@@ -1915,7 +1976,7 @@
           <xs:group ref="property-name"/>
           <xs:choice minOccurs="0">
             <xs:group ref="simple-ref"/>
-            <xs:group ref="binding-pattern"/>
+            <xs:group ref="binding-pattern-content"/>
           </xs:choice>
           <xs:group ref="binding-initialize" minOccurs="0"/>
         </xs:sequence>
@@ -1936,39 +1997,35 @@
       <xs:extension base="base-element">
         <xs:sequence>
           <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="simple-ref"/>
+            <xs:group ref="binding-pattern-content"/>
             <xs:group ref="binding-elision"/>
             <xs:group ref="binding-element"/>
           </xs:choice>
-          <xs:group ref="binding-rest-element" minOccurs="0"/>          
+          <xs:group ref="binding-spread" minOccurs="0"/>          
         </xs:sequence>
       </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="base-binding-element">
-    <xs:complexContent>
-      <xs:extension base="base-element"/>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="binding-element">
     <xs:complexContent>
-      <xs:extension base="base-binding-element">
+      <xs:extension base="base-element">
         <xs:sequence>
           <xs:choice>
-            <xs:group ref="name"/>
-            <xs:group ref="binding-pattern"/>
+            <xs:group ref="simple-ref"/>
+            <xs:group ref="binding-pattern-content"/>
           </xs:choice>
-          <xs:group ref="binding-initialize" minOccurs="0"/>
+          <xs:group ref="binding-initialize"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="binding-rest-element">
+  <xs:complexType name="binding-spread">
     <xs:complexContent>
-      <xs:extension base="base-binding-element">
-        <xs:group ref="name"/>
+      <xs:extension base="base-element">
+        <xs:group ref="simple-ref"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1977,6 +2034,14 @@
     <xs:complexContent>
       <xs:extension base="expression">
         <xs:group ref="function-declaration-content"/>
+        <xs:attribute name="generator" type="xs:boolean"
+          use="optional" default="false">
+          <xs:annotation>
+            <xs:documentation>
+              Indicates a generator function.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1985,6 +2050,22 @@
     <xs:complexContent>
       <xs:extension base="declaration">
         <xs:group ref="function-declaration-content"/>
+        <xs:attribute name="generator" type="xs:boolean" 
+          use="optional" default="false">
+          <xs:annotation>
+            <xs:documentation>
+              Indicates a generator function.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="module-function-declaration">
+    <xs:complexContent>
+      <xs:extension base="function-declaration">
+        <xs:attributeGroup ref="export"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1999,10 +2080,7 @@
     <xs:complexContent>
       <xs:extension base="base-formal-parameter">
         <xs:sequence>
-          <xs:choice>
-            <xs:group ref="name"/>
-            <xs:group ref="binding-pattern"/>
-          </xs:choice>
+          <xs:group ref="name-or-pattern"/>
           <xs:group ref="binding-initialize" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
@@ -2034,6 +2112,14 @@
     </xs:complexContent>
   </xs:complexType>
 
+  <xs:complexType name="module-class-declaration">
+    <xs:complexContent>
+      <xs:extension base="class-declaration">
+        <xs:attributeGroup ref="export"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="class-heritage">
     <xs:complexContent>
       <xs:extension base="base-element">
@@ -2055,6 +2141,14 @@
     </xs:complexContent>
   </xs:complexType>
 
+  <xs:complexType name="module-lexical-declaration">
+    <xs:complexContent>
+      <xs:extension base="lexical-declaration">
+        <xs:attributeGroup ref="export"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="variable-statement">
     <xs:annotation>
       <xs:documentation>
@@ -2064,6 +2158,13 @@
     <xs:complexContent>
       <xs:extension base="statement">
         <xs:group ref="lexical-declaration-content"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="module-variable-statement">
+    <xs:complexContent>
+      <xs:extension base="variable-statement">
         <xs:attributeGroup ref="export"/>
       </xs:extension>
     </xs:complexContent>
@@ -2089,14 +2190,20 @@
     <xs:complexContent>
       <xs:extension base="statement">
         <xs:group ref="expression"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="module-expression-statement">
+    <xs:annotation>
+      <xs:documentation>
+        NOTE: In case of export is default, expression can be
+        assignment-expression only.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="expression-statement">
         <xs:attribute name="export" use="optional" default="false">
-          <xs:annotation>
-            <xs:documentation>
-              NOTE: This attribute is permitted in export production only.
-              In case of export is default, expression can be 
-              assignment-expression only.
-            </xs:documentation>
-          </xs:annotation>
           <xs:simpleType>
             <xs:restriction base="xs:string">
               <xs:enumeration value="false"/>
@@ -2283,10 +2390,7 @@
   <xs:complexType name="catch-parameter">
     <xs:complexContent>
       <xs:extension base="base-element">
-        <xs:choice>
-          <xs:group ref="name"/>
-          <xs:group ref="binding-pattern"/>
-        </xs:choice>
+        <xs:group ref="name-or-pattern"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

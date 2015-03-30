@@ -15,7 +15,7 @@ function f() {
   }
 }
   </comment>
- 
+
   <function>
     <name value="f"/>
     <body>

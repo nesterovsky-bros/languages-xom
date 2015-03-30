@@ -1048,7 +1048,7 @@
             <typeof>
               <new>
                 <ref name="String"/>
-                <boolean value="abc"/>
+                <string value="abc"/>
               </new>
             </typeof>
             <string value="object"/>
@@ -1260,6 +1260,406 @@ alert(object[1]);
           <number value="1"/>
         </subscript>
       </call>
+    </expression>
+  </scope>
+
+  <scope>
+    <comment xml:space="preserve">
+// String interpolation
+var name = "Bob", time = "today";
+fn`Hello ${name}, how are you ${time}?`
+    </comment>
+  </scope>
+
+  <expression>
+    <tag>
+      <ref name="fn"/>
+      <template>
+        <string value="Hello "/>
+        <ref name="name"/>
+        <string value=", how are you "/>
+        <ref name="time"/>
+        <string value="?"/>
+      </template>
+    </tag>
+  </expression>
+
+  <scope>
+    <comment xml:space="preserve">
+function car(make, model, year) {
+   this.make = make;
+   this.model = model;
+   this.year = year;
+}
+ 
+var mycar = new car("Eagle", "Talon TSi", 1993);
+    </comment>
+
+    <function>
+      <name value="car"/>
+      <parameter>
+        <name value="make"/>
+      </parameter>
+      <parameter>
+        <name value="model"/>
+      </parameter>
+      <parameter>
+        <name value="year"/>
+      </parameter>
+      <body>
+        <expression>
+          <assign>
+            <ref name="make">
+              <this/>
+            </ref>
+            <ref name="make"/>
+          </assign>
+        </expression>
+        <expression>
+          <assign>
+            <ref name="model">
+              <this/>
+            </ref>
+            <ref name="model"/>
+          </assign>
+        </expression>
+        <expression>
+          <assign>
+            <ref name="year">
+              <this/>
+            </ref>
+            <ref name="year"/>
+          </assign>
+        </expression>
+      </body>
+    </function>
+
+    <var>
+      <name value="mycar"/>
+      <initialize>
+        <new>
+          <ref name="car"/>
+          <string value="Eagle"/>
+          <string value="Talon TSi"/>
+          <number value="1993"/>
+        </new>
+      </initialize>
+    </var>
+  </scope>
+
+  <scope>
+    <comment xml:space="preserve">
+function* g4() {
+  yield* [1, 2, 3];
+  return "foo";
+}
+
+var result;
+
+function* g5() {
+  result = yield* g4();
+}
+
+var iterator = g5();
+
+console.log(iterator.next()); // { value: 1, done: false }
+console.log(iterator.next()); // { value: 2, done: false }
+console.log(iterator.next()); // { value: 3, done: false }
+console.log(iterator.next()); // { value: undefined, done: true }, 
+                              // g4() returned { value: "foo", done: true } at this point
+
+console.log(result);          // "foo"
+    </comment>
+
+    <function generator="true">
+      <name value="g4"/>
+      <body>
+        <expression>
+          <assign>
+            <ref name="result"/>
+            <yield delegate="true">
+              <call>
+                <ref name="g4"/>
+              </call>
+            </yield>
+          </assign>
+        </expression>
+      </body>
+    </function>
+
+    <var>
+      <name value="result"/>
+    </var>
+
+    <function generator="true">
+      <name value="g5"/>
+      <body>
+        <expression>
+          <yield delegate="true">
+            <array>
+              <number value="1"/>
+              <number value="2"/>
+              <number value="3"/>
+            </array>
+          </yield>
+        </expression>
+
+        <return>
+          <string value="foo"/>
+        </return>
+      </body>
+    </function>
+
+    <var>
+      <name value="iterator"/>
+      <initialize>
+        <call>
+          <ref name="g5"/>
+        </call>
+      </initialize>
+    </var>
+
+    <expression>
+      <comment>{ value: 1, done: false }</comment>
+      <call>
+        <ref name="log">
+          <ref name="console"/>
+        </ref>
+        <call>
+          <ref name="next">
+            <ref name="iterator"/>
+          </ref>
+        </call>
+      </call>
+    </expression>
+
+    <expression>
+      <comment>{ value: 2, done: false }</comment>
+      <call>
+        <ref name="log">
+          <ref name="console"/>
+        </ref>
+        <call>
+          <ref name="next">
+            <ref name="iterator"/>
+          </ref>
+        </call>
+      </call>
+    </expression>
+
+    <expression>
+      <comment>{ value: 3, done: false }</comment>
+      <call>
+        <ref name="log">
+          <ref name="console"/>
+        </ref>
+        <call>
+          <ref name="next">
+            <ref name="iterator"/>
+          </ref>
+        </call>
+      </call>
+    </expression>
+
+
+    <expression>
+      <comment>{ value: undefined, done: true }</comment>
+      <comment>g4() returned { value: "foo", done: true } at this point</comment>
+      <call>
+        <ref name="log">
+          <ref name="console"/>
+        </ref>
+        <call>
+          <ref name="next">
+            <ref name="iterator"/>
+          </ref>
+        </call>
+      </call>
+    </expression>
+
+    <expression>
+      <comment>"foo"</comment>
+      <call>
+        <ref name="log">
+          <ref name="console"/>
+        </ref>
+        <ref name="result"/>
+      </call>
+    </expression>
+  </scope>
+
+  <expression>
+    <assign>
+      <ref name="x"/>
+      <ref name="y"/>
+    </assign>
+  </expression>
+
+  <expression>
+    <assign>
+      <ref name="x"/>
+      <assign>
+        <ref name="y"/>
+        <ref name="z"/>
+      </assign>
+    </assign>
+  </expression>
+
+  <expression>
+    <add-to>
+      <ref name="bar"/>
+      <number value="2"/>
+    </add-to>
+  </expression>
+
+  <expression>
+    <sub-from>
+      <ref name="bar"/>
+      <number value="2"/>
+    </sub-from>
+  </expression>
+
+  <expression>
+    <mul-to>
+      <ref name="bar"/>
+      <number value="2"/>
+    </mul-to>
+  </expression>
+
+  <expression>
+    <div-by>
+      <ref name="bar"/>
+      <number value="2"/>
+    </div-by>
+  </expression>
+
+  <expression>
+    <mod-by>
+      <ref name="bar"/>
+      <number value="2"/>
+    </mod-by>
+  </expression>
+
+  <expression>
+    <left-shift-by>
+      <ref name="bar"/>
+      <number value="2"/>
+    </left-shift-by>
+  </expression>
+
+  <expression>
+    <right-shift-by>
+      <ref name="bar"/>
+      <number value="2"/>
+    </right-shift-by>
+  </expression>
+
+  <expression>
+    <unsigned-right-shift-by>
+      <ref name="bar"/>
+      <number value="2"/>
+    </unsigned-right-shift-by>
+  </expression>
+
+  <expression>
+    <and-with>
+      <ref name="bar"/>
+      <number value="2"/>
+    </and-with>
+  </expression>
+
+  <expression>
+    <xor-with>
+      <ref name="bar"/>
+      <number value="2"/>
+    </xor-with>
+  </expression>
+
+  <expression>
+    <or-with>
+      <ref name="bar"/>
+      <number value="2"/>
+    </or-with>
+  </expression>
+
+  <expression>
+    <add-to>
+      <subscript>
+        <ref name="a"/>
+        <post-inc>
+          <ref name="i"/>
+        </post-inc>
+      </subscript>
+      <number value="5"/>
+    </add-to>
+  </expression>
+
+  <scope>
+    <comment xml:space="preserve">
+[a, b] = [1, 2]
+[a, b, ...rest] = [1, 2, 3, 4, 5]
+{a, b} = {a:1, b:2}
+    </comment>
+
+    <expression>
+      <assign>
+        <pattern>
+          <array>
+            <ref name="a"/>
+            <ref name="b"/>
+          </array>
+        </pattern>
+        <array>
+          <number value="1"/>
+          <number value="2"/>
+        </array>
+      </assign>
+    </expression>
+
+    <expression>
+      <assign>
+        <pattern>
+          <array>
+            <ref name="a"/>
+            <ref name="b"/>
+            <spread>
+              <ref name="rest"/>
+            </spread>
+          </array>
+        </pattern>
+        <array>
+          <number value="1"/>
+          <number value="2"/>
+          <number value="3"/>
+          <number value="4"/>
+          <number value="5"/>
+        </array>
+      </assign>
+    </expression>
+
+    <expression>
+      <assign>
+        <pattern>
+          <object>
+            <property>
+              <name value="a"/>
+            </property>
+            <property>
+              <name value="b"/>
+            </property>
+          </object>
+        </pattern>
+        <object>
+          <property>
+            <name value="a"/>
+            <number value="1"/>
+          </property>
+          <property>
+            <name value="b"/>
+            <number value="2"/>
+          </property>
+        </object>
+      </assign>
     </expression>
   </scope>
 

@@ -28,15 +28,13 @@ a === 1;
   </comment>
 
   <var>
-    <array>
-      <element>
-        <name value="a"/>
-      </element>
-      <elision/>
-      <element>
-        <name value="b"/>
-      </element>
-    </array>
+    <pattern>
+      <array>
+        <ref name="a"/>
+        <elision/>
+        <ref name="b"/>
+      </array>
+    </pattern>
     <initialize>
       <array>
         <number value="1"/>
@@ -47,25 +45,27 @@ a === 1;
   </var>
 
   <var>
-    <object-pattern>
-      <property>
-        <name value="op"/>
-        <ref name="a"/>
-      </property>
-      <property>
-        <name value="lhs"/>
-        <object>
-          <property>
-            <name value="op"/>
-            <ref name="b"/>
-          </property>
-        </object>
-      </property>
-      <property>
-        <name value="rhs"/>
-        <ref name="c"/>
-      </property>
-    </object-pattern>
+    <pattern>
+      <object>
+        <property>
+          <name value="op"/>
+          <ref name="a"/>
+        </property>
+        <property>
+          <name value="lhs"/>
+          <object>
+            <property>
+              <name value="op"/>
+              <ref name="b"/>
+            </property>
+          </object>
+        </property>
+        <property>
+          <name value="rhs"/>
+          <ref name="c"/>
+        </property>
+      </object>
+    </pattern>
     <initialize>
       <call>
         <ref name="getASTNode"/>
@@ -74,17 +74,19 @@ a === 1;
   </var>
 
   <var>
-    <object-pattern>
-      <property>
-        <name value="op"/>
-      </property>
-      <property>
-        <name value="lhs"/>
-      </property>
-      <property>
-        <name value="rhs"/>
-      </property>
-    </object-pattern>
+    <pattern>
+      <object>
+        <property>
+          <name value="op"/>
+        </property>
+        <property>
+          <name value="lhs"/>
+        </property>
+        <property>
+          <name value="rhs"/>
+        </property>
+      </object>
+    </pattern>
     <initialize>
       <call>
         <ref name="getASTNode"/>
@@ -95,12 +97,14 @@ a === 1;
   <function>
     <name value="g"/>
     <parameter>
-      <object-pattern>
-        <property>
-          <name value="name"/>
-          <ref name="x"/>
-        </property>
-      </object-pattern>
+      <pattern>
+        <object>
+          <property>
+            <name value="name"/>
+            <ref name="x"/>
+          </property>
+        </object>
+      </pattern>
     </parameter>
     <body>
       <expression>
@@ -127,11 +131,11 @@ a === 1;
   </expression>
 
   <var>
-    <array-pattern>
-      <element>
-        <name value="a"/>
-      </element>
-    </array-pattern>
+    <pattern>
+      <array>
+        <ref name="a"/>
+      </array>
+    </pattern>
     <initialize>
       <array/>
     </initialize>
@@ -145,14 +149,16 @@ a === 1;
   </expression>
 
   <var>
-    <array-pattern>
-      <element>
-        <name value="a"/>
-        <initialize>
-          <number value="1"/>
-        </initialize>
-      </element>
-    </array-pattern>
+    <pattern>
+      <array>
+        <element>
+          <ref name="a"/>
+          <initialize>
+            <number value="1"/>
+          </initialize>
+        </element>
+      </array>
+    </pattern>
     <initialize>
       <array/>
     </initialize>
