@@ -1,0 +1,963 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<script xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
+
+  <while>
+    <condition>
+      <lt>
+        <ref name="x"/>
+        <number value="10"/>
+      </lt>
+    </condition>
+    <block>
+      <expression>
+        <inc>
+          <ref name="x"/>
+        </inc>
+      </expression>
+    </block>
+  </while>
+
+  <scope>
+    <var>
+      <name value="x"/>
+      <initialize>
+        <number value="1"/>
+      </initialize>
+    </var>
+
+    <block>
+      <var>
+        <name value="x"/>
+        <initialize>
+          <number value="2"/>
+        </initialize>
+      </var>
+    </block>
+
+    <expression>
+      <comment>logs 2</comment>
+      <call>
+        <ref name="log">
+          <ref name="console"/>
+        </ref>
+        <ref name="x"/>
+      </call>
+    </expression>
+  </scope>
+
+  <scope>
+    <comment xml:space="preserve">
+var i, j;
+
+loop1:
+for (i = 0; i &lt; 3; i++) {      //The first for statement is labeled "loop1"
+   loop2:
+   for (j = 0; j &lt; 3; j++) {   //The second for statement is labeled "loop2"
+      if (i == 1 &amp;&amp; j == 1) {
+         continue loop1;
+      }
+      console.log("i = " + i + ", j = " + j);
+   }
+}
+    </comment>
+
+    <var>
+      <name value="i"/>
+    </var>
+    <var>
+      <name value="j"/>
+    </var>
+
+    <label>
+      <comment>The first for statement is labeled "loop1"</comment>
+      <name value="loop1"/>
+      <for>
+        <initialize>
+          <assign>
+            <ref name="i"/>
+            <number value="0"/>
+          </assign>
+        </initialize>
+        <condition>
+          <lt>
+            <ref name="i"/>
+            <number value="3"/>
+          </lt>
+        </condition>
+        <update>
+          <post-inc>
+            <ref name="i"/>
+          </post-inc>
+        </update>
+        <block>
+          <label>
+            <comment>The second for statement is labeled "loop2"</comment>
+            <name value="loop2"/>
+            <for>
+              <initialize>
+                <assign>
+                  <ref name="j"/>
+                  <number value="0"/>
+                </assign>
+              </initialize>
+              <condition>
+                <lt>
+                  <ref name="j"/>
+                  <number value="3"/>
+                </lt>
+              </condition>
+              <update>
+                <post-inc>
+                  <ref name="j"/>
+                </post-inc>
+              </update>
+              <block>
+                <if>
+                  <condition>
+                    <and>
+                      <eq>
+                        <ref name="i"/>
+                        <number value="1"/>
+                      </eq>
+                      <eq>
+                        <ref name="j"/>
+                        <number value="1"/>
+                      </eq>
+                    </and>
+                  </condition>
+                  <then>
+                    <continue>
+                      <ref name="loop1"/>
+                    </continue>
+                  </then>
+                </if>
+
+                <expression>
+                  <call>
+                    <ref name="log">
+                      <ref name="console"/>
+                    </ref>
+                  </call>
+                  <add>
+                    <add>
+                      <add>
+                        <string value="i = "/>
+                        <ref name="i"/>
+                      </add>
+                      <string value=", j = "/>
+                    </add>
+                    <ref name="j"/>
+                  </add>
+                </expression>
+              </block>
+            </for>
+          </label>
+        </block>
+      </for>
+    </label>
+  </scope>
+
+  <scope>
+    <comment xml:space="preserve">
+var allPass = true;
+var i, j;
+
+top:
+for (i = 0; i &lt; items.length; i++)
+  for (j = 0; j &lt; tests.length; j++)
+    if (!tests[j].pass(items[i])){
+      allPass = false;
+      break top;
+    }      
+    </comment>
+
+    <var>
+      <name value="allPass"/>
+      <initialize>
+        <boolean value="true"/>
+      </initialize>
+    </var>
+    <var>
+      <name value="i"/>
+    </var>
+    <var>
+      <name value="j"/>
+    </var>
+
+    <label>
+      <name value="top"/>
+      <for>
+        <initialize>
+          <assign>
+            <ref name="i"/>
+            <number value="0"/>
+          </assign>
+        </initialize>
+        <condition>
+          <lt>
+            <ref name="i"/>
+            <ref name="length">
+              <ref name="itmes"/>
+            </ref>
+          </lt>
+        </condition>
+        <update>
+          <post-inc>
+            <ref name="i"/>
+          </post-inc>
+        </update>
+        <block>
+          <for>
+            <initialize>
+              <assign>
+                <ref name="j"/>
+                <number value="0"/>
+              </assign>
+            </initialize>
+            <condition>
+              <lt>
+                <ref name="j"/>
+                <ref name="length">
+                  <ref name="tests"/>
+                </ref>
+              </lt>
+            </condition>
+            <update>
+              <post-inc>
+                <ref name="j"/>
+              </post-inc>
+            </update>
+            <block>
+              <if>
+                <condition>
+                  <not>
+                    <call>
+                      <ref name="pass">
+                        <subscript>
+                          <ref name="tests"/>
+                          <ref name="j"/>
+                        </subscript>
+                      </ref>
+                      <subscript>
+                        <ref name="items"/>
+                        <ref name="i"/>
+                      </subscript>
+                    </call>
+                  </not>
+                </condition>
+                <then>
+                  <expression>
+                    <assign>
+                      <ref name="allPass"/>
+                      <boolean value="false"/>
+                    </assign>
+                  </expression>
+
+                  <break>
+                    <ref name="top"/>
+                  </break>
+                </then>
+              </if>
+            </block>
+          </for>
+        </block>
+      </for>
+    </label>
+  </scope>
+
+  <statement/>
+
+  <var>
+    <name value="myvar"/>
+    <initialize>
+      <number value="1"/>
+    </initialize>
+  </var>
+
+  <let>
+    <name value="mylet"/>
+    <initialize>
+      <number value="2"/>
+    </initialize>
+  </let>
+
+  <const>
+    <name value="myconst"/>
+    <initialize>
+      <number value="3"/>
+    </initialize>
+  </const>
+
+  <var>
+    <pattern>
+      <array>
+        <ref name="a"/>
+        <ref name="b"/>
+      </array>
+    </pattern>
+    <initialize>
+      <array>
+        <number value="1"/>
+        <number value="2"/>
+      </array>
+    </initialize>
+  </var>
+
+  <expression>
+    <assign>
+      <ref name="a"/>
+      <number value="1"/>
+    </assign>
+    <assign>
+      <ref name="b"/>
+      <number value="2"/>
+    </assign>
+  </expression>
+
+  <if>
+    <condition>
+      <strict-eq>
+        <ref name="cipher_char"/>
+        <ref name="from_char"/>
+      </strict-eq>
+    </condition>
+    <then>
+      <expression>
+        <assign>
+          <ref name="result"/>
+          <add>
+            <ref name="result"/>
+            <ref name="to_char"/>
+          </add>
+        </assign>
+      </expression>
+    </then>
+    <else>
+      <expression>
+        <assign>
+          <ref name="result"/>
+          <add>
+            <ref name="result"/>
+            <ref name="clear_char"/>
+          </add>
+        </assign>
+      </expression>
+    </else>
+  </if>
+
+  <if>
+    <condition>
+      <parens>
+        <assign>
+          <ref name="x"/>
+          <ref name="y"/>
+        </assign>
+      </parens>
+    </condition>
+    <then>
+      <statement>
+        <comment>do the right thing</comment>
+      </statement>
+    </then>
+  </if>
+
+  <scope>
+    <var>
+      <name value="i"/>
+      <initialize>
+        <number value="0"/>
+      </initialize>
+    </var>
+
+    <do-while>
+      <block>
+        <expression>
+          <add-to>
+            <ref name="i"/>
+            <number value="1"/>
+          </add-to>
+        </expression>
+      </block>
+      <condition>
+        <lt>
+          <ref name="i"/>
+          <number value="5"/>
+        </lt>
+      </condition>
+    </do-while>
+  </scope>
+
+  <scope>
+    <var>
+      <name value="n"/>
+      <initialize>
+        <number value="0"/>
+      </initialize>
+    </var>
+    <var>
+      <name value="x"/>
+      <initialize>
+        <number value="0"/>
+      </initialize>
+    </var>
+
+    <while>
+      <condition>
+        <lt>
+          <ref name="n"/>
+          <number value="3"/>
+        </lt>
+      </condition>
+      <block>
+        <expression>
+          <post-inc>
+            <ref name="n"/>
+          </post-inc>
+        </expression>
+        <expression>
+          <add-to>
+            <ref name="x"/>
+            <ref name="n"/>
+          </add-to>
+        </expression>
+      </block>
+    </while>
+  </scope>
+
+  <for>
+    <var>
+      <name value="i"/>
+      <initialize>
+        <number value="0"/>
+      </initialize>
+    </var>
+    <condition>
+      <lt>
+        <ref name="i"/>
+        <number value="9"/>
+      </lt>
+    </condition>
+    <update>
+      <post-inc>
+        <ref name="i"/>
+      </post-inc>
+    </update>
+    <block>
+      <expression>
+        <call>
+          <ref name="log">
+            <ref name="consoler"/>
+          </ref>
+          <ref name="i"/>
+        </call>
+      </expression>
+    </block>
+  </for>
+
+  <scope>
+    <comment xml:space="preserve">
+var obj = {a:1, b:2, c:3};
+    
+for (var prop in obj) {
+  console.log("o." + prop + " = " + obj[prop]);
+}      
+    </comment>
+
+    <var>
+      <name value="obj"/>
+      <initialize>
+        <object>
+          <property>
+            <name value="a"/>
+            <number value="1"/>
+          </property>
+          <property>
+            <name value="b"/>
+            <number value="2"/>
+          </property>
+          <property>
+            <name value="c"/>
+            <number value="3"/>
+          </property>
+        </object>
+      </initialize>
+    </var>
+
+    <for-in>
+      <var>
+        <name value="prop"/>
+        <initialize>
+          <ref name="obj"/>
+        </initialize>
+      </var>
+      <block>
+        <expression>
+          <call>
+            <ref name="log">
+              <ref name="console"/>
+            </ref>
+            <add>
+              <add>
+                <add>
+                  <string value="o."/>
+                  <ref name="prop"/>
+                </add>
+                <string value=" = "/>
+              </add>
+              <subscript>
+                <ref name="obj"/>
+                <ref name="prop"/>
+              </subscript>
+            </add>
+          </call>
+        </expression>        
+      </block>
+    </for-in>
+  </scope>
+
+  <scope>
+    <comment xml:space="preserve">
+let arr = [3, 5, 7];
+arr.foo = "hello";
+
+for (let i in arr) {
+   console.log(i); // logs "0", "1", "2", "foo"
+}
+
+for (let i of arr) {
+   console.log(i); // logs "3", "5", "7"
+}      
+    </comment>
+
+    <let>
+      <name value="arr"/>
+      <initialize>
+        <array>
+          <number value="3"/>
+          <number value="5"/>
+          <number value="6"/>
+        </array>
+      </initialize>
+    </let>
+
+    <expression>
+      <assign>
+        <ref name="foo">
+          <ref name="arr"/>
+        </ref>
+        <string value="hello"/>
+      </assign>
+    </expression>
+
+    <for-in>
+      <let>
+        <name value="i"/>
+        <initialize>
+          <ref name="arr"/>
+        </initialize>
+      </let>
+      <block>
+        <expression>
+          <comment>logs "0", "1", "2", "foo"</comment>
+          <call>
+            <ref name="log">
+              <ref name="console"/>
+            </ref>
+            <ref name="i"/>
+          </call>
+        </expression>
+      </block>
+    </for-in>
+
+    <for-of>
+      <let>
+        <name value="i"/>
+        <initialize>
+          <ref name="arr"/>
+        </initialize>
+      </let>
+      <block>
+        <expression>
+          <comment>logs "3", "5", "6"</comment>
+          <call>
+            <ref name="log">
+              <ref name="console"/>
+            </ref>
+            <ref name="i"/>
+          </call>
+        </expression>
+      </block>
+    </for-of>
+  </scope>
+
+  <scope>
+    <comment xml:space="preserve">
+switch (expr) {
+  case "Oranges":
+    console.log("Oranges are $0.59 a pound.");
+    break;
+  case "Apples":
+    console.log("Apples are $0.32 a pound.");
+    break;
+  case "Bananas":
+    console.log("Bananas are $0.48 a pound.");
+    break;
+  case "Cherries":
+    console.log("Cherries are $3.00 a pound.");
+    break;
+  case "Mangoes":
+  case "Papayas":
+    console.log("Mangoes and papayas are $2.79 a pound.");
+    break;
+  default:
+    console.log("Sorry, we are out of " + expr + ".");
+}
+
+console.log("Is there anything else you'd like?");      
+    </comment>
+
+    <switch>
+      <test>
+        <ref name="expr"/>
+      </test>
+      <case>
+        <value>
+          <ref name="Oranges"/>
+        </value>
+        <block>
+          <expression>
+            <call>
+              <ref name="log">
+                <ref name="console"/>
+              </ref>
+              <string value="Oranges are $0.59 a pound."/>
+            </call>
+          </expression>
+
+          <break/>
+        </block>
+      </case>
+      <case>
+        <value>
+          <ref name="Apples"/>
+        </value>
+        <block>
+          <expression>
+            <call>
+              <ref name="log">
+                <ref name="console"/>
+              </ref>
+              <string value="Apples are $0.32 a pound."/>
+            </call>
+          </expression>
+
+          <break/>
+        </block>
+      </case>
+      <case>
+        <value>
+          <ref name="Bananas"/>
+        </value>
+        <block>
+          <expression>
+            <call>
+              <ref name="log">
+                <ref name="console"/>
+              </ref>
+              <string value="Bananas are $0.48 a pound."/>
+            </call>
+          </expression>
+
+          <break/>
+        </block>
+      </case>
+      <case>
+        <value>
+          <ref name="Cherries"/>
+        </value>
+        <block>
+          <expression>
+            <call>
+              <ref name="log">
+                <ref name="console"/>
+              </ref>
+              <string value="Cherries are $3.00 a pound."/>
+            </call>
+          </expression>
+
+          <break/>
+        </block>
+      </case>
+      <case>
+        <value>
+          <ref name="Mangoes"/>
+        </value>
+      </case>
+      <case>
+        <value>
+          <ref name="Papayas"/>
+        </value>
+        <block>
+          <expression>
+            <call>
+              <ref name="log">
+                <ref name="console"/>
+              </ref>
+              <string value="Mangoes and papayas are $2.79 a pound."/>
+            </call>
+          </expression>
+
+          <break/>
+        </block>
+      </case>
+      <default>
+        <expression>
+          <call>
+            <ref name="log">
+              <ref name="console"/>
+            </ref>
+            <add>
+              <add>
+                <string value="Sorry, we are out of "/>
+                <ref name="expr"/>
+              </add>
+              <string value="."/>
+            </add>
+          </call>
+        </expression>
+      </default>
+    </switch>
+
+    <expression>
+      <call>
+        <ref name="log">
+          <ref name="console"/>
+        </ref>
+        <string value="Is there anything else you'd like?"/>
+      </call>
+    </expression>
+  </scope>
+
+  <function>
+    <name value="x"/>
+    <body>
+      <return/>
+    </body>
+  </function>
+
+  <function>
+    <name value="pi"/>
+    <body>
+      <return>
+        <ref name="PI">
+          <ref name="Math"/>
+        </ref>
+      </return>
+    </body>
+  </function>
+
+  <scope>
+    <comment xml:space="preserve">
+var a, x, y;
+var r = 10;
+
+with (Math) {
+  a = PI * r * r;
+  x = r * cos(PI);
+  y = r * sin(PI / 2);
+}      
+    </comment>
+
+    <var>
+      <name value="a"/>
+    </var>
+    <var>
+      <name value="x"/>
+    </var>
+    <var>
+      <name value="y"/>
+    </var>
+    <var>
+      <name value="r"/>
+      <initialize>
+        <number value="10"/>
+      </initialize>
+    </var>
+
+    <with>
+      <scope>
+        <ref name="Math"/>
+      </scope>
+      <block>
+        <expression>
+          <assign>
+            <ref name="a"/>
+            <mul>
+              <mul>
+                <ref name="PI"/>
+                <ref name="r"/>
+              </mul>
+              <ref name="r"/>
+            </mul>
+          </assign>
+        </expression>
+        <expression>
+          <assign>
+            <ref name="x"/>
+            <mul>
+              <ref name="r"/>
+              <call>
+                <ref name="cos"/>
+                <ref name="PI"/>
+              </call>
+            </mul>
+          </assign>
+        </expression>
+        <expression>
+          <assign>
+            <ref name="y"/>
+            <mul>
+              <ref name="r"/>
+              <call>
+                <ref name="cos"/>
+                <div>
+                  <ref name="PI"/>
+                  <number value="2"/>
+                </div>
+              </call>
+            </mul>
+          </assign>
+        </expression>
+      </block>
+    </with>
+  </scope>
+
+  <throw>
+    <string value="Error2"/>
+  </throw>
+
+  <throw>
+    <number value="42"/>
+  </throw>
+
+  <throw>
+    <boolean value="true"/>
+  </throw>
+
+  <try>
+    <block>
+      <throw>
+        <string value="myException"/>
+      </throw>
+    </block>
+    <catch>
+      <parameter>
+        <name value="e"/>
+      </parameter>
+      <block>
+        <expression>
+          <call>
+            <ref name="logMyErrors"/>
+            <ref name="e"/>
+          </call>
+        </expression>
+      </block>
+    </catch>
+  </try>
+
+  <scope>
+    <expression>
+      <call>
+        <ref name="openMyFile"/>
+      </call>
+    </expression>
+
+    <try>
+      <block>
+        <expression>
+          <call>
+            <ref name="writeMyFile"/>
+            <ref name="theData"/>
+          </call>
+        </expression>
+      </block>
+      <finally>
+        <expression>
+          <call>
+            <ref name="closeMyFile"/>
+          </call>
+        </expression>
+      </finally>
+    </try>
+  </scope>
+
+  <try>
+    <block>
+      <try>
+        <block>
+          <throw>
+            <new>
+              <ref name="Error"/>
+              <string value="oops"/>
+            </new>
+          </throw>
+        </block>
+        <catch>
+          <parameter>
+            <name value="ex"/>
+          </parameter>
+          <block>
+            <expression>
+              <call>
+                <ref name="log">
+                  <ref name="console"/>
+                </ref>
+                <string value="inner"/>
+                <ref name="message">
+                  <ref name="ex"/>
+                </ref>
+              </call>
+            </expression>
+          </block>
+        </catch>
+        <finally>
+          <expression>
+            <call>
+              <ref name="log">
+                <ref name="console"/>
+              </ref>
+              <string value="finally"/>
+            </call>
+          </expression>
+        </finally>
+      </try>
+    </block>
+    <catch>
+      <parameter>
+        <name value="ex"/>
+      </parameter>
+      <block>
+        <expression>
+          <call>
+            <ref name="log">
+              <ref name="console"/>
+            </ref>
+            <string value="outer"/>
+            <ref name="message">
+              <ref name="ex"/>
+            </ref>
+          </call>
+        </expression>
+      </block>
+    </catch>
+  </try>
+
+  <function>
+    <name value="potentiallyBuggyCode"/>
+    <body>
+      <comment>do potentially buggy stuff to examine, step through, etc.</comment>
+      <debugger/>
+    </body>
+  </function>
+  
+</script>
