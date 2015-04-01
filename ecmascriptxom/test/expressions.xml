@@ -1663,4 +1663,357 @@ console.log(result);          // "foo"
     </expression>
   </scope>
 
+  <var>
+    <name value="x"/>
+    <initialize>
+      <function>
+        <parameter>
+          <name value="y"/>
+        </parameter>
+        <body>
+          <return>
+            <mul>
+              <ref name="y"/>
+              <ref name="y"/>
+            </mul>
+          </return>
+        </body>
+      </function>
+    </initialize>
+  </var>
+
+  <var>
+    <name value="math"/>
+    <initialize>
+      <object>
+        <property>
+          <name>
+            <string value="factorial"/>
+          </name>
+        </property>
+        <function>
+          <name value="factorial"/>
+          <body>
+            <if>
+              <condition>
+                <le>
+                  <ref name="1"/>
+                  <number value="1"/>
+                </le>
+              </condition>
+              <then>
+                <return>
+                  <number value="1"/>
+                </return>
+              </then>
+            </if>
+
+            <return>
+              <mul>
+                <ref name="n"/>
+                <call>
+                  <ref name="factorial"/>
+                  <sub>
+                    <ref name="n"/>
+                    <number value="1"/>
+                  </sub>
+                </call>
+              </mul>
+            </return>
+          </body>
+        </function>
+      </object>
+    </initialize>
+  </var>
+
+  <var>
+    <name value="x"/>
+    <initialize>
+      <function generator="true">
+        <parameter>
+          <name value="y"/>
+        </parameter>
+        <body>
+          <expression>
+            <yield>
+              <mul>
+                <ref name="y"/>
+                <ref name="y"/>
+              </mul>
+            </yield>
+          </expression>
+        </body>
+      </function>
+    </initialize>
+  </var>
+
+  <function>
+    <name value="calc_sales"/>
+    <parameter>
+      <name value="units_a"/>
+    </parameter>
+    <parameter>
+      <name value="units_b"/>
+    </parameter>
+    <parameter>
+      <name value="units_x"/>
+    </parameter>
+    <body>
+      <return>
+        <add>
+          <add>
+            <mul>
+              <ref name="units_a"/>
+              <number value="79"/>
+            </mul>
+            <mul>
+              <ref name="units_b"/>
+              <number value="129"/>
+            </mul>
+          </add>
+          <mul>
+            <ref name="units_c"/>
+            <number value="699"/>
+          </mul>
+        </add>
+      </return>
+    </body>
+  </function>
+
+  <scope>
+    <comment xml:space="preserve">
+function* idMaker(){
+    var index = 0;
+    while(true)
+        yield index++;
+}
+
+var gen = idMaker();
+
+console.log(gen.next().value); // 0
+console.log(gen.next().value); // 1
+console.log(gen.next().value); // 2
+    </comment>
+
+    <function generator="true">
+      <name value="idMaker"/>
+      <body>
+        <var>
+          <name value="index"/>
+          <initialize>
+            <number value="0"/>
+          </initialize>
+        </var>
+
+        <while>
+          <condition>
+            <boolean value="true"/>
+          </condition>
+          <block>
+            <expression>
+              <yield>
+                <post-inc>
+                  <ref name="index"/>
+                </post-inc>
+              </yield>
+            </expression>
+          </block>
+        </while>
+      </body>
+    </function>
+
+    <var>
+      <name value="gen"/>
+      <initialize>
+        <call>
+          <ref name="idMaker"/>
+        </call>
+      </initialize>
+    </var>
+
+    <expression>
+      <comment>0</comment>
+      <call>
+        <ref name="log">
+          <ref name="console"/>
+        </ref>
+        <ref name="value">
+          <call>
+            <ref name="next">
+              <ref name="gen"/>
+            </ref>
+          </call>
+        </ref>
+      </call>
+    </expression>
+
+    <expression>
+      <comment>1</comment>
+      <call>
+        <ref name="log">
+          <ref name="console"/>
+        </ref>
+        <ref name="value">
+          <call>
+            <ref name="next">
+              <ref name="gen"/>
+            </ref>
+          </call>
+        </ref>
+      </call>
+    </expression>
+
+    <expression>
+      <comment>2</comment>
+      <call>
+        <ref name="log">
+          <ref name="console"/>
+        </ref>
+        <ref name="value">
+          <call>
+            <ref name="next">
+              <ref name="gen"/>
+            </ref>
+          </call>
+        </ref>
+      </call>
+    </expression>
+  </scope>
+
+  <scope>
+    <comment xml:space="preserve">
+var Foo = class {
+  constructor() {}
+  bar() {
+    return "Hello World!";
+  }
+};
+
+var instance = new Foo();
+instance.bar(); // "Hello World!"      
+    </comment>
+
+    <var>
+      <name value="Foo"/>
+      <initialize>
+        <class>
+          <function>
+            <name value="constructor"/>
+          </function>
+
+          <function>
+            <name value="bar"/>
+            <body>
+              <return>
+                <string value="Hello World!"/>
+              </return>
+            </body>
+          </function>
+        </class>
+      </initialize>
+    </var>
+
+    <var>
+      <name value ="instance"/>
+      <initialize>
+        <new>
+          <ref name="Foo"/>
+        </new>
+      </initialize>
+    </var>
+
+    <expression>
+      <comment>"Hello World!"</comment>
+      <call>
+        <ref name="bar">
+          <ref name="instance"/>
+        </ref>
+      </call>
+    </expression>
+  </scope>
+
+  <class>
+    <comment xml:space="preserve">
+class Square extends Polygon {
+  constructor(length) {
+    // Here, it calls the parent class' constructor with lengths
+    // provided for the Polygon's width and height
+    super(length, length);
+    // Note: In derived classes, super() must be called before you
+    // can use 'this'. Leaving this out will cause a reference error.
+    this.name = 'Square';
+  }
+
+  get area() {
+    return this.height * this.width;
+  }
+
+  set area(value) {
+    this.area = value;
+  } 
+}
+    </comment>
+    <name value="Square"/>
+    <extends>
+      <ref name="Polygon"/>
+    </extends>
+    <function>
+      <name value="constructor"/>
+      <parameter>
+        <name value="length"/>
+      </parameter>
+      <body>
+        <expression>
+          <call>
+            <super/>
+            <ref name="length"/>
+            <ref name="length"/>
+          </call>
+        </expression>
+
+        <expression>
+          <assign>
+            <ref name="name"/>
+            <string value="Square"/>
+          </assign>
+        </expression>
+      </body>
+    </function>
+
+    <function type="getter">
+      <name value="area"/>
+
+      <body>
+        <return>
+          <mul>
+            <ref name="length">
+              <this/>
+            </ref>
+            <ref name="length">
+              <this/>
+            </ref>
+          </mul>
+        </return>
+      </body>
+    </function>
+
+    <function type="setter">
+      <name value="area"/>
+      <parameter>
+        <name value="value"/>
+      </parameter>
+
+      <body>
+        <expression>
+          <assign>
+            <ref name="area">
+              <this/>
+            </ref>
+            <ref name="value"/>
+          </assign>
+        </expression>
+      </body>
+    </function>
+  </class>
+
 </script>

@@ -237,7 +237,7 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- Mode "t:statement". statement. -->
+  <!-- Mode "t:statement". empty-statement. -->
   <xsl:template mode="t:statement" match="empty-statement">
     <xsl:sequence select="';'"/>
     <xsl:sequence select="$t:new-line"/>

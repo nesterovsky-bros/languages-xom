@@ -2251,7 +2251,7 @@
       <xs:extension base="base-element">
         <xs:sequence>
           <xs:group ref="case-value"/>
-          <xs:group ref="contained-statements"/>
+          <xs:group ref="contained-statements" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -2294,7 +2294,7 @@
           <xs:group ref="for-initialize" minOccurs="0"/>
           <xs:group ref="for-condition" minOccurs="0"/>
           <xs:group ref="for-update" minOccurs="0"/>
-          <xs:group ref="contained-statements"/>
+          <xs:group ref="contained-statements" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -2306,7 +2306,7 @@
         <xs:sequence>
           <xs:sequence>
             <xs:group ref="for-source"/>
-            <xs:group ref="contained-statements"/>
+            <xs:group ref="contained-statements" minOccurs="0"/>
           </xs:sequence>
         </xs:sequence>
       </xs:extension>

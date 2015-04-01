@@ -140,8 +140,7 @@
               <xsl:sequence select="t:get-nested-expression($name)"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:apply-templates mode="t:binding-pattern-content"
-                select="$name"/>
+              <xsl:apply-templates mode="#current" select="$name"/>
             </xsl:otherwise>
           </xsl:choose>
 
@@ -154,7 +153,7 @@
           </xsl:if>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:apply-templates mode="t:binding-pattern-content" select="."/>
+          <xsl:apply-templates mode="#current" select="."/>
         </xsl:otherwise>
       </xsl:choose>
 
@@ -376,10 +375,15 @@
       <xsl:sequence select="t:get-comments(.)"/>
       <xsl:apply-templates mode="t:object-member" select="."/>
 
-      <xsl:if test="position() != last()">
-        <xsl:sequence select="','"/>
-        <xsl:sequence select="' '"/>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="self:function">
+          <xsl:sequence select="$t:new-line"/>
+        </xsl:when>
+        <xsl:when test="position() != last()">
+          <xsl:sequence select="','"/>
+          <xsl:sequence select="' '"/>
+        </xsl:when>
+      </xsl:choose>
 
       <xsl:sequence select="$t:soft-line-break"/>
     </xsl:for-each>
@@ -418,12 +422,12 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template mode="t:object-member" match="scope">
+  <xsl:template mode="t:object-member t:class-method" match="scope">
     <xsl:sequence select="$t:new-line"/>
 
     <xsl:for-each select="t:get-elements(.)">
       <xsl:sequence select="t:get-comments(.)"/>
-      <xsl:apply-templates mode="t:object-member" select="."/>
+      <xsl:apply-templates mode="#current" select="."/>
 
       <xsl:if test="position() != last()">
         <xsl:sequence select="','"/>
@@ -477,8 +481,7 @@
     <xsl:variable name="export" as="xs:string?" select="@export"/>
     <xsl:variable name="static" as="xs:boolean?" select="@static"/>
     <xsl:variable name="generator" as="xs:boolean?" select="@generator"/>
-    <xsl:variable name="getter" as="xs:boolean?" select="@getter"/>
-    <xsl:variable name="setter" as="xs:boolean?" select="@setter"/>
+    <xsl:variable name="type" as="xs:string?" select="@type"/>
     <xsl:variable name="name" as="element()?" select="name"/>
     <xsl:variable name="parameters" as="element()*" select="parameter"/>
     <xsl:variable name="rest-parameter" as="element()*"
@@ -504,12 +507,12 @@
     </xsl:if>
 
     <xsl:choose>
-      <xsl:when test="$getter">
+      <xsl:when test="$type = 'get'">
         <xsl:sequence select="'get'"/>
         <xsl:sequence select="' '"/>
         <xsl:sequence select="'function'"/>
       </xsl:when>
-      <xsl:when test="$setter">
+      <xsl:when test="$type = 'set'">
         <xsl:sequence select="'set'"/>
         <xsl:sequence select="' '"/>
         <xsl:sequence select="'function'"/>
@@ -565,12 +568,7 @@
     
     <xsl:sequence select="')'"/>
     <xsl:sequence select="$t:new-line"/>
-    <xsl:sequence select="'{'"/>
-    <xsl:sequence select="$t:new-line"/>
-    <xsl:sequence select="$t:indent"/>
-    <xsl:sequence select="t:get-statements($body/t:get-elements())"/>
-    <xsl:sequence select="$t:unindent"/>
-    <xsl:sequence select="'}'"/>
+    <xsl:apply-templates mode="t:statement" select="$body"/>
   </xsl:template>
 
   <!-- 
@@ -581,6 +579,7 @@
     <xsl:variable name="rest-parameter" as="element()*"
       select="rest-parameter"/>
     <xsl:variable name="body" as="element()?" select="body"/>
+    <xsl:variable name="expression" as="element()?" select="expression"/>
 
     <xsl:variable name="simple-parameters" as="xs:boolean" select="
       not($rest-parameter) and (count($parameter) = 1) and $parameter/name"/>
@@ -626,19 +625,19 @@
     <xsl:choose>
       <xsl:when test="$body">
         <xsl:sequence select="$t:new-line"/>
-        <xsl:sequence select="'{'"/>
-        <xsl:sequence select="$t:new-line"/>
-        <xsl:sequence select="$t:indent"/>
-        <xsl:sequence select="t:get-statements(t:get-elements($body))"/>
-        <xsl:sequence select="$t:unindent"/>
-        <xsl:sequence select="'}'"/>
+        <xsl:apply-templates mode="t:statement" select="$body"/>
+      </xsl:when>
+      <xsl:when test="$expession/object">
+        <xsl:sequence select="' '"/>
+        <xsl:sequence select="'('"/>
+        <xsl:sequence 
+          select="t:get-nested-expression(t:get-elements($expression))"/>
+        <xsl:sequence select="')'"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:variable name="expression" as="element()" select="expression"/>
-      
         <xsl:sequence select="' '"/>
         <xsl:sequence 
-          select="t:get-nested-expression(t:get-elements(expression))"/>
+          select="t:get-nested-expression(t:get-elements($expression))"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -646,7 +645,32 @@
   <!-- Mode "t:declaration t:module-declaration t:expression" class. -->
   <xsl:template match="class"
     mode="t:declaration t:module-declaration t:expression">
-    <!-- TODO: implement this. -->
+    <xsl:variable name="name" as="element()?" select="$name"/>
+    <xsl:variable name="extends" as="element()?" select="$extends"/>
+    <xsl:variable name="members" as="element()?" 
+      select="t:get-elements(.) except ($name, $extends)"/>
+  
+    <xsl:sequence select="t:get-comments(.)"/>
+    <xsl:sequence select="'class'"/>
+    
+    <xsl:if test="$name">
+      <xsl:sequence select="' '"/>
+      <xsl:sequence select="string($name/@value)"/>
+    </xsl:if>
+
+    <xsl:sequence select="$t:new-line"/>
+    <xsl:sequence select="'{'"/>
+    <xsl:sequence select="$t:new-line"/>
+    <xsl:sequence select="$t:indent"/>
+    
+    <xsl:for-each select="$members">
+      <xsl:sequence select="t:get-comments(.)"/>
+      <xsl:apply-templates mode="t:class-method" select="."/>
+      <xsl:sequence select="$t:new-line"/>
+    </xsl:for-each>
+    
+    <xsl:sequence select="$t:unindent"/>
+    <xsl:sequence select="'}'"/>
   </xsl:template>
 
   <!-- Mode "t:expression". conditional. -->
@@ -1181,7 +1205,7 @@
       <xsl:sequence select="*"/>
     </xsl:if>
 
-    <xsl:sequence select="' '"/>
+    <xsl:sequence select="'&#160;'"/>
     <xsl:sequence select="t:get-nested-expression($expression)"/>
   </xsl:template>
 
