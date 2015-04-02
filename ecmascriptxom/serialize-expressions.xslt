@@ -607,7 +607,7 @@
     <xsl:variable name="simple-parameters" as="xs:boolean" select="
       not($rest-parameter) and (count($parameters) = 1) and $parameters/name"/>
   
-    <xsl:if test="$simple-parameters">
+    <xsl:if test="not($simple-parameters)">
        <xsl:sequence select="'('"/>
     </xsl:if>
 
@@ -616,7 +616,7 @@
 
       <xsl:choose>
         <xsl:when test="$parameter-name">
-          <xsl:sequence select="string(@value)"/>
+          <xsl:sequence select="string($parameter-name/@value)"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:variable name="pattern" as="element()" select="pattern"/>
@@ -638,8 +638,8 @@
       <xsl:sequence select="string(@value)"/>
     </xsl:for-each>
 
-    <xsl:if test="$simple-parameters">
-       <xsl:sequence select="')'"/>
+    <xsl:if test="not($simple-parameters)">
+      <xsl:sequence select="')'"/>
     </xsl:if>
     
     <xsl:sequence select="' '"/>
