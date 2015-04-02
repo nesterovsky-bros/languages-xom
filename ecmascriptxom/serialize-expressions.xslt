@@ -10,6 +10,11 @@
   xpath-default-namespace="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20"
   exclude-result-prefixes="xs t">
 
+  <!-- An empty body element. -->
+  <xsl:variable name="t:empty-body" as="element()">
+    <body/>
+  </xsl:variable>
+
   <!--
     Gets a sequence of tokens for an expression.
       $expression - an expression.
@@ -263,7 +268,7 @@
   <!-- Mode "t:expression". template. -->
   <xsl:template mode="t:expression" match="template">
     <xsl:for-each-group select="t:get-elements(.)"
-      group-adjacent="xs:boolean(self::string)">
+      group-adjacent="exists(self::string)">
       <xsl:choose>
         <xsl:when test="current-grouping-key()">
           <xsl:variable name="parts" as="xs:string*">
@@ -341,6 +346,7 @@
 
   <!-- Mode "t:expression". array. -->
   <xsl:template mode="t:expression" match="array">
+    <xsl:sequence select="$t:soft-line-break"/>
     <xsl:sequence select="'['"/>
     <xsl:sequence select="$t:soft-line-break"/>
 
@@ -367,10 +373,12 @@
     </xsl:for-each>
 
     <xsl:sequence select="']'"/>
+    <xsl:sequence select="$t:soft-line-break"/>
   </xsl:template>
 
   <!-- Mode "t:expression". object. -->
   <xsl:template mode="t:expression" match="object">
+    <xsl:sequence select="$t:soft-line-break"/>
     <xsl:sequence select="'{'"/>
     <xsl:sequence select="$t:soft-line-break"/>
 
@@ -392,6 +400,7 @@
     </xsl:for-each>
 
     <xsl:sequence select="'}'"/>
+    <xsl:sequence select="$t:soft-line-break"/>
   </xsl:template>
 
   <!-- Mode "t:property-name". name -->
@@ -532,6 +541,9 @@
         <xsl:sequence select="'function'"/>
         <xsl:sequence select="'*'"/>
       </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="'function'"/>
+      </xsl:otherwise>
     </xsl:choose>
 
     <xsl:if test="$name">
@@ -547,7 +559,7 @@
 
       <xsl:choose>
         <xsl:when test="$parameter-name">
-          <xsl:sequence select="string(@value)"/>
+          <xsl:sequence select="string($parameter-name/@value)"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:variable name="pattern" as="element()" select="pattern"/>
@@ -579,7 +591,7 @@
     
     <xsl:sequence select="')'"/>
     <xsl:sequence select="$t:new-line"/>
-    <xsl:apply-templates mode="t:statement" select="$body"/>
+    <xsl:apply-templates mode="t:statement" select="($body, $t:empty-body)[1]"/>
   </xsl:template>
 
   <!-- 
@@ -1205,7 +1217,7 @@
   <xsl:template match="yield" mode="t:expression">
     <xsl:variable name="expression" as="element()?"
       select="t:get-elements(.)"/>
-    <xsl:variable name="delegate" as="xs:boolean" select="@delegate"/>
+    <xsl:variable name="delegate" as="xs:boolean?" select="@delegate"/>
 
     <xsl:if test="$delegate and not($expression)">
       <xsl:sequence select="

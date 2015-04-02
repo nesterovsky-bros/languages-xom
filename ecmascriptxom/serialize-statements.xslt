@@ -116,7 +116,6 @@
 
         <xsl:sequence select="$t:unindent"/>
         <xsl:sequence select="'}'"/>
-        <xsl:sequence select="$t:new-line"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -229,7 +228,7 @@
     <xsl:variable name="expressions" as="element()+" 
       select="t:get-elements(.)"/>
 
-    <xsl:for-each select="expressions">
+    <xsl:for-each select="$expressions">
       <xsl:sequence select="t:expression(.)"/>
 
       <xsl:if test="position() != last()">

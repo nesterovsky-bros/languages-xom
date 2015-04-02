@@ -25,6 +25,8 @@
   <xsl:function name="t:get-script" as="item()*">
     <xsl:param name="script" as="element()"/>
 
+    <xsl:sequence select="t:get-comments($script)"/>
+    
     <xsl:call-template name="t:get-statements">
       <xsl:with-param name="statements" select="t:get-elements($script)"/>
       <xsl:with-param name="module-items" 

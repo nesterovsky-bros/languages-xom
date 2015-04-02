@@ -534,7 +534,9 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      <xsl:when test="$value = $t:soft-line-break">
+      <xsl:when test="
+        ($value = $t:soft-line-break) and 
+        not($values[$index - 1][. instance of xs:string][. = '&#160;'])">
         <xsl:sequence select="
           t:get-breaker
           (
