@@ -15,11 +15,11 @@
   <xsl:key name="t:name" match="*" use="xs:string(@name)"/>
 
   <!--
-    Tokenizes a value, where split is a space.
-      $value - a value to tokenize.
+    Splits a value on each space.
+      $value - a value to split.
       Returns a sequence of tokens.
   -->
-  <xsl:function name="t:tokenize" as="xs:string+">
+  <xsl:function name="t:split" as="xs:string+">
     <xsl:param name="value" as="xs:string"/>
 
     <xsl:sequence select="tokenize($value, '\s+')"/>
@@ -60,9 +60,9 @@
 
     <xsl:sequence select="
       for $element in $scope/* return
-        if ($element/self::scope)) then
+        if ($element/self::scope) then
           t:get-scope-elements($element, $include-comments-and-meta)
-        else if ($include-comments-and-meta) 
+        else if ($include-comments-and-meta) then
           $element[not(self::comment or self::meta)]
         else
           $element"/>
@@ -138,7 +138,12 @@
       if ($value lt $base) then
         ($value, $result)
       else
-        t:integer-to-digits($value idiv $base, ($value mod $base, $result))"/>
+        t:integer-to-digits
+        (
+          $value idiv $base, 
+          ($value mod $base, $result), 
+          ()
+        )"/>
   </xsl:function>
 
   <!--
@@ -245,7 +250,7 @@
     <xsl:param name="value" as="xs:string"/>
 
     <xsl:variable name="parts" as="xs:string+">
-      <xsl:analyze-string regex="\[\&quot;tnr]" select="$value">
+      <xsl:analyze-string regex="\\[\\&quot;tnr]" select="$value">
         <xsl:matching-substring>
           <xsl:sequence select="
             if (. = '\\') then

@@ -467,7 +467,8 @@
   </xsl:template>
 
   <!-- 
-    Mode "t:object-member t:method-definition t:declaration t:module-declaration t:expression" 
+    Mode "t:object-member t:method-definition t:declaration 
+      t:module-declaration t:module-item t:expression" 
     function.
   -->
   <xsl:template match="function" mode="
@@ -476,6 +477,7 @@
     t:class-method
     t:declaration 
     t:module-declaration 
+    t:module-item
     t:expression">
 
     <xsl:variable name="export" as="xs:string?" select="@export"/>
@@ -642,9 +644,12 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Mode "t:declaration t:module-declaration t:expression" class. -->
+  <!-- 
+    Mode "t:declaration t:module-declaration 
+      t:module-item t:expression" class. 
+  -->
   <xsl:template match="class"
-    mode="t:declaration t:module-declaration t:expression">
+    mode="t:declaration t:module-declaration t:module-item t:expression">
     <xsl:variable name="name" as="element()?" select="$name"/>
     <xsl:variable name="extends" as="element()?" select="$extends"/>
     <xsl:variable name="members" as="element()?" 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<files xmlns="http://www.nesterovsky-bros.com/ecmascript">
+  <file name="arrow.xml"/>
+  <file name="class.xml"/>
+  <file name="classes.xml"/>
+  <file name="default-rest-spread.xml"/>
+  <file name="destructuring.xml"/>
+  <file name="export.lib.xml"/>
+  <file name="export.myClass.xml"/>
+  <file name="export.myFunc.xml"/>
+  <file name="export.xml"/>
+  <file name="expressions.xml"/>
+  <file name="function.xml"/>
+  <file name="import.main.xml"/>
+  <file name="import.main1.xml"/>
+  <file name="import.main2.xml"/>
+  <file name="import.xml"/>
+  <file name="let-const.xml"/>
+  <file name="object-literals.xml"/>
+  <file name="statements.xml"/>
+  <file name="templates.xml"/>
+  <file name="test0.xml"/>
+  <file name="test1.xml"/>
+</files>

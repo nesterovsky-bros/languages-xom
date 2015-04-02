@@ -103,7 +103,6 @@
       select="$scope/(node() except (meta, comment))"/>
 
     <xsl:variable name="attributes" as="attribute()*" select="$scope/@*"/>
-    <xsl:variable name="type-attributes" as="element()*" select="$scope/meta/attribute"/>
 
     <xsl:variable name="empty-content" as="xs:boolean" select="
       empty($content) or
@@ -117,11 +116,10 @@
       <xsl:choose>
         <xsl:when test="
           empty($attributes) and
-          empty($type-attributes) and
           $empty-content">
           <xsl:sequence select="concat('&lt;', local-name($scope), '/>')"/>
         </xsl:when>
-        <xsl:when test="empty($attributes) and empty($type-attributes)">
+        <xsl:when test="empty($attributes)">
           <xsl:sequence select="concat('&lt;', local-name($scope), '>')"/>
         </xsl:when>
         <xsl:otherwise>
@@ -131,30 +129,6 @@
             <xsl:sequence select="' '"/>
             <xsl:sequence select="
               concat(local-name(), '=&quot;', t:escape-xml(.), '&quot;')"/>
-          </xsl:for-each>
-
-          <xsl:for-each select="$type-attributes">
-            <xsl:variable name="name" as="xs:string" select="@name"/>
-            <xsl:variable name="type" as="element()?" select="type"/>
-
-            <xsl:sequence select="' '"/>
-
-            <xsl:sequence select="
-              string-join
-              (
-                (
-                  $name,
-                  '=&quot;',
-                  (
-                    for
-                      $token in $type/t:get-type(.)[not(. instance of xs:QName)]
-                    return
-                      t:escape-xml($token)
-                  ),
-                  '&quot;'
-                ),
-                ''
-              )"/>
           </xsl:for-each>
 
           <xsl:choose>
