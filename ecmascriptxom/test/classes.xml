@@ -95,7 +95,7 @@ class SkinnedMesh extends THREE.Mesh {
         </expression>
       </body>
     </function>
-    <get-function>
+    <function type="getter">
       <name value="boneCount"/>
       <body>
         <return>
@@ -106,9 +106,9 @@ class SkinnedMesh extends THREE.Mesh {
           </ref>
         </return>
       </body>
-    </get-function>
+    </function>
 
-    <set-function>
+    <function type="getter">
       <name value="matrixType"/>
       <parameter>
         <name value="matrixType"/>
@@ -128,7 +128,7 @@ class SkinnedMesh extends THREE.Mesh {
           </assign>
         </expression>
       </body>
-    </set-function>
+    </function>
 
     <function static="true">
       <name value="defaultMatrix"/>

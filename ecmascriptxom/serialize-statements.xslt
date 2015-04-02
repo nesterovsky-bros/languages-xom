@@ -127,7 +127,7 @@
       error
       (
         xs:QName('invalid-statement'),
-        'Invalid statement',
+        concat('Invalid statement. ', t:get-path(.)),
         .
       )"/>
   </xsl:template>
@@ -135,7 +135,7 @@
   <!--  Mode "t:statement t:module-item". scope. -->
   <xsl:template mode="t:statement t:module-item" match="scope">
     <xsl:sequence select="comment/t:get-comment(.)"/>
-    <xsl:apply-templates mode="#default" select="t:get-elements(.)"/>
+    <xsl:apply-templates mode="#current" select="t:get-elements(.)"/>
   </xsl:template>
 
   <!--  Mode "t:statement t:module-item". block, body. -->
@@ -172,7 +172,7 @@
   <xsl:template mode="t:statement t:module-item" match="var | let | const">
     <xsl:variable name="export" as="xs:string?" select="@export"/>
     <xsl:variable name="name" as="element()?" select="name"/>
-    <xsl:variable name="initialize" as="element()" select="initialize"/>
+    <xsl:variable name="initialize" as="element()?" select="initialize"/>
 
     <xsl:choose>
       <xsl:when test="$export = 'true'">
@@ -349,9 +349,10 @@
           concat
           (
             'Variable declaration and initializer are ',
-            'mutually exclusive in ''for'' statement.'
+            'mutually exclusive in ''for'' statement. ', 
+            t:get-path(.)
           ),
-          ($var, $const, $let, $initialize)
+          .
         )"/>
     </xsl:if>
 
@@ -442,7 +443,7 @@
     <xsl:variable name="assign" as="element()?"
       select="$elements[1][self::assign]"/>
     <xsl:variable name="var" as="element()?"
-      select="$elements[1][self::var or self::left or self::const]"/>
+      select="$elements[1][self::var or self::let or self::const]"/>
     <xsl:variable name="block" as="element()?"
       select="$elements[2][self::block]"/>
     
@@ -451,8 +452,8 @@
         error
         (
           xs:QName('for-source'),
-          'For source is expected.',
-          ($assign, $var)
+          concat('For-source is expected. ', t:get-path(.)),
+          .
         )"/>
     </xsl:if>
 
@@ -525,7 +526,7 @@
     <xsl:apply-templates mode="t:statement" select="$block"/>
   </xsl:template>
 
-  <!-- Mode "t:statement t:module-item". switch-statement. -->
+  <!-- Mode "t:statement t:module-item". switch. -->
   <xsl:template mode="t:statement t:module-item" match="switch">
     <xsl:variable name="test" as="element()" select="test"/>
     <xsl:variable name="cases" as="element()+" select="case | default"/>
@@ -541,11 +542,15 @@
 
     <xsl:for-each select="$cases">
       <xsl:choose>
-        <xsl:when test="empty(self::default)">
+        <xsl:when test="exists(self::default)">
           <xsl:sequence select="'default'"/>
           <xsl:sequence select="':'"/>
           <xsl:sequence select="$t:new-line"/>
-          <xsl:apply-templates mode="t:statement" select="."/>
+          
+          <xsl:call-template name="t:get-statements-block">
+            <xsl:with-param name="comments" select="comment"/>
+            <xsl:with-param name="statements" select="t:get-elements(.)"/>
+          </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
           <xsl:variable name="value" as="element()" select="value"/>
@@ -646,7 +651,12 @@
         error
         (
           xs:QName('invalid-try'),
-          'Invalid try statement. Catch or finally clauses are expected.',
+          concat
+          (
+            'Invalid try statement. ',
+            'Catch or finally clauses are expected. ', 
+            t:get-path(.)
+          ),
           .
         )"/>
     </xsl:if>
@@ -656,9 +666,9 @@
     <xsl:apply-templates mode="t:statement" select="$block"/>
   
     <xsl:if test="$catch">
-      <xsl:variable name="parameter" as="element()" select="parameter"/>
+      <xsl:variable name="parameter" as="element()" select="$catch/parameter"/>
       <xsl:variable name="name" as="element()?" select="$parameter/name"/>
-      <xsl:variable name="catch-block" as="element()" select="block"/>
+      <xsl:variable name="catch-block" as="element()" select="$catch/block"/>
       
       <xsl:sequence select="'catch'"/>
       <xsl:sequence select="'('"/>
@@ -682,7 +692,11 @@
     <xsl:if test="$finally">
       <xsl:sequence select="'finally'"/>
       <xsl:sequence select="$t:new-line"/>
-      <xsl:apply-templates mode="t:statement" select="$finally"/>
+
+      <xsl:call-template name="t:get-statements-block">
+        <xsl:with-param name="comments" select="$finally/comment"/>
+        <xsl:with-param name="statements" select="t:get-elements($finally)"/>
+      </xsl:call-template>
     </xsl:if>
   </xsl:template>
 

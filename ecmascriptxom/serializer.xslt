@@ -20,13 +20,15 @@
   <!--
     Gets a sequence of tokens for a script.
       $script - a script or module.
+      Returns a sequence of tokens.
   -->
   <xsl:function name="t:get-script" as="item()*">
     <xsl:param name="script" as="element()"/>
 
     <xsl:call-template name="t:get-statements">
       <xsl:with-param name="statements" select="t:get-elements($script)"/>
-      <xsl:with-param name="module-items" select="$script[self::module]"/>
+      <xsl:with-param name="module-items" 
+        select="exists($script[self::module])"/>
     </xsl:call-template>
   </xsl:function>
   

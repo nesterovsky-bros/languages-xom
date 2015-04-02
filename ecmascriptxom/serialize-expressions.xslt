@@ -42,7 +42,7 @@
       error
       (
         xs:QName('invalid-pattern'),
-        'Invalid pattern',
+        concat('Invalid pattern. ', t:get-path(.)),
         .
       )"/>
   </xsl:template>
@@ -74,18 +74,18 @@
   <!-- Mode "t:binding-property" property. -->
   <xsl:template mode="t:binding-property" match="property">
     <xsl:variable name="name" as="element()" select="name"/>
-    <xsl:variable name="initialize" as="element()" select="initialize"/>
+    <xsl:variable name="initialize" as="element()?" select="initialize"/>
     <xsl:variable name="value" as="element()?"
       select="t:get-elements(.) except ($name, $initialize)"/>
 
     <xsl:apply-templates mode="t:property-name" select="$name"/>
 
-    <xsl:if test="not($name/@name) and not($value)">
+    <xsl:if test="not($name/@value) and not($value)">
       <xsl:sequence select="
         error
         (
           xs:QName('invalid-property-value'),
-          'Property value is expected.',
+          concat('Property value is expected. ', t:get-path(.)),
           .
         )"/>
     </xsl:if>
@@ -172,7 +172,7 @@
       error
       (
         xs:QName('invalid-expression'),
-        'Invalid expression',
+        concat('Invalid expression. ', t:get-path(.)),
         .
       )"/>
   </xsl:template>
@@ -231,11 +231,11 @@
       </xsl:when>
       <xsl:when test="$form = 'octal'">
         <xsl:sequence 
-          select="concat('0o', t:integer-to-string(xs:integer($value), 2))"/>
+          select="concat('0o', t:integer-to-string(xs:integer($value), 8))"/>
       </xsl:when>
       <xsl:when test="$form = 'hex'">
         <xsl:sequence 
-          select="concat('0x', t:integer-to-string(xs:integer($value), 2))"/>
+          select="concat('0x', t:integer-to-string(xs:integer($value), 16))"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:sequence select="string($value)"/>
@@ -405,7 +405,12 @@
         error
         (
           xs:QName('invalid-property-name'),
-          'Property name is required either in the form of identifier, string, number or expression.',
+          concat
+          (
+            'Property name is required either in the form of identifier, ',
+            'string, number or expression. ',
+            t:get-path(.)
+          ),
           .
         )"/>
     </xsl:if>
@@ -415,11 +420,11 @@
         <xsl:sequence select="$name"/>
       </xsl:when>
       <xsl:when test="$expression[self::number or self::string]">
-        <xsl:sequence select="t:get-nested-expression(.)"/>
+        <xsl:sequence select="t:get-nested-expression(t:get-elements(.))"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:sequence select="'['"/>
-        <xsl:sequence select="t:get-nested-expression(.)"/>
+        <xsl:sequence select="t:get-nested-expression(t:get-elements(.))"/>
         <xsl:sequence select="']'"/>
       </xsl:otherwise>
     </xsl:choose>
@@ -451,12 +456,12 @@
 
     <xsl:apply-templates mode="t:property-name" select="$name"/>
 
-    <xsl:if test="not($name/@name) and not($value)">
+    <xsl:if test="not($name/@value) and not($value)">
       <xsl:sequence select="
         error
         (
           xs:QName('invalid-property-value'),
-          'Property value is expected.',
+          concat('Property value is expected. ', t:get-path(.)),
           .
         )"/>
     </xsl:if>
@@ -470,7 +475,7 @@
   </xsl:template>
 
   <!-- 
-    Mode "t:object-member t:method-definition t:declaration 
+    Mode "t:object-member t:method-definition t:declaration t:statement
       t:module-declaration t:module-item t:expression" 
     function.
   -->
@@ -479,6 +484,7 @@
     t:method-definition 
     t:class-method
     t:declaration 
+    t:statement
     t:module-declaration 
     t:module-item
     t:expression">
@@ -536,7 +542,7 @@
     <xsl:sequence select="'('"/>
 
     <xsl:for-each select="$parameters">
-      <xsl:variable name="initialize" as="element()" select="initialize"/>
+      <xsl:variable name="initialize" as="element()?" select="initialize"/>
       <xsl:variable name="parameter-name" as="element()?" select="name"/>
 
       <xsl:choose>
@@ -648,14 +654,18 @@
   </xsl:template>
 
   <!-- 
-    Mode "t:declaration t:module-declaration 
+    Mode "t:declaration t:statement t:module-declaration 
       t:module-item t:expression" class. 
   -->
-  <xsl:template match="class"
-    mode="t:declaration t:module-declaration t:module-item t:expression">
+  <xsl:template match="class" mode="
+    t:declaration 
+    t:statement 
+    t:module-declaration 
+    t:module-item 
+    t:expression">
     <xsl:variable name="name" as="element()?" select="name"/>
     <xsl:variable name="extends" as="element()?" select="extends"/>
-    <xsl:variable name="members" as="element()?" 
+    <xsl:variable name="members" as="element()*" 
       select="t:get-elements(.) except ($name, $extends)"/>
   
     <xsl:sequence select="t:get-comments(.)"/>
@@ -1152,7 +1162,7 @@
 
   <!-- Mode "t:expression". new, call. -->
   <xsl:template match="new | call" mode="t:expression">
-    <xsl:variable name="is-new" as="xs:boolean?" select="self::new"/>
+    <xsl:variable name="is-new" as="xs:boolean" select="exists(self::new)"/>
     <xsl:variable name="elements" as="element()+"
       select="t:get-elements(.)"/>
     <xsl:variable name="name" as="element()" select="$elements[1]"/>
@@ -1202,7 +1212,7 @@
         error
         (
           xs:QName('invalid-yield-expression'),
-          'Yield argument is expected.',
+          concat('Yield argument is expected. ', t:get-path(.)),
           .
         )"/>
     </xsl:if>

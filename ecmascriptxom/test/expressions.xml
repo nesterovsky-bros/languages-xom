@@ -1690,38 +1690,38 @@ console.log(result);          // "foo"
           <name>
             <string value="factorial"/>
           </name>
-        </property>
-        <function>
-          <name value="factorial"/>
-          <body>
-            <if>
-              <condition>
-                <le>
-                  <ref name="1"/>
-                  <number value="1"/>
-                </le>
-              </condition>
-              <then>
-                <return>
-                  <number value="1"/>
-                </return>
-              </then>
-            </if>
-
-            <return>
-              <mul>
-                <ref name="n"/>
-                <call>
-                  <ref name="factorial"/>
-                  <sub>
-                    <ref name="n"/>
+          <function>
+            <name value="factorial"/>
+            <body>
+              <if>
+                <condition>
+                  <le>
+                    <ref name="1"/>
                     <number value="1"/>
-                  </sub>
-                </call>
-              </mul>
-            </return>
-          </body>
-        </function>
+                  </le>
+                </condition>
+                <then>
+                  <return>
+                    <number value="1"/>
+                  </return>
+                </then>
+              </if>
+
+              <return>
+                <mul>
+                  <ref name="n"/>
+                  <call>
+                    <ref name="factorial"/>
+                    <sub>
+                      <ref name="n"/>
+                      <number value="1"/>
+                    </sub>
+                  </call>
+                </mul>
+              </return>
+            </body>
+          </function>
+        </property>
       </object>
     </initialize>
   </var>

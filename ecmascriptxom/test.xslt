@@ -18,25 +18,29 @@
   <!-- Entry point. -->
   <xsl:template match="/t:files">
     <xsl:for-each select="t:file">
-      <xsl:variable name="file-uri" as="xs:string" 
+      <xsl:variable name="file-uri" as="xs:string"
         select="xs:string(resolve-uri(@name, base-uri()))"/>
       <xsl:variable name="result-uri" as="xs:string" select="
         replace($file-uri, '(.*)/(.*)\..*$', '$1/output/$2.js')"/>
 
-      <xsl:message select="'source:', $file-uri"/>
-      <xsl:message select="'target:', $result-uri"/>
+      <xsl:message>
+        <test>
+          source: <xsl:value-of select="$file-uri"/>
+          target: <xsl:value-of select="$result-uri"/>
+        </test>
+      </xsl:message>
 
       <xsl:variable name="script" as="element()"
         select="document($file-uri)/*"/>
 
       <!-- Optional step: Normalize names. -->
-      <xsl:variable name="name-normalized-script" as="element()" 
+      <xsl:variable name="name-normalized-script" as="element()"
         select="t:normalize-names($script, ())"/>
 
       <xsl:variable name="tokens" as="item()*"
         select="t:get-script($name-normalized-script)"/>
 
-      <xsl:variable name="lines" as="xs:string*" 
+      <xsl:variable name="lines" as="xs:string*"
         select="t:get-lines($tokens)"/>
 
       <xsl:result-document href="{$result-uri}" format="ecmascript">

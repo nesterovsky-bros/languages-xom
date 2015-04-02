@@ -141,8 +141,8 @@
         t:integer-to-digits
         (
           $value idiv $base, 
-          ($value mod $base, $result), 
-          ()
+          $base,
+          ($value mod $base, $result)
         )"/>
   </xsl:function>
 
@@ -189,12 +189,18 @@
       string-join
       (
         (
-          for $d in t:integer-to-digits($value, $base, ()) return
+          '-'[$value lt 0],
+          for $d in t:integer-to-digits(abs($value), $base, ()) return
             substring('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', $d + 1, 1)
         ),
         ''
       )"/>
   </xsl:function>
+
+  <xsl:variable name="t:zero-codepoint" as="xs:integer"
+    select="string-to-codepoints('0')"/>
+  <xsl:variable name="t:minus-codepoint" as="xs:integer"
+    select="string-to-codepoints('-')"/>
 
   <!--
     Converts integer string value into integer.
@@ -206,17 +212,26 @@
     <xsl:param name="value" as="xs:string"/>
     <xsl:param name="base" as="xs:integer"/>
 
-    <xsl:variable name="zero-point" as="xs:integer" 
-      select="string-to-codepoints('0')"/>
+    <xsl:variable name="codepoints" as="xs:integer+" 
+      select="string-to-codepoints($value)"/>
 
     <xsl:sequence select="
-      t:digits-to-integer
-      (
-        (for $p in string-to-codepoints($value) return $p - $zero-point),
-        $base,
-        1,
-        0
-      )"/>
+      if ($codepoints[1] = $t:minus-codepoint) then
+        -t:digits-to-integer
+        (
+          (for $p in subsequence($codepoints, 2) return $p - $t:zero-codepoint),
+          $base,
+          1,
+          0
+        )
+      else
+        t:digits-to-integer
+        (
+          (for $p in $codepoints return $p - $t:zero-codepoint),
+          $base,
+          1,
+          0
+        )"/>
   </xsl:function>
 
   <xsl:function name="t:escape-string" as="xs:string">
@@ -273,6 +288,58 @@
     </xsl:variable>
 
     <xsl:sequence select="string-join($parts, '')"/>
+  </xsl:function>
+
+  <!--
+    Builds friendly xpath to the element or attribute.
+      $node - a node to build xpath for.
+      Returns node's xpath.
+  -->
+  <xsl:function name="t:get-path" as="xs:string">
+    <xsl:param name="node" as="node()"/>
+
+    <xsl:sequence select="
+      string-join
+      (
+        if ($node instance of document-node()) then
+        (
+          '/'
+        )
+        else
+        (
+          for $node in $node/ancestor-or-self::* return
+          (
+            if ($node instance of attribute()) then
+            (
+              '/@*[self::',
+              name($node),
+              ']'
+            )
+            else
+            (
+              '/*[',
+              xs:string(count($node/preceding-sibling::*) + 1),
+              '][self::*:',
+              name($node),
+              ']',
+                  
+              for 
+                $suffix in ('id', 'ref', 'name', 'type'),
+                $attribute in 
+                  $node/@*[ends-with(lower-case(local-name()), $suffix)]
+              return
+              (
+                '[@', 
+                name($attribute), 
+                ' = ''',
+                xs:string($attribute),
+                ''']'
+              )
+            )
+          )
+        ),
+        ''
+      )"/>
   </xsl:function>
 
 </xsl:stylesheet>
