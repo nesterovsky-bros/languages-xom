@@ -97,7 +97,7 @@
     <xsl:param name="leader" tunnel="yes" as="xs:integer?"/>
 
     <xsl:variable name="is-code" as="xs:boolean"
-      select="exists($scope[self::code])"/>
+      select="exists($scope[self::code or self::script or self::module])"/>
 
     <xsl:variable name="content" as="node()*"
       select="$scope/(node() except (meta, comment))"/>
@@ -214,7 +214,7 @@
           </xsl:when>
           <xsl:when test="$is-code">
             <xsl:variable name="tokens" as="item()*"
-              select="t:get-tokens-for-element(.)"/>
+              select="t:get-script(.)"/>
 
             <xsl:choose>
               <xsl:when test="exists($tokens)">
@@ -361,14 +361,12 @@
       (
         replace
         (
-          replace($value, '&amp;', '&amp;amp;', 'm'),
+          replace($value, '&amp;', '&amp;amp;'),
           '&quot;',
-          '&amp;quot;',
-          'm'
+          '&amp;quot;'
         ),
         '&lt;',
-        '&amp;lt;',
-        'm'
+        '&amp;lt;'
       )"/>
   </xsl:function>
 

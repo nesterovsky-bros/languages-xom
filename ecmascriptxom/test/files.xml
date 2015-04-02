@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <files xmlns="http://www.nesterovsky-bros.com/ecmascript">
   <file name="arrow.xml"/>
-  <file name="class.xml"/>
   <file name="classes.xml"/>
   <file name="default-rest-spread.xml"/>
   <file name="destructuring.xml"/>

@@ -71,8 +71,8 @@
           not
           (
             (
-              (self::var or self:let or self:const) and 
-              $next[self::var or self:let or self:const]
+              (self::var or self::let or self::const) and 
+              $next[self::var or self::let or self::const]
             ) or
             (self::expression and $next[self::expression])
           ) or
@@ -134,12 +134,12 @@
 
   <!--  Mode "t:statement t:module-item". scope. -->
   <xsl:template mode="t:statement t:module-item" match="scope">
-    <xsl:sequence select="$comment/t:get-comment(.)"/>
+    <xsl:sequence select="comment/t:get-comment(.)"/>
     <xsl:apply-templates mode="#default" select="t:get-elements(.)"/>
   </xsl:template>
 
   <!--  Mode "t:statement t:module-item". block, body. -->
-  <xsl:template mode="t:statement t:module-item" match="block body">
+  <xsl:template mode="t:statement t:module-item" match="block | body">
     <xsl:call-template name="t:get-statements-block">
       <xsl:with-param name="comments" select="comment"/>
       <xsl:with-param name="statements" select="t:get-elements(.)"/>
@@ -148,12 +148,12 @@
 
   <!-- Mode "t:statement t:module-item". labeled-statement. -->
   <xsl:template mode="t:statement t:module-item" match="label">
-    <xsl:variable name="name" as="xs:string" select="name/@value"/>
+    <xsl:variable name="name" as="element()" select="name"/>
     <xsl:variable name="statements" as="element()+"
       select="t:get-elements(.) except $name"/>
 
     <xsl:sequence select="$t:line-indent"/>
-    <xsl:sequence select="$name"/>
+    <xsl:sequence select="string($name/@value)"/>
     <xsl:sequence select="':'"/>
     <xsl:sequence select="$t:new-line"/>
 
@@ -230,7 +230,7 @@
       select="t:get-elements(.)"/>
 
     <xsl:for-each select="expressions">
-      <xsl:sequence select="t:get-statement-expression(.)"/>
+      <xsl:sequence select="t:expression(.)"/>
 
       <xsl:if test="position() != last()">
         <xsl:sequence select="','"/>
@@ -252,7 +252,7 @@
     <xsl:sequence select="'if'"/>
     <xsl:sequence select="' '"/>
     <xsl:sequence select="'('"/>
-    <xsl:sequence select="t:get-expression(t:get-elements($condition))"/>
+    <xsl:sequence select="t:expression(t:get-elements($condition))"/>
     <xsl:sequence select="')'"/>
     <xsl:sequence select="$t:new-line"/>
 
@@ -304,7 +304,7 @@
 
     <xsl:sequence select="'while'"/>
     <xsl:sequence select="'('"/>
-    <xsl:sequence select="t:get-expression(t:get-elements($condition))"/>
+    <xsl:sequence select="t:expression(t:get-elements($condition))"/>
     <xsl:sequence select="')'"/>
     <xsl:sequence select="';'"/>
     <xsl:sequence select="$t:new-line"/>
@@ -318,7 +318,7 @@
 
     <xsl:sequence select="'while'"/>
     <xsl:sequence select="'('"/>
-    <xsl:sequence select="t:get-expression(t:get-elements($condition))"/>
+    <xsl:sequence select="t:expression(t:get-elements($condition))"/>
     <xsl:sequence select="')'"/>
     <xsl:sequence select="$t:new-line"/>
 
@@ -351,7 +351,7 @@
             'Variable declaration and initializer are ',
             'mutually exclusive in ''for'' statement.'
           ),
-          ($var, $const, $let, $initializer)
+          ($var, $const, $let, $initialize)
         )"/>
     </xsl:if>
 
@@ -400,7 +400,7 @@
     </xsl:for-each>
 
     <xsl:for-each select="initialize/t:get-elements(.)">
-      <xsl:sequence select="t:get-statement-expression(.)"/>
+      <xsl:sequence select="t:expression(.)"/>
 
       <xsl:if test="position() != last()">
         <xsl:sequence select="','"/>
@@ -412,7 +412,7 @@
 
     <xsl:if test="exists($condition)">
       <xsl:sequence select="' '"/>
-      <xsl:sequence select="t:get-expression(t:get-elements($condition))"/>
+      <xsl:sequence select="t:expression(t:get-elements($condition))"/>
     </xsl:if>
 
     <xsl:sequence select="';'"/>
@@ -421,7 +421,7 @@
       <xsl:sequence select="' '"/>
 
       <xsl:for-each select="$update/t:get-elements(.)">
-        <xsl:sequence select="t:get-expression(.)"/>
+        <xsl:sequence select="t:expression(.)"/>
 
         <xsl:if test="position() != last()">
           <xsl:sequence select="','"/>
@@ -433,10 +433,7 @@
     <xsl:sequence select="')'"/>
 
     <xsl:sequence select="$t:new-line"/>
-
-    <xsl:call-template name="t:get-statements-block">
-      <xsl:with-param name="statements" select="$statements"/>
-    </xsl:call-template>
+    <xsl:apply-templates mode="t:statement" select="$block"/>
   </xsl:template>
 
   <!-- Mode "t:statement t:module-item". for. -->
@@ -455,7 +452,7 @@
         (
           xs:QName('for-source'),
           'For source is expected.',
-          ($assign, $var, $let, $const)
+          ($assign, $var)
         )"/>
     </xsl:if>
 
@@ -522,10 +519,10 @@
     </xsl:choose>
 
     <xsl:sequence select="' '"/>
-    <xsl:sequence select="t:get-nested-expression($right)"/>
+    <xsl:sequence select="t:get-nested-expression($source)"/>
     <xsl:sequence select="')'"/>
     <xsl:sequence select="$t:new-line"/>
-    <xsl:apply-templates mode="t:statement" select="$body"/>
+    <xsl:apply-templates mode="t:statement" select="$block"/>
   </xsl:template>
 
   <!-- Mode "t:statement t:module-item". switch-statement. -->
@@ -535,7 +532,7 @@
 
     <xsl:sequence select="'switch'"/>
     <xsl:sequence select="'('"/>
-    <xsl:sequence select="t:get-expression(t:get-elements($test))"/>
+    <xsl:sequence select="t:expression(t:get-elements($test))"/>
     <xsl:sequence select="')'"/>
     <xsl:sequence select="$t:new-line"/>
     <xsl:sequence select="'{'"/>
@@ -556,7 +553,7 @@
 
           <xsl:sequence select="'case'"/>
           <xsl:sequence select="' '"/>
-          <xsl:sequence select="t:get-expression(t:get-elements($value))"/>
+          <xsl:sequence select="t:expression(t:get-elements($value))"/>
           <xsl:sequence select="':'"/>
           <xsl:sequence select="$t:new-line"/>
           <xsl:apply-templates mode="t:statement" select="$block"/>
@@ -608,7 +605,7 @@
 
     <xsl:if test="exists($expression)">
       <xsl:sequence select="'&#160;'"/>
-      <xsl:sequence select="t:get-expression($expression)"/>
+      <xsl:sequence select="t:expression($expression)"/>
     </xsl:if>
 
     <xsl:sequence select="';'"/>
@@ -622,7 +619,7 @@
   
     <xsl:sequence select="'with'"/>
     <xsl:sequence select="'('"/>
-    <xsl:sequence select="t:get-expression(t:get-elements($scope))"/>
+    <xsl:sequence select="t:expression(t:get-elements($scope))"/>
     <xsl:sequence select="')'"/>
     <xsl:sequence select="$t:new-line"/>
     <xsl:apply-templates mode="t:statement" select="$block"/>
@@ -634,7 +631,7 @@
   
     <xsl:sequence select="'throw'"/>
     <xsl:sequence select="'&#160;'"/>
-    <xsl:sequence select="t:get-expression($expression)"/>
+    <xsl:sequence select="t:expression($expression)"/>
     <xsl:sequence select="';'"/>
   </xsl:template>
 

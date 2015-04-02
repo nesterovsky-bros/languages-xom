@@ -24,17 +24,10 @@
   <xsl:function name="t:get-script" as="item()*">
     <xsl:param name="script" as="element()"/>
 
-    <xsl:choose>
-      <xsl:when test="$script[self::script]">
-        <xsl:sequence select="t:get-statements(t:get-elements(.))"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:call-template name="t:get-statements">
-          <xsl:with-param name="statements" select="t:get-elements(.)"/>
-          <xsl:with-param name="module-items" select="true()"/>
-        </xsl:call-template>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:call-template name="t:get-statements">
+      <xsl:with-param name="statements" select="t:get-elements($script)"/>
+      <xsl:with-param name="module-items" select="$script[self::module]"/>
+    </xsl:call-template>
   </xsl:function>
   
   <!--
@@ -109,7 +102,7 @@
       <xsl:sequence select="' '"/>
     </xsl:if>
     
-    <xsl:sequence select="t:get-expression($from/string)"/>
+    <xsl:sequence select="t:expression($from/string)"/>
     <xsl:sequence select="';'"/>
   </xsl:template>
 
@@ -128,7 +121,7 @@
         <xsl:sequence select="' '"/>
         <xsl:sequence select="'from'"/>
         <xsl:sequence select="' '"/>
-        <xsl:sequence select="t:get-expression($from/string)"/>
+        <xsl:sequence select="t:expression($from/string)"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:variable name="refs" as="element()+" select="ref"/>
@@ -163,7 +156,7 @@
           <xsl:sequence select="$t:new-line"/>
           <xsl:sequence select="'from'"/>
           <xsl:sequence select="' '"/>
-          <xsl:sequence select="t:get-expression($from/string)"/>
+          <xsl:sequence select="t:expression($from/string)"/>
         </xsl:if>
         
         <xsl:sequence select="$t:unindent"/>

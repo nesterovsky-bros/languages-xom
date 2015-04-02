@@ -16,14 +16,17 @@
   <xsl:output name="ecmascript" byte-order-mark="yes" encoding="utf-8" method="text"/>
 
   <!-- Entry point. -->
-  <xsl:template match="/files">
-    <xsl:for-each select="file">
-      <xsl:variable name="file-uri" as="xs:anyURI" 
-        select="resolve-uri(@name, base-uri())"/>
-      <xsl:variable name="result-uri" as="xs:anyURI" select="
-        replace($file-uri, '/(.*)\..*$', '/output/$1.js')"/>
+  <xsl:template match="/t:files">
+    <xsl:for-each select="t:file">
+      <xsl:variable name="file-uri" as="xs:string" 
+        select="xs:string(resolve-uri(@name, base-uri()))"/>
+      <xsl:variable name="result-uri" as="xs:string" select="
+        replace($file-uri, '(.*)/(.*)\..*$', '$1/output/$2.js')"/>
 
-      <xsl:variable name="script" as="document-node()"
+      <xsl:message select="'source:', $file-uri"/>
+      <xsl:message select="'target:', $result-uri"/>
+
+      <xsl:variable name="script" as="element()"
         select="document($file-uri)/*"/>
 
       <!-- Optional step: Normalize names. -->

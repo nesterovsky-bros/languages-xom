@@ -684,18 +684,15 @@
             (
               replace
               (
-                replace($value, '''', '\\''', 'm'),
+                replace($value, '''', '\\'''),
                 '\t',
-                '\\t',
-                'm'
+                '\\t'
               ),
               '\n',
-              '\\n',
-              'm'
+              '\\n'
             ),
             '\r',
-            '\\r',
-            'm'
+            '\\r'
           ),
           ''''
         )"/>
@@ -713,7 +710,7 @@
           concat
           (
             '@&quot;',
-            replace($value, '&quot;', '&quot;&quot;', 'm'),
+            replace($value, '&quot;', '&quot;&quot;'),
             '&quot;'
           )"/>
       </xsl:when>
@@ -733,18 +730,18 @@
                   (
                     replace
                     (
-                      replace($value, '\', '\\'),
+                      replace($value, '\\', '\\\\'),
                       '&quot;',
-                      '\&quot;'
+                      '\\&quot;'
                     ),
-                    '&#9;',
-                    '\t'
+                    '\t',
+                    '\\t'
                   ),
-                  '&#10;',
-                  '\n'
+                  '\n',
+                  '\\n'
                 ),
-                '&#13;',
-                '\r'
+                '\r',
+                '\\r'
               ),
               '&quot;'
             )"/>
@@ -1017,7 +1014,7 @@
       select="t:get-elements(.) except ($type, $initializer)"/>
 
     <xsl:variable name="ranks" as="xs:integer*" select="
-      for $item in tokenize(@rank, '\s', 'm') return
+      for $item in tokenize(@rank, '\s') return
         xs:integer($item)"/>
 
     <xsl:if test="empty($type) and empty($ranks) and empty($expressions)">

@@ -131,7 +131,7 @@
           <xsl:sequence select="t:get-nested-expression(ref)"/>
         </xsl:when>
         <xsl:when test="self::element">
-          <xsl:variable name="initialize" as="element()" select="$initialize"/>
+          <xsl:variable name="initialize" as="element()" select="initialize"/>
           <xsl:variable name="name" as="element()"
             select="t:get-elements(.) except $initialize"/>
 
@@ -222,17 +222,20 @@
   <!-- Mode "t:expression". boolean. -->
   <xsl:template mode="t:expression" match="number">
     <xsl:variable name="value" as="xs:double" select="@value"/>
-    <xsl:variable name="form" as="xs:xsting?" select="@form"/>
+    <xsl:variable name="form" as="xs:string?" select="@form"/>
 
     <xsl:choose>
       <xsl:when test="$form = 'binary'">
-        <xsl:sequence select="concat('0b', t:integer-to-string($value, 2))"/>
+        <xsl:sequence 
+          select="concat('0b', t:integer-to-string(xs:integer($value), 2))"/>
       </xsl:when>
       <xsl:when test="$form = 'octal'">
-        <xsl:sequence select="concat('0o', t:integer-to-string($value, 2))"/>
+        <xsl:sequence 
+          select="concat('0o', t:integer-to-string(xs:integer($value), 2))"/>
       </xsl:when>
       <xsl:when test="$form = 'hex'">
-        <xsl:sequence select="concat('0x', t:integer-to-string($value, 2))"/>
+        <xsl:sequence 
+          select="concat('0x', t:integer-to-string(xs:integer($value), 2))"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:sequence select="string($value)"/>
@@ -265,7 +268,7 @@
         <xsl:when test="current-grouping-key()">
           <xsl:variable name="parts" as="xs:string*">
             <xsl:for-each select="current-group()/@value">
-              <xsl:analyze-string select="." regex="\.|[`$\]">
+              <xsl:analyze-string select="." regex="\.|[`$\\]">
                 <xsl:matching-substring>
                   <xsl:choose>
                     <xsl:when test=". = ('`', '$', '\')">
@@ -376,7 +379,7 @@
       <xsl:apply-templates mode="t:object-member" select="."/>
 
       <xsl:choose>
-        <xsl:when test="self:function">
+        <xsl:when test="self::function">
           <xsl:sequence select="$t:new-line"/>
         </xsl:when>
         <xsl:when test="position() != last()">
@@ -442,7 +445,7 @@
 
   <!-- Mode "t:object-member" property. -->
   <xsl:template mode="t:object-member" match="property">
-    <xsl:variable name="name" as="element()" select="$name"/>
+    <xsl:variable name="name" as="element()" select="name"/>
     <xsl:variable name="value" as="element()?"
       select="t:get-elements(.) except $name"/>
 
@@ -532,7 +535,7 @@
 
     <xsl:sequence select="'('"/>
 
-    <xsl:for-each select="$parameter">
+    <xsl:for-each select="$parameters">
       <xsl:variable name="initialize" as="element()" select="initialize"/>
       <xsl:variable name="parameter-name" as="element()?" select="name"/>
 
@@ -584,13 +587,13 @@
     <xsl:variable name="expression" as="element()?" select="expression"/>
 
     <xsl:variable name="simple-parameters" as="xs:boolean" select="
-      not($rest-parameter) and (count($parameter) = 1) and $parameter/name"/>
+      not($rest-parameter) and (count($parameters) = 1) and $parameters/name"/>
   
     <xsl:if test="$simple-parameters">
        <xsl:sequence select="'('"/>
     </xsl:if>
 
-    <xsl:for-each select="$parameter">
+    <xsl:for-each select="$parameters">
       <xsl:variable name="parameter-name" as="element()?" select="name"/>
 
       <xsl:choose>
@@ -629,7 +632,7 @@
         <xsl:sequence select="$t:new-line"/>
         <xsl:apply-templates mode="t:statement" select="$body"/>
       </xsl:when>
-      <xsl:when test="$expession/object">
+      <xsl:when test="$expression/object">
         <xsl:sequence select="' '"/>
         <xsl:sequence select="'('"/>
         <xsl:sequence 
@@ -650,8 +653,8 @@
   -->
   <xsl:template match="class"
     mode="t:declaration t:module-declaration t:module-item t:expression">
-    <xsl:variable name="name" as="element()?" select="$name"/>
-    <xsl:variable name="extends" as="element()?" select="$extends"/>
+    <xsl:variable name="name" as="element()?" select="name"/>
+    <xsl:variable name="extends" as="element()?" select="extends"/>
     <xsl:variable name="members" as="element()?" 
       select="t:get-elements(.) except ($name, $extends)"/>
   
@@ -1126,7 +1129,7 @@
 
     <xsl:sequence select="t:get-nested-expression($object)"/>
     <xsl:sequence select="'['"/>
-    <xsl:sequence select="t:get-expression($subscript)"/>
+    <xsl:sequence select="t:get-nested-expression($subscript)"/>
     <xsl:sequence select="']'"/>
   </xsl:template>
 
@@ -1149,12 +1152,12 @@
 
   <!-- Mode "t:expression". new, call. -->
   <xsl:template match="new | call" mode="t:expression">
-    <xsl:variable name="is-new" as="xs:boolean" select="self::new"/>
+    <xsl:variable name="is-new" as="xs:boolean?" select="self::new"/>
     <xsl:variable name="elements" as="element()+"
       select="t:get-elements(.)"/>
     <xsl:variable name="name" as="element()" select="$elements[1]"/>
     <xsl:variable name="arguments" as="element()*"
-      select="subsequence($elements[2])"/>
+      select="subsequence($elements, 2)"/>
 
     <xsl:if test="$is-new">
       <xsl:sequence select="'new'"/>

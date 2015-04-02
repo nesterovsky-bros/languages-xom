@@ -211,7 +211,7 @@
       )"/>
 
     <xsl:variable name="new-scope-ids" as="xs:string*" select="
-      $new-names[xs:boolean(@normalize) and @id]/@id
+      $new-names[xs:boolean(@normalize) and @id]/@id,
       $scope-ids"/>
     
     <xsl:variable name="new-scope-names" as="xs:string*" select="
@@ -265,10 +265,12 @@
           self::class
         )
       ]/
-        if (self::ref or self::name) then
-          .
-        else
-          p:get-scope-names(.)"/>
+        (
+          if (self::ref or self::name) then
+            .
+          else
+            p:get-scope-names(.)
+        )"/>
   </xsl:function>
 
 </xsl:stylesheet>
