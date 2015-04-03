@@ -577,7 +577,7 @@
     <xsl:sequence select="'break'"/>
     
     <xsl:if test="$ref">
-      <xsl:sequence select="'&#160;'"/>
+      <xsl:sequence select="$t:nbsp"/>
       <xsl:sequence select="string($ref/@name)"/>
     </xsl:if>
     
@@ -592,7 +592,7 @@
     <xsl:sequence select="'continue'"/>
     
     <xsl:if test="$ref">
-      <xsl:sequence select="'&#160;'"/>
+      <xsl:sequence select="$t:nbsp"/>
       <xsl:sequence select="string($ref/@name)"/>
     </xsl:if>
 
@@ -608,7 +608,7 @@
     <xsl:sequence select="'return'"/>
 
     <xsl:if test="exists($expression)">
-      <xsl:sequence select="'&#160;'"/>
+      <xsl:sequence select="$t:nbsp"/>
       <xsl:sequence select="t:expression($expression)"/>
     </xsl:if>
 
@@ -634,7 +634,7 @@
     <xsl:variable name="expression" as="element()" select="t:get-elements(.)"/>
   
     <xsl:sequence select="'throw'"/>
-    <xsl:sequence select="'&#160;'"/>
+    <xsl:sequence select="$t:nbsp"/>
     <xsl:sequence select="t:expression($expression)"/>
     <xsl:sequence select="';'"/>
   </xsl:template>

@@ -147,10 +147,10 @@
         if ($leader or empty($line-ends)) then
           $leader
         else
-          max
+          min
           (
             for $i in (0, $line-ends) return
-              t:get-count-of-leading-spaces($items, $i + 1, ())
+              t:get-count-of-leading-spaces($items, $i + 1, 0)
           )"/>
 
       <xsl:variable name="fixed-items" as="item()*">
@@ -224,7 +224,7 @@
   <xsl:function name="t:get-count-of-leading-spaces" as="xs:integer?">
     <xsl:param name="items" as="item()*"/>
     <xsl:param name="index" as="xs:integer"/>
-    <xsl:param name="result" as="xs:integer?"/>
+    <xsl:param name="result" as="xs:integer"/>
 
     <xsl:variable name="item" as="item()?" select="$items[$index]"/>
 
@@ -235,13 +235,9 @@
       <xsl:when test="
         ($item instance of xs:string) and
         matches($item, '^\s+$')">
-        <xsl:variable name="length" as="xs:integer" select="string-length($item)"/>
-
-        <xsl:variable name="next" as="xs:integer" select="
-          if (exists($result)) then
-            $result + $length
-          else
-            $length"/>
+        <xsl:variable name="length" as="xs:integer" 
+          select="string-length($item)"/>
+        <xsl:variable name="next" as="xs:integer" select="$result + $length"/>
 
         <xsl:sequence
           select="t:get-count-of-leading-spaces($items, $index + 1, $next)"/>

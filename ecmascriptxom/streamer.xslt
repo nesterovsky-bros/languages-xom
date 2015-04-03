@@ -56,6 +56,9 @@
   <xsl:variable name="t:terminator" as="xs:QName"
     select="xs:QName('t:terminator')"/>
 
+  <!-- No break space control word. -->
+  <xsl:variable name="t:nbsp" as="xs:QName" select="xs:QName('t:nbsp')"/>
+
   <!-- Regular line control word. -->
   <xsl:variable name="t:code" as="xs:QName" select="xs:QName('t:code')"/>
 
@@ -440,11 +443,11 @@
 
   <!-- Line breakers, used in t:get-breaker() function. -->
   <xsl:variable name="t:line-breakers" as="xs:string*"
-    select="'=', '(', '.', ' ', ':', ',', ';', '>', '=>'"/>
+    select="'=', '[', '{', '(', '.', ' ', ':', ',', ';', '>', '=>'"/>
 
   <!-- Line breaker priorities, used in t:get-breaker() function. -->
   <xsl:variable name="t:line-breaker-priorities" as="xs:integer*"
-    select="15,   5,   0,   0,   15,   5,   15,   2, 15"/>
+    select="15,  10,  10,   5,   15,   0,   15,   5,   15,   2, 15"/>
 
   <!--
     Gets a position of code line breaker.
@@ -534,9 +537,39 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      <xsl:when test="
-        ($value = $t:soft-line-break) and 
-        not($values[$index - 1][. instance of xs:string][. = '&#160;'])">
+      <xsl:when test="$value = $t:nbsp">
+        <xsl:variable name="count" as="xs:integer" select="count($values)"/>
+        <xsl:variable name="next" as="xs:integer?" select="
+          (
+            for 
+              $next in $index + 1 to $count,
+              $next-value in $values[$next]
+            return
+              $next
+              [
+                if ($next-value instance of xs:string) then
+                  not(matches($next-value, '^\s+$'))
+                else
+                  not($next-value = $t:new-line)
+              ]
+          )[1]"/>
+
+        <xsl:sequence select="
+          if (exists($next)) then
+            t:get-breaker
+            (
+              $values,
+              $width,
+              $next,
+              $breaker-priority,
+              $breaker-index
+            )
+          else if (exists($breaker-index)) then
+            $breaker-index
+          else
+            $count"/>
+      </xsl:when>
+      <xsl:when test="$value = $t:soft-line-break">
         <xsl:sequence select="
           t:get-breaker
           (

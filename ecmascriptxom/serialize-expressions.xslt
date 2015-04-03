@@ -1235,7 +1235,7 @@
       <xsl:sequence select="*"/>
     </xsl:if>
 
-    <xsl:sequence select="'&#160;'"/>
+    <xsl:sequence select="$t:nbsp"/>
     <xsl:sequence select="t:get-nested-expression($expression)"/>
   </xsl:template>
 
