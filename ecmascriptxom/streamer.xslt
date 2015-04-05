@@ -57,7 +57,7 @@
     select="xs:QName('t:terminator')"/>
 
   <!-- No break space control word. -->
-  <xsl:variable name="t:nbsp" as="xs:QName" select="xs:QName('t:nbsp')"/>
+  <xsl:variable name="t:no-break" as="xs:QName" select="xs:QName('t:no-break')"/>
 
   <!-- Regular line control word. -->
   <xsl:variable name="t:code" as="xs:QName" select="xs:QName('t:code')"/>
@@ -83,8 +83,15 @@
   <xsl:function name="t:get-lines" as="xs:string*">
     <xsl:param name="tokens" as="item()*"/>
 
-    <xsl:sequence
-      select="t:get-lines($tokens, index-of($tokens, $t:new-line), 0, 0, ())"/>
+    <xsl:sequence select="
+      t:get-lines
+      (
+        $tokens, 
+        index-of($tokens, $t:new-line)[not(t:is-soft-line-break($tokens, .))], 
+        0, 
+        0, 
+        ()
+      )"/>
   </xsl:function>
 
   <!--
@@ -537,7 +544,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      <xsl:when test="$value = $t:nbsp">
+      <xsl:when test="$value = $t:no-break">
         <xsl:variable name="count" as="xs:integer" select="count($values)"/>
         <xsl:variable name="next" as="xs:integer?" select="
           (
@@ -569,7 +576,7 @@
           else
             $count"/>
       </xsl:when>
-      <xsl:when test="$value = $t:soft-line-break">
+      <xsl:when test="$value = ($t:soft-line-break, $t:new-line)">
         <xsl:sequence select="
           t:get-breaker
           (
@@ -948,6 +955,29 @@
     <xsl:param name="value" as="xs:string?"/>
 
     <xsl:sequence select="replace($value, '^\s+|\s+$', '')"/>
+  </xsl:function>
+
+  <!-- 
+    Indicates whether the line break specified by index in tokens sequence,
+    is actually a soft line break.
+      $tokens - input sequence of tokens.
+      $index - a line break index.
+      Return true in index is a soft line break, and false otherwise.
+  -->
+  <xsl:function name="t:is-soft-line-break" as="xs:boolean">
+    <xsl:param name="tokens" as="item()*"/>
+    <xsl:param name="index" as="xs:integer"/>
+
+    <xsl:variable name="token" as="item()?"
+      select="$tokens[$index - 1]"/>
+
+    <xsl:sequence select="
+      exists($token) and
+      (
+        not($token instance of xs:string) or
+        matches($token, '^\s+$')
+      ) and
+      t:is-soft-line-break($tokens, $index - 1)"/>
   </xsl:function>
 
 </xsl:stylesheet>

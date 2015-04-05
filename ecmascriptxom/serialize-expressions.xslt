@@ -59,19 +59,46 @@
 
   <!-- Mode "t:binding-pattern". object. -->
   <xsl:template mode="t:binding-pattern-content" match="object">
+    <xsl:variable name="tokens" as="item()*">
+      <xsl:for-each select="t:get-elements(.)">
+        <xsl:sequence select="t:get-comments(.)"/>
+        <xsl:apply-templates mode="t:binding-property" select="."/>
+
+        <xsl:if test="position() != last()">
+          <xsl:sequence select="','"/>
+        </xsl:if>
+
+        <xsl:sequence select="$t:terminator"/>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:variable name="verbose" as="xs:integer?"
+      select="@serialization-verbose"/>
+
+    <xsl:variable name="formatted-tokens" as="item()*" select="
+      t:reformat-tokens
+      (
+        $tokens,
+        $verbose,
+        ' ',
+        $t:new-line,
+        false(),
+        false()
+      )"/>
+
     <xsl:sequence select="'{'"/>
-    <xsl:sequence select="' '"/>
 
-    <xsl:for-each select="t:get-elements(.)">
-      <xsl:sequence select="t:get-comments(.)"/>
-      <xsl:apply-templates mode="t:binding-property" select="."/>
-
-      <xsl:if test="position() != last()">
-        <xsl:sequence select="','"/>
-      </xsl:if>
-
-      <xsl:sequence select="' '"/>
-    </xsl:for-each>
+    <xsl:choose>
+      <xsl:when test="t:is-multiline($formatted-tokens)">
+        <xsl:sequence select="$formatted-tokens"/>
+        <xsl:sequence select="$t:new-line"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="' '"/>
+        <xsl:sequence select="$formatted-tokens"/>
+        <xsl:sequence select="' '"/>
+      </xsl:otherwise>
+    </xsl:choose>
 
     <xsl:sequence select="'}'"/>
   </xsl:template>
@@ -121,52 +148,74 @@
 
   <!-- Mode "t:binding-pattern". array. -->
   <xsl:template mode="t:binding-pattern-content" match="array">
+    <xsl:variable name="tokens" as="item()*">
+      <xsl:for-each select="t:get-elements(.)">
+        <xsl:choose>
+          <xsl:when test="self::ref">
+            <xsl:sequence select="t:get-nested-expression(.)"/>
+          </xsl:when>
+          <xsl:when test="self::elision">
+            <!-- Do nothing. -->
+          </xsl:when>
+          <xsl:when test="self::spread">
+            <xsl:sequence select="'...'"/>
+            <xsl:sequence select="t:get-nested-expression(ref)"/>
+          </xsl:when>
+          <xsl:when test="self::element">
+            <xsl:variable name="initialize" as="element()" select="initialize"/>
+            <xsl:variable name="name" as="element()"
+              select="t:get-elements(.) except $initialize"/>
+
+            <xsl:choose>
+              <xsl:when test="$name[self::ref]">
+                <xsl:sequence select="t:get-nested-expression($name)"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:apply-templates mode="#current" select="$name"/>
+              </xsl:otherwise>
+            </xsl:choose>
+
+            <xsl:if test="$initialize">
+              <xsl:sequence select="' '"/>
+              <xsl:sequence select="'='"/>
+              <xsl:sequence select="' '"/>
+              <xsl:sequence
+                select="t:get-nested-expression(t:get-elements($initialize))"/>
+            </xsl:if>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates mode="#current" select="."/>
+          </xsl:otherwise>
+        </xsl:choose>
+
+        <xsl:if test="position() != last()">
+          <xsl:sequence select="','"/>
+        </xsl:if>
+
+        <xsl:sequence select="$t:terminator"/>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:variable name="verbose" as="xs:integer?"
+      select="@serialization-verbose"/>
+
+    <xsl:variable name="formatted-tokens" as="item()*" select="
+      t:reformat-tokens
+      (
+        $tokens,
+        $verbose,
+        ' ',
+        $t:new-line,
+        false(),
+        false()
+      )"/>
+
     <xsl:sequence select="'['"/>
+    <xsl:sequence select="$formatted-tokens"/>
 
-    <xsl:for-each select="t:get-elements(.)">
-      <xsl:choose>
-        <xsl:when test="self::ref">
-          <xsl:sequence select="t:get-nested-expression(.)"/>
-        </xsl:when>
-        <xsl:when test="self::elision">
-          <!-- Do nothing. -->
-        </xsl:when>
-        <xsl:when test="self::spread">
-          <xsl:sequence select="'...'"/>
-          <xsl:sequence select="t:get-nested-expression(ref)"/>
-        </xsl:when>
-        <xsl:when test="self::element">
-          <xsl:variable name="initialize" as="element()" select="initialize"/>
-          <xsl:variable name="name" as="element()"
-            select="t:get-elements(.) except $initialize"/>
-
-          <xsl:choose>
-            <xsl:when test="$name[self::ref]">
-              <xsl:sequence select="t:get-nested-expression($name)"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:apply-templates mode="#current" select="$name"/>
-            </xsl:otherwise>
-          </xsl:choose>
-
-          <xsl:if test="$initialize">
-            <xsl:sequence select="' '"/>
-            <xsl:sequence select="'='"/>
-            <xsl:sequence select="' '"/>
-            <xsl:sequence
-              select="t:get-nested-expression(t:get-elements($initialize))"/>
-          </xsl:if>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:apply-templates mode="#current" select="."/>
-        </xsl:otherwise>
-      </xsl:choose>
-
-      <xsl:if test="position() != last()">
-        <xsl:sequence select="','"/>
-        <xsl:sequence select="' '"/>
-      </xsl:if>
-    </xsl:for-each>
+    <xsl:if test="t:is-multiline($formatted-tokens)">
+      <xsl:sequence select="$t:new-line"/>
+    </xsl:if>
 
     <xsl:sequence select="']'"/>
   </xsl:template>
@@ -346,61 +395,102 @@
 
   <!-- Mode "t:expression". array. -->
   <xsl:template mode="t:expression" match="array">
-    <xsl:sequence select="$t:soft-line-break"/>
+    <xsl:variable name="tokens" as="item()*">
+      <xsl:for-each select="t:get-elements(.)">
+        <xsl:choose>
+          <xsl:when test="self::elision">
+            <!-- Do nothing. -->
+          </xsl:when>
+          <xsl:when test="self::spread">
+            <xsl:sequence select="'...'"/>
+            <xsl:sequence select="t:get-nested-expression(t:get-elements(.))"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:sequence select="t:get-nested-expression(.)"/>
+          </xsl:otherwise>
+        </xsl:choose>
+
+        <xsl:if test="position() != last()">
+          <xsl:sequence select="','"/>
+        </xsl:if>
+
+        <xsl:sequence select="$t:terminator"/>
+      </xsl:for-each>
+    </xsl:variable>
+    
+    <xsl:variable name="verbose" as="xs:integer?"
+      select="@serialization-verbose"/>
+
+    <xsl:variable name="formatted-tokens" as="item()*" select="
+      t:reformat-tokens
+      (
+        $tokens,
+        $verbose,
+        ' ',
+        $t:new-line,
+        false(),
+        false()
+      )"/>
+
     <xsl:sequence select="'['"/>
-    <xsl:sequence select="$t:soft-line-break"/>
+    <xsl:sequence select="$formatted-tokens"/>
 
-    <xsl:for-each select="t:get-elements(.)">
-      <xsl:choose>
-        <xsl:when test="self::elision">
-          <!-- Do nothing. -->
-        </xsl:when>
-        <xsl:when test="self::spread">
-          <xsl:sequence select="'...'"/>
-          <xsl:sequence select="t:get-nested-expression(t:get-elements(.))"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:sequence select="t:get-nested-expression(.)"/>
-        </xsl:otherwise>
-      </xsl:choose>
-
-      <xsl:if test="position() != last()">
-        <xsl:sequence select="','"/>
-        <xsl:sequence select="' '"/>
-      </xsl:if>
-
-      <xsl:sequence select="$t:soft-line-break"/>
-    </xsl:for-each>
+    <xsl:if test="t:is-multiline($formatted-tokens)">
+      <xsl:sequence select="$t:new-line"/>
+    </xsl:if>
 
     <xsl:sequence select="']'"/>
-    <xsl:sequence select="$t:soft-line-break"/>
   </xsl:template>
 
   <!-- Mode "t:expression". object. -->
   <xsl:template mode="t:expression" match="object">
-    <xsl:sequence select="$t:soft-line-break"/>
+    <xsl:variable name="tokens" as="item()*">
+      <xsl:for-each select="t:get-elements(.)">
+        <xsl:sequence select="t:get-comments(.)"/>
+        <xsl:apply-templates mode="t:object-member" select="."/>
+
+        <xsl:choose>
+          <xsl:when test="self::function">
+            <xsl:sequence select="$t:new-line"/>
+          </xsl:when>
+          <xsl:when test="position() != last()">
+            <xsl:sequence select="','"/>
+          </xsl:when>
+        </xsl:choose>
+
+        <xsl:sequence select="$t:terminator"/>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:variable name="verbose" as="xs:integer?"
+      select="@serialization-verbose"/>
+
+    <xsl:variable name="formatted-tokens" as="item()*" select="
+      t:reformat-tokens
+      (
+        $tokens,
+        $verbose,
+        ' ',
+        $t:new-line,
+        false(),
+        false()
+      )"/>
+
     <xsl:sequence select="'{'"/>
-    <xsl:sequence select="$t:soft-line-break"/>
 
-    <xsl:for-each select="t:get-elements(.)">
-      <xsl:sequence select="t:get-comments(.)"/>
-      <xsl:apply-templates mode="t:object-member" select="."/>
-
-      <xsl:choose>
-        <xsl:when test="self::function">
-          <xsl:sequence select="$t:new-line"/>
-        </xsl:when>
-        <xsl:when test="position() != last()">
-          <xsl:sequence select="','"/>
-          <xsl:sequence select="' '"/>
-        </xsl:when>
-      </xsl:choose>
-
-      <xsl:sequence select="$t:soft-line-break"/>
-    </xsl:for-each>
+    <xsl:choose>
+      <xsl:when test="t:is-multiline($formatted-tokens)">
+        <xsl:sequence select="$formatted-tokens"/>
+        <xsl:sequence select="$t:new-line"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="' '"/>
+        <xsl:sequence select="$formatted-tokens"/>
+        <xsl:sequence select="' '"/>
+      </xsl:otherwise>
+    </xsl:choose>
 
     <xsl:sequence select="'}'"/>
-    <xsl:sequence select="$t:soft-line-break"/>
   </xsl:template>
 
   <!-- Mode "t:property-name". name -->
@@ -451,7 +541,7 @@
         <xsl:sequence select="' '"/>
       </xsl:if>
 
-      <xsl:sequence select="$t:soft-line-break"/>
+      <xsl:sequence select="$t:new-line"/>
     </xsl:for-each>
 
     <xsl:sequence select="$t:new-line"/>
@@ -481,6 +571,23 @@
       <xsl:sequence select="$t:soft-line-break"/>
       <xsl:sequence select="t:get-nested-expression($value)"/>
     </xsl:if>
+  </xsl:template>
+
+  <!-- 
+    Mode "t:object-member t:method-definition t:declaration t:statement
+      t:module-declaration t:module-item" 
+    function.
+  -->
+  <xsl:template match="function" priority="2" mode="
+    t:object-member 
+    t:method-definition 
+    t:class-method
+    t:declaration 
+    t:statement
+    t:module-declaration 
+    t:module-item">
+    <xsl:next-match/>
+    <xsl:sequence select="$t:new-line"/>
   </xsl:template>
 
   <!-- 
@@ -551,47 +658,54 @@
       <xsl:sequence select="string($name/@value)"/>
     </xsl:if>
 
+    <xsl:variable name="tokens" as="item()*">
+      <xsl:for-each select="$parameters">
+        <xsl:variable name="initialize" as="element()?" select="initialize"/>
+        <xsl:variable name="parameter-name" as="element()?" select="name"/>
+
+        <xsl:choose>
+          <xsl:when test="$parameter-name">
+            <xsl:sequence select="string($parameter-name/@value)"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:variable name="pattern" as="element()" select="pattern"/>
+
+            <xsl:apply-templates mode="t:binding-pattern" select="$pattern"/>
+          </xsl:otherwise>
+        </xsl:choose>
+
+        <xsl:if test="$initialize">
+          <xsl:sequence select="' '"/>
+          <xsl:sequence select="'='"/>
+          <xsl:sequence select="' '"/>
+          <xsl:sequence
+            select="t:get-nested-expression(t:get-elements($initialize))"/>
+        </xsl:if>
+
+        <xsl:if test="$rest-parameter or (position() != last())">
+          <xsl:sequence select="','"/>
+        </xsl:if>
+
+        <xsl:sequence select="$t:terminator"/>
+      </xsl:for-each>
+
+      <xsl:for-each select="$rest-parameter">
+        <xsl:variable name="parameter-name" as="element()" select="name"/>
+
+        <xsl:sequence select="'...'"/>
+        <xsl:sequence select="string(@value)"/>
+
+        <xsl:sequence select="$t:terminator"/>
+      </xsl:for-each>
+    </xsl:variable>
+
     <xsl:sequence select="'('"/>
-
-    <xsl:for-each select="$parameters">
-      <xsl:variable name="initialize" as="element()?" select="initialize"/>
-      <xsl:variable name="parameter-name" as="element()?" select="name"/>
-
-      <xsl:choose>
-        <xsl:when test="$parameter-name">
-          <xsl:sequence select="string($parameter-name/@value)"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:variable name="pattern" as="element()" select="pattern"/>
-
-          <xsl:apply-templates mode="t:binding-pattern" select="$pattern"/>
-        </xsl:otherwise>
-      </xsl:choose>
-
-      <xsl:if test="$initialize">
-        <xsl:sequence select="' '"/>
-        <xsl:sequence select="'='"/>
-        <xsl:sequence select="' '"/>
-        <xsl:sequence
-          select="t:get-nested-expression(t:get-elements($initialize))"/>
-      </xsl:if>
-
-      <xsl:if test="$rest-parameter or (position() != last())">
-        <xsl:sequence select="','"/>
-        <xsl:sequence select="' '"/>
-      </xsl:if>
-    </xsl:for-each>
-
-    <xsl:for-each select="$rest-parameter">
-      <xsl:variable name="parameter-name" as="element()" select="name"/>
-
-      <xsl:sequence select="'...'"/>
-      <xsl:sequence select="string(@value)"/>
-    </xsl:for-each>
-    
+    <xsl:sequence select="
+      t:reformat-tokens($tokens, 4, ' ', $t:new-line, false(), false())"/>
     <xsl:sequence select="')'"/>
     <xsl:sequence select="$t:new-line"/>
-    <xsl:apply-templates mode="t:statement" select="($body, $t:empty-body)[1]"/>
+    <xsl:apply-templates mode="t:statement" 
+      select="($body, $t:empty-body)[1]"/>
   </xsl:template>
 
   <!-- 
@@ -663,6 +777,19 @@
           select="t:get-nested-expression(t:get-elements($expression))"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <!-- 
+    Mode "t:declaration t:statement t:module-declaration 
+      t:module-item" class. 
+  -->
+  <xsl:template match="class" priority="2" mode="
+    t:declaration 
+    t:statement 
+    t:module-declaration 
+    t:module-item">
+    <xsl:next-match/>
+    <xsl:sequence select="$t:new-line"/>
   </xsl:template>
 
   <!-- 
@@ -1191,23 +1318,39 @@
     <xsl:if test="not($is-new) or exists($arguments)">
       <xsl:sequence select="'('"/>
 
-      <xsl:for-each select="$arguments">
-        <xsl:choose>
-          <xsl:when test="self::spread">
-            <xsl:sequence select="'...'"/>
-            <xsl:sequence select="t:get-nested-expression(t:get-elements(.))"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:sequence select="t:get-nested-expression(.)"/>
-          </xsl:otherwise>
-        </xsl:choose>
+      <xsl:variable name="tokens" as="item()*">
+        <xsl:for-each select="$arguments">
+          <xsl:choose>
+            <xsl:when test="self::spread">
+              <xsl:sequence select="'...'"/>
+              <xsl:sequence select="t:get-nested-expression(t:get-elements(.))"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:sequence select="t:get-nested-expression(.)"/>
+            </xsl:otherwise>
+          </xsl:choose>
 
-        <xsl:if test="position() != last()">
-          <xsl:sequence select="','"/>
-          <xsl:sequence select="' '"/>
-          <xsl:sequence select="$t:soft-line-break"/>
-        </xsl:if>
-      </xsl:for-each>
+          <xsl:if test="position() != last()">
+            <xsl:sequence select="','"/>
+          </xsl:if>
+
+          <xsl:sequence select="$t:terminator"/>
+        </xsl:for-each>
+      </xsl:variable>
+
+      <xsl:variable name="verbose" as="xs:integer?"
+        select="@serialization-verbose"/>
+
+      <xsl:sequence select="
+        t:reformat-tokens
+        (
+          $tokens,
+          $verbose,
+          ' ',
+          $t:new-line,
+          false(),
+          false()
+        )"/>
 
       <xsl:sequence select="')'"/>
     </xsl:if>
@@ -1235,7 +1378,8 @@
       <xsl:sequence select="*"/>
     </xsl:if>
 
-    <xsl:sequence select="$t:nbsp"/>
+    <xsl:sequence select="$t:no-break"/>
+    <xsl:sequence select="' '"/>
     <xsl:sequence select="t:get-nested-expression($expression)"/>
   </xsl:template>
 
@@ -1415,5 +1559,5 @@
     <xsl:sequence select="' '"/>
     <xsl:sequence select="t:get-nested-expression($right)"/>
   </xsl:template>
-
+  
 </xsl:stylesheet>
