@@ -75,6 +75,7 @@
       <xsl:sequence select="$t:indent"/>
       <xsl:sequence select="'{'"/>
       <xsl:sequence select="$t:new-line"/>
+      <xsl:sequence select="$t:indent"/>
 
       <xsl:for-each select="$refs">
         <xsl:variable name="ref-name" as="element()?" select="name"/>
@@ -95,19 +96,33 @@
         <xsl:sequence select="$t:new-line"/>
       </xsl:for-each>
 
+      <xsl:sequence select="$t:unindent"/>
       <xsl:sequence select="'}'"/>
       <xsl:sequence select="$t:unindent"/>
       <xsl:sequence select="$t:new-line"/>
     </xsl:if>
+
+    <xsl:choose>
+      <xsl:when test="$refs">
+        <xsl:sequence select="$t:indent"/>
+        <xsl:sequence select="'from'"/>
+        <xsl:sequence select="' '"/>
+        <xsl:sequence select="t:expression($from/string)"/>
+        <xsl:sequence select="$t:unindent"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="$name or $namespace">
+          <xsl:sequence select="' '"/>
+          <xsl:sequence select="'from'"/>
+          <xsl:sequence select="' '"/>
+        </xsl:if>
+
+        <xsl:sequence select="t:expression($from/string)"/>
+      </xsl:otherwise>
+    </xsl:choose>
     
-    <xsl:if test="$name or $namespace or $refs">
-      <xsl:sequence select="' '"/>
-      <xsl:sequence select="'from'"/>
-      <xsl:sequence select="' '"/>
-    </xsl:if>
-    
-    <xsl:sequence select="t:expression($from/string)"/>
     <xsl:sequence select="';'"/>
+    <xsl:sequence select="$t:new-line"/>
   </xsl:template>
 
   <!--
@@ -133,6 +148,7 @@
         <xsl:sequence select="$t:new-line"/>
         <xsl:sequence select="$t:indent"/>
         <xsl:sequence select="'{'"/>
+        <xsl:sequence select="$t:indent"/>
         <xsl:sequence select="$t:new-line"/>
 
         <xsl:for-each select="$refs">
@@ -154,6 +170,7 @@
           <xsl:sequence select="$t:new-line"/>
         </xsl:for-each>
 
+        <xsl:sequence select="$t:unindent"/>
         <xsl:sequence select="'}'"/>
         
         <xsl:if test="$from">

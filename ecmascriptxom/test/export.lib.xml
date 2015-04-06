@@ -68,7 +68,7 @@ export { sqrt as S };
   </function>
 
   <export>
-    <ref name="square">
+    <ref name="sqrt">
       <name value="S"/>
     </ref>
   </export>

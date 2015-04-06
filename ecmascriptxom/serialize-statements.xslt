@@ -9,6 +9,16 @@
   xpath-default-namespace="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20"
   exclude-result-prefixes="xs t">
 
+  <!-- An empty body element. -->
+  <xsl:variable name="t:empty-body" as="element()">
+    <body/>
+  </xsl:variable>
+
+  <!-- An empty block element. -->
+  <xsl:variable name="t:empty-block" as="element()">
+    <block/>
+  </xsl:variable>
+
   <!--
     Gets a sequence of tokens for a statement.
       $statement - a statment.
@@ -133,12 +143,24 @@
 
   <!--  Mode "t:statement t:module-item". scope. -->
   <xsl:template mode="t:statement t:module-item" match="scope">
-    <xsl:sequence select="comment/t:get-comment(.)"/>
-    <xsl:apply-templates mode="#current" select="t:get-elements(.)"/>
+    <xsl:call-template name="t:get-statements">
+      <xsl:with-param name="statements" select="t:get-elements(.)"/>
+    </xsl:call-template>
+
+    <xsl:sequence select="$t:new-line"/>
   </xsl:template>
 
-  <!--  Mode "t:statement t:module-item". block, body. -->
-  <xsl:template mode="t:statement t:module-item" match="block | body">
+  <!--  Mode "t:statement t:module-item". block. -->
+  <xsl:template mode="t:statement t:module-item" match="block">
+    <xsl:call-template name="t:get-statements-block">
+      <xsl:with-param name="comments" select="comment"/>
+      <xsl:with-param name="statements" select="t:get-elements(.)"/>
+    </xsl:call-template>
+    <xsl:sequence select="$t:new-line"/>
+  </xsl:template>
+
+  <!--  Mode "t:statement t:module-item". body. -->
+  <xsl:template mode="t:statement t:module-item" match="body">
     <xsl:call-template name="t:get-statements-block">
       <xsl:with-param name="comments" select="comment"/>
       <xsl:with-param name="statements" select="t:get-elements(.)"/>
@@ -198,25 +220,58 @@
       </xsl:otherwise>
     </xsl:choose>
 
-    <xsl:sequence select="' '"/>
+    <xsl:variable name="left-tokens" as="item()*">
+      <xsl:choose>
+        <xsl:when test="$name">
+          <xsl:sequence select="string($name/@value)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="pattern" as="element()" select="pattern"/>
+
+          <xsl:apply-templates mode="t:binding-pattern" select="$pattern"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="multiline-target" as="xs:boolean" 
+      select="t:is-multiline($left-tokens)"/>
 
     <xsl:choose>
-      <xsl:when test="$name">
-        <xsl:sequence select="string($name/@value)"/>
+      <xsl:when test="$multiline-target">
+        <xsl:sequence select="$t:new-line"/>
+        <xsl:sequence select="$t:indent"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:variable name="pattern" as="element()" select="pattern"/>
-
-        <xsl:apply-templates mode="t:binding-pattern" select="$pattern"/>
+        <xsl:sequence select="' '"/>
       </xsl:otherwise>
     </xsl:choose>
 
+    <xsl:sequence select="$left-tokens"/>
+    
     <xsl:if test="$initialize">
       <xsl:sequence select="' '"/>
       <xsl:sequence select="'='"/>
       <xsl:sequence select="' '"/>
-      <xsl:sequence
-        select="t:get-nested-expression(t:get-elements($initialize))"/>
+
+      <xsl:variable name="right" as="element()" 
+        select="t:get-elements($initialize)"/>
+
+      <xsl:variable name="right-tokens" as="item()*">
+        <xsl:sequence select="t:get-nested-expression($right)"/>
+      </xsl:variable>
+
+      <xsl:if test="
+        $right[self::array or self::object] and 
+        t:is-multiline($right-tokens)">
+
+        <xsl:sequence select="$t:new-line"/>
+      </xsl:if>
+
+      <xsl:sequence select="$right-tokens"/>
+    </xsl:if>
+
+    <xsl:if test="$multiline-target">
+      <xsl:sequence select="$t:unindent"/>
     </xsl:if>
 
     <xsl:sequence select="';'"/>
@@ -264,6 +319,7 @@
       <xsl:variable name="else-statements" as="element()*"
         select="t:get-elements($else)"/>
 
+      <xsl:sequence select="$t:new-line"/>
       <xsl:sequence select="'else'"/>
 
       <xsl:choose>
@@ -286,21 +342,19 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
+
+    <xsl:sequence select="$t:new-line"/>
   </xsl:template>
 
   <!-- Mode "t:statement t:module-item". do-while. -->
   <xsl:template mode="t:statement t:module-item" match="do-while">
     <xsl:variable name="condition" as="element()" select="condition"/>
-    <xsl:variable name="statements" as="element()*"
-      select="t:get-elements(.) except $condition"/>
+    <xsl:variable name="block" as="element()" 
+      select="(block, $t:empty-block)[1]"/>
 
     <xsl:sequence select="'do'"/>
     <xsl:sequence select="$t:new-line"/>
-
-    <xsl:call-template name="t:get-statements-block">
-      <xsl:with-param name="statements" select="$statements"/>
-    </xsl:call-template>
-
+    <xsl:apply-templates mode="t:statement" select="$block"/>
     <xsl:sequence select="'while'"/>
     <xsl:sequence select="'('"/>
     <xsl:sequence select="t:expression(t:get-elements($condition))"/>
@@ -312,18 +366,15 @@
   <!-- Mode "t:statement t:module-item". while-statement. -->
   <xsl:template mode="t:statement t:module-item" match="while">
     <xsl:variable name="condition" as="element()" select="condition"/>
-    <xsl:variable name="statements" as="element()*"
-      select="t:get-elements(.) except $condition"/>
+    <xsl:variable name="block" as="element()"
+      select="(block, $t:empty-block)[1]"/>
 
     <xsl:sequence select="'while'"/>
     <xsl:sequence select="'('"/>
     <xsl:sequence select="t:expression(t:get-elements($condition))"/>
     <xsl:sequence select="')'"/>
     <xsl:sequence select="$t:new-line"/>
-
-    <xsl:call-template name="t:get-statements-block">
-      <xsl:with-param name="statements" select="$statements"/>
-    </xsl:call-template>
+    <xsl:apply-templates mode="t:statement" select="$block"/>
   </xsl:template>
 
   <!-- Mode "t:statement t:module-item". for. -->
@@ -334,8 +385,9 @@
     <xsl:variable name="const" as="element()*" select="const"/>
     <xsl:variable name="condition" as="element()?" select="condition"/>
     <xsl:variable name="update" as="element()*" select="update"/>
-    <xsl:variable name="block" as="element()" select="block"/>
-    
+    <xsl:variable name="block" as="element()"
+      select="(block, $t:empty-block)[1]"/>
+
     <xsl:if test="
       xs:integer(exists($initialize)) + 
       xs:integer(exists($var)) + 
@@ -443,8 +495,8 @@
       select="$elements[1][self::assign]"/>
     <xsl:variable name="var" as="element()?"
       select="$elements[1][self::var or self::let or self::const]"/>
-    <xsl:variable name="block" as="element()?"
-      select="$elements[2][self::block]"/>
+    <xsl:variable name="block" as="element()"
+      select="($elements[2][self::block], $t:empty-block)[1]"/>
     
     <xsl:if test="xs:integer(exists($assign)) + xs:integer(exists($var)) != 1">
       <xsl:sequence select="
@@ -550,6 +602,7 @@
             <xsl:with-param name="comments" select="comment"/>
             <xsl:with-param name="statements" select="t:get-elements(.)"/>
           </xsl:call-template>
+          <xsl:sequence select="$t:new-line"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:variable name="value" as="element()" select="value"/>
@@ -622,8 +675,9 @@
   <!-- Mode "t:statement t:module-item". with. -->
   <xsl:template mode="t:statement t:module-item" match="with">
     <xsl:variable name="scope" as="element()" select="scope"/>
-    <xsl:variable name="block" as="element()" select="block"/>
-  
+    <xsl:variable name="block" as="element()"
+      select="(block, $t:empty-block)[1]"/>
+
     <xsl:sequence select="'with'"/>
     <xsl:sequence select="'('"/>
     <xsl:sequence select="t:expression(t:get-elements($scope))"/>
@@ -641,11 +695,13 @@
     <xsl:sequence select="' '"/>
     <xsl:sequence select="t:expression($expression)"/>
     <xsl:sequence select="';'"/>
+    <xsl:sequence select="$t:new-line"/>
   </xsl:template>
 
   <!-- Mode "t:statement t:module-item". try. -->
   <xsl:template mode="t:statement t:module-item" match="try">
-    <xsl:variable name="block" as="element()" select="block"/>
+    <xsl:variable name="block" as="element()"
+      select="(block, $t:empty-block)[1]"/>
     <xsl:variable name="catch" as="element()?" select="catch"/>
     <xsl:variable name="finally" as="element()?" select="finally"/>
 
@@ -671,7 +727,8 @@
     <xsl:if test="$catch">
       <xsl:variable name="parameter" as="element()" select="$catch/parameter"/>
       <xsl:variable name="name" as="element()?" select="$parameter/name"/>
-      <xsl:variable name="catch-block" as="element()" select="$catch/block"/>
+      <xsl:variable name="catch-block" as="element()" 
+        select="($catch/block, $t:empty-block)[1]"/>
       
       <xsl:sequence select="'catch'"/>
       <xsl:sequence select="'('"/>
@@ -700,6 +757,7 @@
         <xsl:with-param name="comments" select="$finally/comment"/>
         <xsl:with-param name="statements" select="t:get-elements($finally)"/>
       </xsl:call-template>
+      <xsl:sequence select="$t:new-line"/>
     </xsl:if>
   </xsl:template>
 
@@ -707,6 +765,7 @@
   <xsl:template mode="t:statement t:module-item" match="debugger">
     <xsl:sequence select="'debugger'"/>
     <xsl:sequence select="';'"/>
+    <xsl:sequence select="$t:new-line"/>
   </xsl:template>
 
 </xsl:stylesheet>

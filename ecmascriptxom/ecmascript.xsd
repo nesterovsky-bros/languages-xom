@@ -2269,7 +2269,7 @@
     <xs:complexContent>
       <xs:extension base="base-element">
         <xs:sequence>
-          <xs:group ref="contained-statements"/>
+          <xs:group ref="contained-statements" minOccurs="0"/>
           <xs:element name="condition" type="expression-container"/>
         </xs:sequence>
       </xs:extension>
@@ -2281,7 +2281,7 @@
       <xs:extension base="base-element">
         <xs:sequence>
           <xs:element name="condition" type="expression-container"/>
-          <xs:group ref="contained-statements"/>
+          <xs:group ref="contained-statements" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -2334,7 +2334,7 @@
       <xs:extension base="statement">
         <xs:sequence>
           <xs:group ref="with-scope"/>
-          <xs:group ref="contained-statements"/>
+          <xs:group ref="contained-statements" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -2366,7 +2366,7 @@
     <xs:complexContent>
       <xs:extension base="statement">
         <xs:sequence>
-          <xs:group ref="contained-statements"/>
+          <xs:group ref="contained-statements" minOccurs="0"/>
           <xs:choice>
             <xs:group ref="catch-finally"/>
             <xs:group ref="finally"/>
@@ -2381,7 +2381,7 @@
       <xs:extension base="statement">
         <xs:sequence>
           <xs:group ref="catch-parameter"/>
-          <xs:group ref="contained-statements"/>
+          <xs:group ref="contained-statements" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>

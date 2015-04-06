@@ -2,7 +2,7 @@
 <module xmlns="http://www.nesterovsky-bros.com/ecmascript6/2015-02-20">
   <comment>
     //------ MyClass.js ------
-    export default class { return null; };
+    export default class { function() { return null; } };
   </comment>
 
   <class export="default">
