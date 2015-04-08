@@ -1,0 +1,266 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/java-1.5/2008-02-07" package="com.nesterovskyBros.test">
+  <comment xml:space="preserve">
+import java.util.function.Consumer;
+
+public class Calculator {
+  
+    interface IntegerMath {
+        int operation(int a, int b);   
+    }
+  
+    public int operateBinary(int a, int b, IntegerMath op) {
+        return op.operation(a, b);
+    }
+ 
+    public static void main(String... args) {
+    
+        Calculator myApp = new Calculator();
+        IntegerMath addition = (a, b) -> a + b;
+        IntegerMath subtraction = (a, b) -> a - b;
+        System.out.println("40 + 2 = " +
+            myApp.operateBinary(40, 2, addition));
+        System.out.println("20 - 10 = " +
+            myApp.operateBinary(20, 10, subtraction));    
+    }
+
+    void methodInFirstLevel(int x) {
+            
+            Consumer&lt;Integer&lt; myConsumer = (y) -> 
+            {
+                System.out.println("x = " + x); // Statement A
+                System.out.println("y = " + y);
+            };
+
+            myConsumer.accept(x);
+
+        }
+}    
+  </comment>
+
+  <imports>
+    <import>
+      <type name="Consumer" package="java.util.function"/>
+    </import>
+  </imports>
+  
+  <class name="Calculator" access="public">
+    <interface name="IntegerMath">
+      <method name="operation">
+        <returns>
+          <type name="int"/>
+        </returns>
+        <parameters>
+          <parameter name="a">
+            <type name="int"/>
+          </parameter>
+          <parameter name="b">
+            <type name="int"/>
+          </parameter>
+        </parameters>
+      </method>
+    </interface>
+
+    <method access="public" name="operateBinary">
+      <returns>
+        <type name="int"/>
+      </returns>
+      <parameters>
+        <parameter name="a">
+          <type name="int"/>
+        </parameter>
+        <parameter name="b">
+          <type name="int"/>
+        </parameter>
+        <parameter name="op">
+          <type name="IntegerMath"/>
+        </parameter>
+      </parameters>
+      <block>
+        <return>
+          <invoke name="operation">
+            <instance>
+              <var name="op"/>
+            </instance>
+            <arguments>
+              <var name="a"/>
+              <var name="b"/>
+            </arguments>
+          </invoke>
+        </return>
+      </block>
+    </method>
+
+    <method static="true" access="public" name="main">
+      <parameters vararg="true">
+        <parameter name="args">
+          <type name="String" arity="1"/>
+        </parameter>
+      </parameters>
+      <block>
+        <var-decl name="myApp">
+          <type name="Calculator"/>
+          <initialize>
+            <new-object>
+              <type name="Calculator"/>
+            </new-object>
+          </initialize>
+        </var-decl>
+        <var-decl name="addition">
+          <type name="IntegerMath"/>
+          <initialize>
+            <lambda>
+              <parameters>
+                <parameter name="a"/>
+                <parameter name="b"/>
+              </parameters>
+              <expression>
+                <add>
+                  <var name="a"/>
+                  <var name="b"/>
+                </add>
+              </expression>
+            </lambda>
+          </initialize>
+        </var-decl>
+        <var-decl name="subtraction">
+          <type name="IntegerMath"/>
+          <initialize>
+            <lambda>
+              <parameters>
+                <parameter name="a"/>
+                <parameter name="b"/>
+              </parameters>
+              <expression>
+                <sub>
+                  <var name="a"/>
+                  <var name="b"/>
+                </sub>
+              </expression>
+            </lambda>
+          </initialize>
+        </var-decl>
+
+        <expression>
+          <invoke name="println">
+            <instance>
+              <static-field name="out">
+                <type name="System"/>
+              </static-field>
+            </instance>
+            <arguments>
+              <add>
+                <string value="40 + 2 = "/>
+                <invoke name="operateBinary">
+                  <instance>
+                    <var name="myApp"/>
+                  </instance>
+                  <arguments>
+                    <int value="40"/>
+                    <int value="2"/>
+                    <var name="addition"/>
+                  </arguments>
+                </invoke>
+              </add>
+            </arguments>
+          </invoke>
+        </expression>
+        <expression>
+          <invoke name="println">
+            <instance>
+              <static-field name="out">
+                <type name="System"/>
+              </static-field>
+            </instance>
+            <arguments>
+              <add>
+                <string value="20 - 10 = "/>
+                <invoke name="operateBinary">
+                  <instance>
+                    <var name="myApp"/>
+                  </instance>
+                  <arguments>
+                    <int value="20"/>
+                    <int value="10"/>
+                    <var name="subtraction"/>
+                  </arguments>
+                </invoke>
+              </add>
+            </arguments>
+          </invoke>
+        </expression>
+      </block>
+    </method>
+
+    <method name="methodInFirstLevel">
+      <parameters>
+        <parameter name="x">
+          <type name="int"/>
+        </parameter>
+      </parameters>
+      <block>
+        <var-decl name="myConsumer">
+          <type name="Consumer">
+            <argument>
+              <type name="Integer"/>
+            </argument>
+          </type>
+          <initialize>
+            <lambda>
+              <parameters>
+                <parameter name="y"/>
+              </parameters>
+              <block>
+                <expression>
+                  <comment>
+                    Statement A
+                  </comment>
+                  <invoke name="println">
+                    <instance>
+                      <static-field name="out">
+                        <type name="System"/>
+                      </static-field>
+                    </instance>
+                    <arguments>
+                      <add>
+                        <string value="x = "/>
+                        <var name="x"/>
+                      </add>
+                    </arguments>
+                  </invoke>
+                </expression>
+
+                <expression>
+                  <invoke name="println">
+                    <instance>
+                      <static-field name="out">
+                        <type name="System"/>
+                      </static-field>
+                    </instance>
+                    <arguments>
+                      <add>
+                        <string value="y = "/>
+                        <var name="y"/>
+                      </add>
+                    </arguments>
+                  </invoke>
+                </expression>
+              </block>
+            </lambda>
+          </initialize>
+        </var-decl>
+
+        <expression>
+          <invoke name="accept">
+            <instance>
+              <var name="myConsumer"/>
+            </instance>
+            <arguments>
+              <var name="x"/>
+            </arguments>
+          </invoke>
+        </expression>
+      </block>
+    </method>
+  </class>
+</unit>

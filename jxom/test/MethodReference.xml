@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/java-1.5/2008-02-07" package="com.nesterovskyBros.test">
+  <comment xml:space="preserve">
+package com.nesterovskyBros.test;
+
+public class Test
+{
+  public static void main(String... args)
+  {
+    String[] stringArray =
+    {
+      "Barbara",
+      "James",
+      "Mary",
+      "John",
+      "Patricia",
+      "Robert",
+      "Michael",
+      "Linda"
+    };
+
+    Arrays.sort(stringArray, String::compareToIgnoreCase);
+  }
+}
+  </comment>
+
+  <class name="Test" access="public">
+    <method static="true" access="public" name="main">
+      <parameters vararg="true">
+        <parameter name="args">
+          <type name="String" arity="1"/>
+        </parameter>
+      </parameters>
+      <block>
+        <var-decl name="stringArray">
+          <type name="String" arity="1"/>
+          <initialize>
+            <array>
+              <string value="Barbara"/>
+              <string value="James"/>
+              <string value="Mary"/>
+              <string value="John"/>
+              <string value="Patricia"/>
+              <string value="Robert"/>
+              <string value="Michael"/>
+              <string value="Linda"/>
+            </array>
+          </initialize>
+        </var-decl>
+
+        <expression>
+          <static-invoke name="sort">
+            <type name="Arrays"/>
+            <arguments>
+              <var name="stringArray"/>
+              <static-method-ref name="compareToIgnoreCase">
+                <type name="String"/>
+              </static-method-ref>
+            </arguments>
+          </static-invoke>
+        </expression>
+      </block>
+    </method>
+  </class>
+</unit>

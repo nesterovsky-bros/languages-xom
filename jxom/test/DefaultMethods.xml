@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/java-1.5/2008-02-07" package="com.nesterovskyBros.test">
+  <comment xml:space="preserve">
+package com.nesterovskyBros.test;
+
+import java.time.*;
+
+public interface TimeClient {
+    void setTime(int hour, int minute, int second);
+    void setDate(int day, int month, int year);
+    void setDateAndTime(int day, int month, int year,
+                                int hour, int minute, int second);
+    LocalDateTime getLocalDateTime();
+    
+    static ZoneId getZoneId (String zoneString) {
+        try {
+            return ZoneId.of(zoneString);
+        } catch (DateTimeException e) {
+            System.err.println("Invalid time zone: " + zoneString +
+                "; using default time zone instead.");
+            return ZoneId.systemDefault();
+        }
+    }
+        
+    default ZonedDateTime getZonedDateTime(String zoneString) {
+        return ZonedDateTime.of(getLocalDateTime(), getZoneId(zoneString));
+    }
+}
+  </comment>
+
+  <imports>
+    <import>
+      <type package="java.time"/>
+    </import>
+  </imports>
+
+  <interface access="public" name="TimeClient">
+    <method name="setTime">
+      <parameters>
+        <parameter name="hour">
+          <type name="int"/>
+        </parameter>
+        <parameter name="minute">
+          <type name="int"/>
+        </parameter>
+        <parameter name="second">
+          <type name="int"/>
+        </parameter>
+      </parameters>
+    </method>
+
+    <method name="setDate">
+      <parameters>
+        <parameter name="day">
+          <type name="int"/>
+        </parameter>
+        <parameter name="month">
+          <type name="int"/>
+        </parameter>
+        <parameter name="year">
+          <type name="int"/>
+        </parameter>
+      </parameters>
+    </method>
+
+    <method name="setDateAndTime">
+      <parameters>
+        <parameter name="day">
+          <type name="int"/>
+        </parameter>
+        <parameter name="month">
+          <type name="int"/>
+        </parameter>
+        <parameter name="year">
+          <type name="int"/>
+        </parameter>
+        <parameter name="hour">
+          <type name="int"/>
+        </parameter>
+        <parameter name="minute">
+          <type name="int"/>
+        </parameter>
+        <parameter name="second">
+          <type name="int"/>
+        </parameter>
+      </parameters>
+    </method>
+
+    <method name="getLocalDateTime">
+      <returns>
+        <type name="LocalDateTime"/>
+      </returns>
+    </method>
+
+    <method name="getZoneId" static="true">
+      <returns>
+        <type name="ZoneId"/>
+      </returns>
+      <parameters>
+        <parameter name="zoneString">
+          <type name="String"/>
+        </parameter>
+      </parameters>
+      <block>
+        <try>
+          <block>
+            <return>
+              <static-invoke name="of">
+                <type name="ZoneId"/>
+                <arguments>
+                  <var name="zoneString"/>
+                </arguments>
+              </static-invoke>
+            </return>
+          </block>
+          <catch>
+            <parameter name="e">
+              <type name="DateTimeException"/>
+            </parameter>
+            <block>
+              <expression>
+                <invoke name="println">
+                  <instance>
+                    <static-field name="err">
+                      <type name="System"/>
+                    </static-field>
+                  </instance>
+                  <arguments>
+                    <add>
+                      <add>
+                        <string value="Invalid time zone: "/>
+                        <var name="zoneString"/>
+                      </add>
+                      <string value="; using default time zone instead."/>
+                    </add>
+                  </arguments>
+                </invoke>
+              </expression>
+
+              <return>
+                <static-invoke name="systemDefault">
+                  <type name="ZoneId"/>
+                </static-invoke>
+              </return>
+            </block>
+          </catch>
+        </try>          
+      </block>
+    </method>
+
+    <method name="getZonedDateTime">
+      <returns>
+        <type name="ZonedDateTime"/>
+      </returns>
+      <parameters>
+        <parameter name="zoneString">
+          <type name="String"/>
+        </parameter>
+      </parameters>
+      <block>
+        <return>
+          <static-invoke name="of">
+            <type name="ZonedDateTime"/>
+            <arguments>
+              <invoke name="getLocalDateTime"/>
+              <invoke name="getZoneId">
+                <arguments>
+                  <var name="zoneString"/>
+                </arguments>
+              </invoke>
+            </arguments>
+          </static-invoke>
+        </return>
+      </block>
+    </method>
+  </interface>
+
+</unit>

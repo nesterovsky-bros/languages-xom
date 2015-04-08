@@ -458,15 +458,6 @@
   </xsl:template>
 
   <!--
-    Mode "t:get-type-of". Сomplex expression.
-  -->
-  <xsl:template mode="t:get-type-of" 
-    match="snippet-expression[meta/complex/result]">
-    <xsl:apply-templates mode="#current"
-      select="t:get-java-element(meta/complex/result)"/>
-  </xsl:template>
-
-  <!--
     Mode "t:get-type-of". boolean expressions and literals.
   -->
   <xsl:template mode="t:get-type-of"
@@ -905,6 +896,43 @@
   </xsl:function>
 
   <!--
+    A type used to supply a result of a lambda function.
+  -->
+  <xsl:variable name="t:complex-type" as="element()">
+    <type name="Supplier" package="com.nesterovskyBros"/>
+  </xsl:variable>
+
+  <!--  
+    Creates a complex expression from a set of statements.
+    Return statement should be only, and the last statement 
+    in the statements sequence.
+  -->
+  <xsl:function name="t:create-complex-expression" as="element()">
+    <xsl:param name="statements" as="element()+"/>
+
+    <static-invoke name="get">
+      <meta>
+        <xsl:sequence select="
+          t:get-type-of
+          (
+            t:get-java-element($statements[last()][self::return]), 
+            true()
+          )"/>
+      </meta>
+
+      <xsl:sequence select="$t:complex-type"/>
+
+      <arguments>
+        <lambda>
+          <block>
+            <xsl:sequence select="$statements"/>
+          </block>
+        </lambda>
+      </arguments>
+    </static-invoke>
+  </xsl:function>
+
+  <!--
     Tests whether a specified element contains complex subexpression.
       $element - an element to verify.
       Returns true if this is a complex expression, and false otherwise.
@@ -924,21 +952,19 @@
     <xsl:param name="element" as="element()"/>
 
     <xsl:sequence select="
-      for
-        $expression in
-          $element//self::snippet-expression[meta/complex]
-          [
-            every $item in ancestor-or-self::*[not($element >> .)] satisfies
-              $item[not(self::meta or self::comment)]
-          ]
-      return
-        (
-          $expression,
-          $expression/meta/complex/result/t:get-complex-expressions(.)
-        )"/>
+      $element//type
+      [
+        (@name = $t:complex-type/@name) and 
+        (@package = $t:complex-type/@package)
+      ]
+      [
+        every $item in ancestor-or-self::*[not($element >> .)] satisfies
+          $item[not(self::meta or self::comment)]
+      ]/
+        parent::static-invoke[@name = 'get']"/>
   </xsl:function>
 
-<!--
+  <!--
     Rewrites, if required, try-with-resources statement.
       $try - a try statement.
       $rewrite-using-regular-try - indicates whether to rewrite statement,

@@ -22,35 +22,38 @@
   -->
 
   <!--
-    This api supports pseudo expressions, represented as a set of statements like:
+    This API supports refactoring of lambda expressions in the form:
+    
+    com.nesterovskyBros.Supplier.get(() => { statements... return result; })
+    
+    com.nesterovskyBros.Supplier class is assumed has get() overload for 
+    every return type, and returns a value from a lambda function call.
+    
+    The API refactors:
+    
+    expression ... com.nesterovskyBros.Supplier.get(() => { statements... return result; }) ... expression
+    
+    into:
+    
+    statements;
+    
+    expression ... result ... expression.
 
-    int x = a + { int result; for() { ... } -> result };
-
-    where content inside curly braces is statements, which derive a single result.
-
-    Api refactors this into a:
-
-    int result;
-
-    for() { ... }
-
-    int x = a + result;
-
-    The pseudo expression has a following format:
-      <snippet-expression>
-        <meta>
-          <complex>
-            <scope>
-              Statements
-            </scope>
-            <result>
-              Result expression
-            </result>
-          </complex>
-        </meta>
-      </snippet-expression>
-
-    A name normalization technique should be used to resolve names.
+    The lambda expression has a following format:
+      <static-invoke name="get">
+        <type name="Supplier" package="com.nesterovskyBros"/>
+        <arguments>
+          <lambda>
+            <block>
+              statements.
+            
+              <return>
+                ...
+              </return>
+            </block>
+          </lambda>
+        </arguments>
+      </static-invoke>
   -->
 
   <!--
@@ -64,23 +67,20 @@
     <xsl:param name="expression" as="element()"/>
 
     <xsl:variable name="complex-expressions" as="element()*" select="
-      for
-        $complex-expression in t:get-complex-expressions($expression)
-      return
-        $complex-expression
-        [
-          not
+      t:get-complex-expressions($expression)
+      [
+        not
+        (
           (
-            (
-              ancestor::class-method |
-              ancestor::constructor | 
-              ancestor::class-initializer
-            )
-            [
-              . >> $expression
-            ]
+            ancestor::class-method |
+            ancestor::constructor | 
+            ancestor::class-initializer
           )
-        ]"/>
+          [
+            . >> $expression
+          ]
+        )
+      ]"/>
 
     <xsl:choose>
       <xsl:when test="
@@ -88,7 +88,7 @@
           (
             ancestor::and, 
             ancestor::or, 
-            ancestor::condition[count(t:get-java-element(.) = 3)]
+            ancestor::condition[count(t:get-java-element(.)) = 3]
           )">
         
         <xsl:variable name="condition" as="element()">
@@ -99,8 +99,9 @@
         <xsl:sequence select="t:refactor-complex-expression($condition)"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:variable name="statements" as="element()*"
-          select="$complex-expressions/meta/complex/scope/t:get-java-element(.)"/>
+        <xsl:variable name="statements" as="element()*" select="
+          $complex-expressions/arguments/lambda/
+            t:get-java-element(block)[not(self::return)]"/>
 
         <scope>
           <xsl:sequence
@@ -146,11 +147,18 @@
   <!--
     Mode "p:refactor-complex-expression". Complex expression.
   -->
-  <xsl:template mode="p:refactor-complex-expression"
-    match="snippet-expression[meta/complex]">
-    
+  <xsl:template mode="p:refactor-complex-expression" match="
+    static-invoke[@name = 'get']
+    [
+      type
+      [
+        (@name = $t:complex-type/@name) and 
+        (@package = $t:complex-type/@package)
+      ]
+    ]">
+
     <xsl:variable name="result" as="element()"
-      select="t:get-java-element(meta/complex/result)"/>
+      select="t:get-java-element(arguments/lambda/block/return)"/>
 
     <xsl:apply-templates mode="#current" select="$result"/>
   </xsl:template>
@@ -194,37 +202,34 @@
       <var name="condition" name-ref="{$name-id}"/>
     </xsl:variable>
 
-    <snippet-expression>
-      <meta>
-        <complex>
-          <scope>
-            <var-decl name="condition" name-id="{$name-id}">
-              <type name="boolean"/>
-              <initialize>
-                <xsl:sequence select="$arguments[1]"/>
-              </initialize>
-            </var-decl>
+    <xsl:variable name="statements" as="element()+">
+      <var-decl name="condition" name-id="{$name-id}">
+        <type name="boolean"/>
+        <initialize>
+          <xsl:sequence select="$arguments[1]"/>
+        </initialize>
+      </var-decl>
 
-            <if>
-              <condition>
-                <xsl:sequence select="$condition"/>
-              </condition>
-              <then>
-                <expression>
-                  <assign>
-                    <xsl:sequence select="$condition"/>
-                    <xsl:sequence select="subsequence($arguments, 2)"/>
-                  </assign>
-                </expression>
-              </then>
-            </if>
-          </scope>
-          <result>
-            <xsl:sequence select="$condition"/>                          
-          </result>
-        </complex>
-      </meta>
-    </snippet-expression>
+      <if>
+        <condition>
+          <xsl:sequence select="$condition"/>
+        </condition>
+        <then>
+          <expression>
+            <assign>
+              <xsl:sequence select="$condition"/>
+              <xsl:sequence select="subsequence($arguments, 2)"/>
+            </assign>
+          </expression>
+        </then>
+      </if>
+
+      <return>
+        <xsl:sequence select="$condition"/>
+      </return>
+    </xsl:variable>
+
+    <xsl:sequence select="t:create-complex-expression($statements)"/>
   </xsl:template>
 
   <!--
@@ -242,39 +247,36 @@
       <var name="condition" name-ref="{$name-id}"/>
     </xsl:variable>
 
-    <snippet-expression>
-      <meta>
-        <complex>
-          <scope>
-            <var-decl name="condition" name-id="{$name-id}">
-              <type name="boolean"/>
-              <initialize>
-                <xsl:sequence select="$arguments[1]"/>
-              </initialize>
-            </var-decl>
+    <xsl:variable name="statements" as="element()+">
+      <var-decl name="condition" name-id="{$name-id}">
+        <type name="boolean"/>
+        <initialize>
+          <xsl:sequence select="$arguments[1]"/>
+        </initialize>
+      </var-decl>
 
-            <if>
-              <condition>
-                <not>
-                  <xsl:sequence select="$condition"/>
-                </not>
-              </condition>
-              <then>
-                <expression>
-                  <assign>
-                    <xsl:sequence select="$condition"/>
-                    <xsl:sequence select="subsequence($arguments, 2)"/>
-                  </assign>
-                </expression>
-              </then>
-            </if>
-          </scope>
-          <result>
+      <if>
+        <condition>
+          <not>
             <xsl:sequence select="$condition"/>
-          </result>
-        </complex>
-      </meta>
-    </snippet-expression>
+          </not>
+        </condition>
+        <then>
+          <expression>
+            <assign>
+              <xsl:sequence select="$condition"/>
+              <xsl:sequence select="subsequence($arguments, 2)"/>
+            </assign>
+          </expression>
+        </then>
+      </if>
+
+      <return>
+        <xsl:sequence select="$condition"/>
+      </return>
+    </xsl:variable>
+
+    <xsl:sequence select="t:create-complex-expression($statements)"/>
   </xsl:template>
 
   <!--
@@ -295,42 +297,39 @@
       <var name="value" name-ref="{$name-id}"/>
     </xsl:variable>
 
-    <snippet-expression>
-      <meta>
-        <complex>
-          <scope>
-            <var-decl name="value" name-id="{$name-id}">
-              <xsl:sequence select="t:get-type-of(., true())"/>
-            </var-decl>
+    <xsl:variable name="statements" as="element()+">
+      <var-decl name="value" name-id="{$name-id}">
+        <xsl:sequence select="t:get-type-of(., true())"/>
+      </var-decl>
 
-            <if>
-              <condition>
-                <xsl:sequence select="$arguments[1]"/>
-              </condition>
-              <then>
-                <expression>
-                  <assign>
-                    <xsl:sequence select="$value"/>
-                    <xsl:sequence select="$arguments[2]"/>
-                  </assign>
-                </expression>
-              </then>
-              <else>
-                <expression>
-                  <assign>
-                    <xsl:sequence select="$value"/>
-                    <xsl:sequence select="subsequence($arguments, 3)"/>
-                  </assign>
-                </expression>
-              </else>
-            </if>
-          </scope>
-          <result>
-            <xsl:sequence select="$value"/>
-          </result>
-        </complex>
-      </meta>
-    </snippet-expression>
+      <if>
+        <condition>
+          <xsl:sequence select="$arguments[1]"/>
+        </condition>
+        <then>
+          <expression>
+            <assign>
+              <xsl:sequence select="$value"/>
+              <xsl:sequence select="$arguments[2]"/>
+            </assign>
+          </expression>
+        </then>
+        <else>
+          <expression>
+            <assign>
+              <xsl:sequence select="$value"/>
+              <xsl:sequence select="subsequence($arguments, 3)"/>
+            </assign>
+          </expression>
+        </else>
+      </if>
+
+      <return>
+        <xsl:sequence select="$value"/>
+      </return>
+    </xsl:variable>
+
+    <xsl:sequence select="t:create-complex-expression($statements)"/>
   </xsl:template>
 
   <!--
@@ -752,7 +751,9 @@
         <xsl:sequence select="$var-decl/annotations"/>
         <xsl:sequence select="$type"/>
 
-        <var name="iterator" name-ref="{$iterator-var-id}"/>
+        <initialize>
+          <var name="iterator" name-ref="{$iterator-var-id}"/>
+        </initialize>
       </var-decl>
 
       <xsl:apply-templates mode="#current" select="block"/>
@@ -862,6 +863,7 @@
 
         <if>
           <xsl:sequence select="$new-condition"/>
+          
           <then>
             <break/>
           </then>

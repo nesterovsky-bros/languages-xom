@@ -75,6 +75,8 @@
     <operator name="shl-by" precedence="1" right-to-left="true"/>
     <operator name="shr-by" precedence="1" right-to-left="true"/>
     <operator name="sshr-by" precedence="1" right-to-left="true"/>
+
+    <operator name="lambda" precedence="0"/>
   </xsl:variable>
 
   <!--
@@ -443,6 +445,82 @@
         xs:QName('invalid-expression'),
         t:get-path(.)
       )"/>
+  </xsl:template>
+
+  <!--
+    Mode "t:expression". lambda.
+  -->
+  <xsl:template mode="t:expression" match="lambda">
+    <xsl:variable name="parameters" as="element()*"
+      select="parameters/parameter"/>
+    <xsl:variable name="block" as="element()?" select="block"/>
+    <xsl:variable name="expression" as="element()?" select="expression"/>
+
+    <xsl:if test="not($block) = not($expression)">
+      <xsl:sequence select="error(xs:QName('lambda-body'), t:get-path(.))"/>
+    </xsl:if>
+
+    <xsl:variable name="inferred" as="xs:boolean" 
+      select="exists($parameters[not(type)])"/>
+
+    <xsl:if test="$parameters[type] and $inferred">
+      <xsl:sequence select="
+        error(xs:QName('lambda-inconsistent-parameters'), t:get-path(.))"/>
+    </xsl:if>
+
+    <xsl:choose>
+      <xsl:when test="not($inferred)">
+        <xsl:sequence select="'('"/>
+        <xsl:sequence select="t:get-method-parameters(.)"/>
+        <xsl:sequence select="')'"/>
+      </xsl:when>
+      <xsl:when test="count($parameters) = 1">
+        <xsl:variable name="name" as="xs:string" select="$parameters/@name"/>
+
+        <xsl:sequence select="$name"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="tokens" as="item()*">
+          <xsl:for-each select="$parameters">
+            <xsl:variable name="name" as="xs:string" select="@name"/>
+
+            <xsl:sequence select="$name"/>
+
+            <xsl:if test="position() != last()">
+              <xsl:sequence select="','"/>
+            </xsl:if>
+
+            <xsl:sequence select="$t:terminator"/>
+          </xsl:for-each>
+        </xsl:variable>
+
+        <xsl:sequence select="'('"/>
+        <xsl:sequence select="
+          t:reformat-tokens($tokens, 5, ' ', $t:new-line, false(), false())"/>
+        <xsl:sequence select="')'"/>
+      </xsl:otherwise>
+    </xsl:choose>
+
+    <xsl:sequence select="' '"/>
+    <xsl:sequence select="'->'"/>
+    <xsl:sequence select="' '"/>
+
+    <xsl:choose>
+      <xsl:when test="$block">
+        <xsl:sequence select="$t:new-line"/>
+        <xsl:sequence select="'{'"/>
+        <xsl:sequence select="$t:new-line"/>
+        <xsl:sequence select="$t:indent"/>
+        <xsl:sequence select="t:get-comments($block)"/>
+        <xsl:sequence select="t:get-statement-scope($block)"/>
+        <xsl:sequence select="$t:unindent"/>
+        <xsl:sequence select="'}'"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence 
+          select="t:get-expression(t:get-java-element($expression))"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!--
@@ -1276,6 +1354,88 @@
     </xsl:variable>
 
     <xsl:sequence select="t:indent-from-second-line($tokens)"/>
+  </xsl:template>
+
+  <!--
+    Mode "t:expression". method-ref.
+  -->
+  <xsl:template mode="t:expression" match="method-ref">
+    <xsl:variable name="name" as="xs:string" select="@name"/>
+    <xsl:variable name="instance" as="element()?" select="instance"/>
+
+    <xsl:if test="$instance">
+      <xsl:sequence select="
+        t:get-expression
+        (
+          t:get-instance-expression(t:get-java-element($instance))
+        )"/>
+
+      <xsl:sequence select="'::'"/>
+    </xsl:if>
+
+    <xsl:sequence select="t:get-generic-type-list(.)"/>
+    <xsl:sequence select="$name"/>
+  </xsl:template>
+
+  <!--
+    Mode "t:expression". static-method-ref.
+  -->
+  <xsl:template mode="t:expression" match="static-method-ref">
+    <xsl:variable name="name" as="xs:string" select="@name"/>
+    <xsl:variable name="type" as="element()?" select="type"/>
+    <xsl:variable name="instance" as="element()?" select="value"/>
+
+    <xsl:choose>
+      <xsl:when test="exists($type) and exists($instance)">
+        <xsl:sequence select="error(xs:QName('invalid-static-invoke'))"/>
+      </xsl:when>
+      <xsl:when test="exists($type)">
+        <xsl:sequence select="t:get-type($type)"/>
+        <xsl:sequence select="'::'"/>
+      </xsl:when>
+      <xsl:when test="exists($instance)">
+        <xsl:variable name="tokens" as="item()+"
+          select="t:get-expression(t:get-java-element($instance))"/>
+
+        <xsl:if test="$tokens">
+          <xsl:sequence select="$tokens"/>
+          <xsl:sequence select="'::'"/>
+        </xsl:if>
+      </xsl:when>
+    </xsl:choose>
+
+    <xsl:sequence select="t:get-generic-type-list(.)"/>
+    <xsl:sequence select="$name"/>
+  </xsl:template>
+
+  <!--
+    Mode "t:expression". constructor-ref.
+  -->
+  <xsl:template mode="t:expression" match="constructor-ref">
+    <xsl:variable name="type" as="element()?" select="type"/>
+    <xsl:variable name="instance" as="element()?" select="value"/>
+
+    <xsl:choose>
+      <xsl:when test="exists($type) and exists($instance)">
+        <xsl:sequence select="error(xs:QName('invalid-static-invoke'))"/>
+      </xsl:when>
+      <xsl:when test="exists($type)">
+        <xsl:sequence select="t:get-type($type)"/>
+        <xsl:sequence select="'::'"/>
+      </xsl:when>
+      <xsl:when test="exists($instance)">
+        <xsl:variable name="tokens" as="item()+"
+          select="t:get-expression(t:get-java-element($instance))"/>
+
+        <xsl:if test="$tokens">
+          <xsl:sequence select="$tokens"/>
+          <xsl:sequence select="'::'"/>
+        </xsl:if>
+      </xsl:when>
+    </xsl:choose>
+
+    <xsl:sequence select="t:get-generic-type-list(.)"/>
+    <xsl:sequence select="'new'"/>
   </xsl:template>
 
   <!--

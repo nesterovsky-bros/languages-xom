@@ -1,20 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns="http://www.bphx.com/java-1.5/2008-02-07"
-           targetNamespace="http://www.bphx.com/java-1.5/2008-02-07"
-           elementFormDefault="qualified">
+  xmlns="http://www.bphx.com/java-1.5/2008-02-07"
+  targetNamespace="http://www.bphx.com/java-1.5/2008-02-07"
+  elementFormDefault="qualified">
   <xs:annotation>
-    <xs:documentation><![CDATA[
-      $Id$
-
+    <xs:documentation xml:space="preserve">
       This xml flavour of java grammar is derived from
       a Java 1.5 grammar for ANTLR v3 derived from the spec.
-    ]]></xs:documentation>
+      
+      Additions to the grammar has been made to support java 7 features:
+        Binary Literals (*) - http://docs.oracle.com/javase/8/docs/technotes/guides/language/binary-literals.html
+        Underscores in Numeric Literals (*) - http://docs.oracle.com/javase/8/docs/technotes/guides/language/underscores-literals.html
+
+        The try-with-resources Statement - http://docs.oracle.com/javase/8/docs/technotes/guides/language/try-with-resources.html 
+        Catching Multiple Exception Types and Rethrowing Exceptions with Improved Type Checking - http://docs.oracle.com/javase/8/docs/technotes/guides/language/catch-multiple.html
+        
+        (*) literals in jxom are prinited as is, and are not validated in most cases.
+            In cases where literal is evaluated, decimal literals without underscores are expected.
+
+      Additions to the grammar has been made to support java 8 features:
+        Lambda Expressions - http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html
+        Method References - http://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html
+        Default Methods - http://docs.oracle.com/javase/tutorial/java/IandI/defaultmethods.html
+    </xs:documentation>
   </xs:annotation>
 
   <xs:simpleType name="ids">
     <xs:annotation>
-      <xs:documentation>
+      <xs:documentation xml:space="preserve">
         A list of ids.
       </xs:documentation>
     </xs:annotation>
@@ -24,7 +37,7 @@
   <xs:attributeGroup name="name-id">
     <xs:attribute name="name-id" type="ids" use="optional">
       <xs:annotation>
-        <xs:documentation>
+        <xs:documentation xml:space="preserve">
           A name id used for the name normalization.
         </xs:documentation>
       </xs:annotation>
@@ -34,7 +47,7 @@
   <xs:attributeGroup name="name-ref">
     <xs:attribute name="name-ref" type="xs:string" use="optional">
       <xs:annotation>
-        <xs:documentation>
+        <xs:documentation xml:space="preserve">
           A name ref used for the name normalization.
         </xs:documentation>
       </xs:annotation>
@@ -45,7 +58,7 @@
 
   <xs:complexType name="meta" mixed="true">
     <xs:annotation>
-      <xs:documentation>
+      <xs:documentation xml:space="preserve">
         Meta information, allowing to attach custom information to any element.
       </xs:documentation>
     </xs:annotation>
@@ -53,14 +66,14 @@
       <!--
       <xs:element ref="type">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Defines a compile time expression type.
           </xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element name="value" type="unary-expression">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Defines a compile time expression value.
           </xs:documentation>
         </xs:annotation>
@@ -75,7 +88,7 @@
 
   <xs:complexType name="comment" mixed="true">
     <xs:annotation>
-      <xs:documentation>
+      <xs:documentation xml:space="preserve">
         Comment. It can be attached to most elements.
       </xs:documentation>
     </xs:annotation>
@@ -109,7 +122,7 @@
 
   <xs:complexType name="java-element" abstract="true">
     <xs:annotation>
-      <xs:documentation>
+      <xs:documentation xml:space="preserve">
         Base element of the java object model.
       </xs:documentation>
     </xs:annotation>
@@ -122,15 +135,15 @@
 
   <xs:element name="unit" type="compilationUnit">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         Starting point for parsing a java file.
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
   </xs:element>
 
   <xs:complexType name="compilationUnit">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         compilationUnit
         :	annotations?
         packageDeclaration?
@@ -141,7 +154,7 @@
         packageDeclaration
         :	'package' qualifiedName ';'
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="java-element">
@@ -164,11 +177,11 @@
 
   <xs:complexType name="importDeclaration">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         importDeclaration
         :	'import' 'static'? Identifier ('.' Identifier)* ('.' '*')? ';'
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="java-element">
@@ -177,10 +190,10 @@
         </xs:sequence>
         <xs:attribute name="static" type="xs:boolean"
           default="false" use="optional"/>
-        
+
         <xs:attribute name="name" type="Identifier" use="optional">
           <xs:annotation>
-            <xs:documentation>
+            <xs:documentation xml:space="preserve">
               Static member name.
             </xs:documentation>
           </xs:annotation>
@@ -208,7 +221,7 @@
 
   <xs:complexType name="typeDeclaration" abstract="true">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         typeDeclaration
         :	classOrInterfaceDeclaration
         |   ';'
@@ -227,7 +240,7 @@
         :	normalInterfaceDeclaration
         | annotationTypeDeclaration
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="memberDecl"/>
@@ -268,14 +281,14 @@
 
   <xs:complexType name="classDeclaration">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         normalClassDeclaration
         :	'class' Identifier (typeParameters)?
         ('extends' type)?
         ('implements' typeList)?
         classBody
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="typeDeclaration">
@@ -291,11 +304,11 @@
 
   <xs:complexType name="enumDeclaration">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         enumDeclaration
         :	ENUM Identifier ('implements' typeList)? enumBody
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="typeDeclaration">
@@ -309,12 +322,12 @@
 
   <xs:complexType name="interfaceDeclaration">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         normalInterfaceDeclaration
         :	'interface' Identifier typeParameters?
           ('extends' typeList)? interfaceBody
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="typeDeclaration">
@@ -329,11 +342,11 @@
 
   <xs:complexType name="annotationDeclaration">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         annotationTypeDeclaration
         :	'@' 'interface' Identifier annotationTypeBody
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="typeDeclaration">
@@ -404,7 +417,7 @@
 
   <xs:complexType name="typeParameter">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         typeParameters
         :	'&lt;' typeParameter (',' typeParameter)* '&gt;'
         ;
@@ -416,7 +429,7 @@
         bound
         :	type ('&amp;' type)*
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="java-element">
@@ -451,11 +464,11 @@
 
   <xs:group name="enumBody">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         enumBody
         :	'{' enumConstants? ','? enumBodyDeclarations? '}'
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:sequence>
       <xs:element ref="constant" minOccurs="0" maxOccurs="unbounded"/>
@@ -465,7 +478,7 @@
 
   <xs:complexType name="enumConstant">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         enumConstants
         :	enumConstant (',' enumConstant)*
         ;
@@ -473,7 +486,7 @@
         enumConstant
         :	annotations? Identifier (arguments)? (classBody)?
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="java-element">
@@ -491,11 +504,11 @@
 
   <xs:group name="enumBodyDeclarations">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         enumBodyDeclarations
         :	';' (classBodyDeclaration)*
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:sequence>
       <xs:group ref="classBodyDeclaration"
@@ -517,11 +530,11 @@
 
   <xs:group name="typeList">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         typeList
         :	type (',' type)*
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:sequence>
       <xs:element ref="types" minOccurs="0" maxOccurs="1"/>
@@ -530,11 +543,11 @@
 
   <xs:group name="classBody">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         classBody
         :	'{' classBodyDeclaration* '}'
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:sequence>
       <xs:group ref="classBodyDeclaration"
@@ -544,11 +557,11 @@
 
   <xs:group name="interfaceBody">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         interfaceBody
         :	'{' interfaceBodyDeclaration* '}'
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:sequence>
       <xs:group ref="interfaceBodyDeclaration"
@@ -565,19 +578,20 @@
 
   <xs:group name="classBodyDeclaration">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         classBodyDeclaration
         :	';'
         |	'static'? block
         |	modifier* memberDecl
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:choice>
       <xs:element ref="class-members"/>
       <xs:element name="snippet-member" type="snippetMember"/>
       <xs:element ref="class-snippet-member"/>
       <xs:element ref="class-initializer"/>
+      <xs:element name="method" type="methodDeclaration"/>
       <xs:element ref="class-method"/>
       <xs:element ref="constructor"/>
       <xs:element name="field" type="fieldDeclaration"/>
@@ -611,7 +625,7 @@
 
   <xs:complexType name="memberDecl" abstract="true">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         memberDecl
         :	genericMethodOrConstructorDecl
         |	methodDeclaration
@@ -671,7 +685,7 @@
         |	'=' variableInitializer
         |
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="java-element">
@@ -730,7 +744,7 @@
 
   <xs:group name="interfaceBodyDeclaration">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         interfaceBodyDeclaration
         :	modifier* interfaceMemberDecl
         |   ';'
@@ -743,7 +757,7 @@
         |   interfaceDeclaration
         |   classDeclaration
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:choice>
       <xs:element ref="interface-members"/>
@@ -790,6 +804,7 @@
           <xs:group ref="returns"/>
           <xs:group ref="parameters"/>
           <xs:group ref="throws"/>
+          <xs:group ref="methodBody" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -810,12 +825,12 @@
 
   <xs:group name="variableInitializer">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         variableInitializer
         :	arrayInitializer
         |   expression
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:choice>
       <xs:group ref="expression"/>
@@ -825,11 +840,11 @@
 
   <xs:complexType name="arrayInitializer">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         arrayInitializer
         :	'{' (variableInitializer (',' variableInitializer)* (',')? )? '}'
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="java-element">
@@ -879,7 +894,7 @@
 
   <xs:attributeGroup name="modifiers">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         modifier
         :   annotation
         |   'public'
@@ -894,7 +909,7 @@
         |   'volatile'
         |   'strictfp'
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:attribute name="access" type="accessSpecifier"
       default="package" use="optional"/>
@@ -933,22 +948,22 @@
 
   <xs:simpleType name="packageOrTypeName">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         packageOrTypeName
         :	Identifier ('.' Identifier)*
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string"/>
   </xs:simpleType>
 
   <xs:simpleType name="enumConstantName">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         enumConstantName
         :   Identifier
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string"/>
   </xs:simpleType>
@@ -957,13 +972,13 @@
 
   <xs:complexType name="type">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         type
         :	Identifier (typeArguments)?
           ('.' Identifier (typeArguments)? )* ('[' ']')*
         |	primitiveType ('[' ']')*
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="java-element">
@@ -971,7 +986,7 @@
           <xs:element name="argument" type="typeArgument"
             minOccurs="0" maxOccurs="unbounded">
             <xs:annotation>
-              <xs:documentation>
+              <xs:documentation xml:space="preserve">
                 Type arguments.
               </xs:documentation>
             </xs:annotation>
@@ -979,7 +994,7 @@
           
           <xs:element ref="type" minOccurs="0">
             <xs:annotation>
-              <xs:documentation>
+              <xs:documentation xml:space="preserve">
                 Container type.
               </xs:documentation>
             </xs:annotation>
@@ -988,7 +1003,7 @@
         <xs:attribute name="package" type="packageOrTypeName" use="optional"/>
         <xs:attribute name="name" use="optional">
           <xs:annotation>
-            <xs:documentation>
+            <xs:documentation xml:space="preserve">
               Optional in case of import.
             </xs:documentation>
           </xs:annotation>
@@ -1000,7 +1015,7 @@
         <xs:attributeGroup ref="name-id"/>
         <xs:attribute name="arity" type="xs:int" default="0" use="optional">
           <xs:annotation>
-            <xs:documentation>
+            <xs:documentation xml:space="preserve">
               Defines array's arity. 
               Default 0, which means a scalar value.
             </xs:documentation>
@@ -1012,7 +1027,7 @@
 
   <xs:simpleType name="primitiveType">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         primitiveType
         :   'boolean'
         |	'char'
@@ -1023,7 +1038,7 @@
         |	'float'
         |	'double'
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
       <xs:enumeration value="boolean"/>
@@ -1040,7 +1055,7 @@
 
   <xs:complexType name="typeArgument">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         typeArguments
         :	'&lt;' typeArgument (',' typeArgument)* '&gt;'
         ;
@@ -1049,7 +1064,7 @@
         :	type
         |	'?' (('extends' | 'super') type)?
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="java-element">
@@ -1081,7 +1096,7 @@
 
   <xs:complexType name="formalParameters">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         formalParameters
         :	'(' formalParameterDecls? ')'
         ;
@@ -1103,13 +1118,13 @@
         :	'final'
         |   annotation
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="java-element">
         <xs:sequence>
           <xs:element name="parameter" type="formalParameter"
-            minOccurs="1" maxOccurs="unbounded"/>
+            minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="vararg" type="xs:boolean"
           default="false" use="optional"/>
@@ -1132,8 +1147,61 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:element name="returns" type="returns"/>
+  <xs:group name="lambda-parameters">
+    <xs:sequence>
+      <xs:element name="parameters" type="lambda-parameters"/>
+    </xs:sequence>
+  </xs:group>
 
+  <xs:group name="lambda-body">
+    <xs:choice>
+      <xs:element ref="block"/>
+      <xs:element ref="expression"/>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="lambda-parameters">
+    <xs:annotation>
+      <xs:documentation xml:space="preserve">
+      lambdaParameters 
+      :	Identifier 
+      |	'(' formalParameterList? ')' 
+      |	'(' inferredFormalParameterList ')' 
+      ; 
+ 
+      inferredFormalParameterList 
+      :	Identifier (',' Identifier)* 
+      ; 
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:element name="parameter" type="lambda-parameter"
+            minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="vararg" type="xs:boolean"
+          default="false" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="lambda-parameter">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:group ref="annotations"/>
+          <xs:element ref="type" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="Identifier" use="required"/>
+        <xs:attributeGroup ref="name-id"/>
+        <xs:attribute name="final" type="xs:boolean"
+          default="false" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="returns" type="returns"/>
 
   <xs:group name="returns">
     <xs:sequence>
@@ -1153,11 +1221,11 @@
 
   <xs:group name="methodBody">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         methodBody
         :	block
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:sequence>
       <xs:element name="block" type="block"/>
@@ -1166,7 +1234,7 @@
 
   <xs:simpleType name="qualifiedName">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         qualifiedNameList
         :	qualifiedName (',' qualifiedName)*
         ;
@@ -1174,14 +1242,14 @@
         qualifiedName
         :	Identifier ('.' Identifier)*
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string"/>
   </xs:simpleType>
 
   <xs:complexType name="literal-expression">
     <xs:annotation>
-      <xs:documentation>
+      <xs:documentation xml:space="preserve">
         A value is specified either as text or as "value" attribute.
       </xs:documentation>
     </xs:annotation>
@@ -1216,7 +1284,7 @@
 
   <xs:complexType name="annotation">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         // ANNOTATIONS
 
         annotations
@@ -1230,7 +1298,7 @@
         annotationName
         : Identifier ('.' Identifier)*
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="java-element">
@@ -1245,7 +1313,7 @@
 
   <xs:complexType name="elementValuePair">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         elementValuePairs
         : elementValuePair (',' elementValuePair)*
         ;
@@ -1253,7 +1321,7 @@
         elementValuePair
         : (Identifier '=')? elementValue
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="java-element">
@@ -1272,13 +1340,13 @@
 
   <xs:group name="elementValue">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         elementValue
         :	conditionalExpression
         |   annotation
         |   elementValueArrayInitializer
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:choice>
       <xs:group ref="expression"/>
@@ -1290,11 +1358,11 @@
 
   <xs:complexType name="elementValueArrayInitializer">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         elementValueArrayInitializer
         :	'{' (elementValue (',' elementValue )*)? '}'
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="java-element">
@@ -1307,7 +1375,7 @@
 
   <xs:group name="annotationTypeBody">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         annotationTypeBody
         :	'{' (annotationTypeElementDeclarations)? '}'
         ;
@@ -1316,7 +1384,7 @@
         :	(annotationTypeElementDeclaration)
           (annotationTypeElementDeclaration)*
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:sequence>
       <xs:group ref="annotationTypeElementDeclaration"
@@ -1331,7 +1399,7 @@
 
   <xs:group name="annotationTypeElementDeclaration">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         annotationTypeElementDeclaration
         :	(modifier)* annotationTypeElementRest
         ;
@@ -1352,7 +1420,7 @@
         annotationConstantRest
         :	variableDeclarators
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:choice>
       <xs:element ref="annotation-members"/>
@@ -1378,7 +1446,7 @@
   </xs:complexType>
   <xs:complexType name="annotationMethodDeclaration">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         annotationMethodRest
         :	Identifier '(' ')' (defaultValue)?
         ;
@@ -1386,7 +1454,7 @@
         defaultValue
         :	'default' elementValue
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="memberDecl">
@@ -1410,13 +1478,13 @@
 
   <xs:complexType name="block">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         // STATEMENTS / BLOCKS
 
         block
         :	'{' blockStatement* '}'
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="java-element">
@@ -1449,7 +1517,7 @@
 
   <xs:group name="statement">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         blockStatement
         :	localVariableDeclaration
         |	classOrInterfaceDeclaration
@@ -1478,7 +1546,7 @@
         | statementExpression ';'
         | Identifier ':' statement
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:choice>
       <xs:element ref="scope"/>
@@ -1509,8 +1577,7 @@
 
   <xs:complexType name="localVariableDeclaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
         localVariableDeclaration
         :	variableModifier* type variableDeclarators ';'
         ;
@@ -1519,7 +1586,6 @@
         :	'final'
         |   annotation
         ;
-      ]]>
       </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
@@ -1544,7 +1610,7 @@
 
         <xs:attribute name="label-id" type="xs:string" use="optional">
           <xs:annotation>
-            <xs:documentation>
+            <xs:documentation xml:space="preserve">
               Optional label id.
             </xs:documentation>
           </xs:annotation>
@@ -1636,7 +1702,7 @@
 
   <xs:complexType name="forStatement">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         statement
         | 'for' '(' forControl ')' statement
 
@@ -1671,7 +1737,7 @@
         forUpdate
         :	expressionList
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="statement">
@@ -1727,7 +1793,7 @@
 
   <xs:complexType name="forEachStatement">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         statement
         | 'for' '(' forControl ')' statement
 
@@ -1743,7 +1809,7 @@
         forVarControl
         :	variableModifier* type Identifier ':' expression
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="statement">
@@ -1815,8 +1881,7 @@
 
   <xs:complexType name="tryStatement">
     <xs:annotation>
-      <xs:documentation>
-  <![CDATA[
+      <xs:documentation xml:space="preserve">
         statement
         | 'try' resourceSpecification? block
         (	catches 'finally' block
@@ -1847,7 +1912,7 @@
         catchType:
           classType
           classType '|' catchType;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="statement">
@@ -1926,7 +1991,7 @@
 
   <xs:complexType name="switchStatement">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         statement
         : 'switch' parExpression '{' switchBlockStatementGroups '}'
         ;
@@ -1944,7 +2009,7 @@
         |   'case' enumConstantName ':'
         |   'default' ':'
         ;
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="statement">
@@ -2040,7 +2105,7 @@
 
         <xs:attribute name="label-ref" type="xs:string" use="optional">
           <xs:annotation>
-            <xs:documentation>
+            <xs:documentation xml:space="preserve">
               Optional label reference.
             </xs:documentation>
           </xs:annotation>
@@ -2057,7 +2122,7 @@
 
         <xs:attribute name="label-ref" type="xs:string" use="optional">
           <xs:annotation>
-            <xs:documentation>
+            <xs:documentation xml:space="preserve">
               Optional label reference.
             </xs:documentation>
           </xs:annotation>
@@ -2127,13 +2192,11 @@
 
   <xs:complexType name="cast-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
         castExpression
         :  '(' primitiveType ')' unaryExpression
         |  '(' (type | expression) ')' unaryExpressionNotPlusMinus
         ;
-      ]]>
       </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
@@ -2148,10 +2211,8 @@
 
   <xs:complexType name="outer-type-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
         'this' ('.' Identifier)*
-      ]]>
       </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
@@ -2196,13 +2257,11 @@
 
   <xs:complexType name="constructor-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
         'this' arguments
         | 'super' arguments
         | 'this' ('.' Identifier)* '.' ('this'|'super') arguments
         ;
-      ]]>
       </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
@@ -2248,8 +2307,7 @@
 
   <xs:complexType name="new-array-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
         primary
         :
         |   'new' creator
@@ -2272,7 +2330,6 @@
         |   expression ']' ('[' expression ']')* ('[' ']')*
         )
         ;
-      ]]>
       </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
@@ -2298,8 +2355,7 @@
 
   <xs:complexType name="new-object-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
         primary
         :
         |   'new' creator
@@ -2330,7 +2386,6 @@
         innerCreator
         :	Identifier nonWildcardTypeArgumentsOrDiamond? classCreatorRest
         ;
-      ]]>
       </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
@@ -2405,14 +2460,56 @@
     </xs:complexContent>
   </xs:complexType>
 
+  <xs:complexType name="method-ref-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:group ref="typeList"/>
+          <xs:element name="instance" type="unary-expression"
+            minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="Identifier" use="required"/>
+        <xs:attributeGroup ref="name-ref"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="static-method-ref-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:group ref="typeList"/>
+          <xs:choice minOccurs="0" maxOccurs="1">
+            <xs:element ref="type"/>
+            <xs:element name="instance" type="unary-expression"/>
+          </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="name" type="Identifier" use="required"/>
+        <xs:attributeGroup ref="name-ref"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="constructor-ref-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:group ref="typeList"/>
+          <xs:choice minOccurs="0" maxOccurs="1">
+            <xs:element ref="type"/>
+            <xs:element name="instance" type="unary-expression"/>
+          </xs:choice>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="arguments">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
         arguments
         :	'(' expressionList? ')'
         ;
-      ]]>
       </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
@@ -2424,9 +2521,20 @@
     </xs:complexContent>
   </xs:complexType>
 
+  <xs:complexType name="lambda-expression">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:group ref="lambda-parameters" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:group ref="lambda-body"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:element name="scope-expression" type="expression">
     <xs:annotation>
-      <xs:documentation>
+      <xs:documentation xml:space="preserve">
         Logically scopes an expression.
       </xs:documentation>
     </xs:annotation>
@@ -2486,20 +2594,24 @@
   <xs:element name="static-field" type="static-field-reference-expression"/>
   <xs:element name="invoke" type="invoke-expression"/>
   <xs:element name="static-invoke" type="static-invoke-expression"/>
+  <xs:element name="method-ref" type="method-ref-expression"/>
+  <xs:element name="static-method-ref" type="static-method-ref-expression"/>
+  <xs:element name="constructor-ref" type="constructor-ref-expression"/>
   <xs:element name="postfix-inc" type="unary-expression"/>
   <xs:element name="postfix-dec" type="unary-expression"/>
   <xs:element name="subscript" type="binary-expression"/>
+  <xs:element name="lambda" type="lambda-expression"/>
 
   <xs:group name="expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
       constantExpression
       :	expression
       ;
 
       expression
-      :	conditionalExpression (assignmentOperator expression)?
+      :	conditionalExpression (assignmentOperator expression)? |
+        lambdaExpression
       ;
 
       assignmentOperator
@@ -2684,7 +2796,15 @@
       :   'true'
       |   'false'
       ;
-    ]]>
+      
+      lambdaExpression 
+      :	lambdaParameters '->' lambdaBody 
+      ; 
+
+      lambdaBody 
+      :	expression 
+      |	block 
+      ; 
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2718,6 +2838,9 @@
       <xs:element ref="static-field"/>
       <xs:element ref="invoke"/>
       <xs:element ref="static-invoke"/>
+      <xs:element ref="method-ref"/>
+      <xs:element ref="static-method-ref"/>
+      <xs:element ref="constructor-ref"/>
       <xs:element ref="postfix-inc"/>
       <xs:element ref="postfix-dec"/>
       <xs:element ref="subscript"/>
@@ -2774,17 +2897,17 @@
       <xs:element ref="shl-by"/>
       <xs:element ref="shr-by"/>
       <xs:element ref="sshr-by"/>
+
+      <xs:element ref="lambda"/>
     </xs:choice>
   </xs:group>
 
   <xs:group name="expressionList">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
         expressionList
         :   expression (',' expression)*
         ;
-      ]]>
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2794,9 +2917,9 @@
 
   <xs:simpleType name="Identifier">
     <xs:annotation>
-      <xs:documentation><![CDATA[
+      <xs:documentation xml:space="preserve">
         Letter (Letter|JavaIDDigit)*
-      ]]></xs:documentation>
+      </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string"/>
   </xs:simpleType>

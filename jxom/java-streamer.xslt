@@ -453,11 +453,11 @@
 
   <!-- Line breakers, used in t:get-breaker() function. -->
   <xsl:variable name="t:line-breakers" as="xs:string*"
-    select="'=', '(', '.', ' ', ':', ',', ';', '>'"/>
+    select="'=', '(', '.', '::', ' ', ':', ',', ';', '>', '->'"/>
 
   <!-- Line breaker priorities, used in t:get-breaker() function. -->
   <xsl:variable name="t:line-breaker-priorities" as="xs:integer*"
-    select="15,   5,   0,   0,   15,   5,   15,   2"/>
+    select="15,   5,   0,   0,    0,   15,  5,   15,  2,  15"/>
 
   <!--
     Gets a position of code line breaker.

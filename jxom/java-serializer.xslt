@@ -2,8 +2,6 @@
 <!--
   This stylesheet serializes java xml object model document down to
   the java text.
-
-  $Id$
  -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -618,10 +616,12 @@
         (
           comment or
           self::interface-members or $previous/self::interface-members or
+          self::method/block or self::interface-method/block or
+          $previous/self::method/block or $previous/self::interface-method/block or
           not
           (
             (self::field or self::class-field) and
-            $previous[self::field or self::class-field] and
+            $previous[self::field or self::interface-field] and
             (@access = $previous/@access) or
             empty(@access) and empty($previous/@access)
           )
@@ -796,11 +796,10 @@
 
     <xsl:variable name="type-parameters" as="element()?"
       select="$element/type-parameters"/>
+    <xsl:variable name="parameters" as="element()*"
+      select="$type-parameters/parameter"/>
 
-    <xsl:if test="$type-parameters">
-      <xsl:variable name="parameters" as="element()+"
-        select="$type-parameters/parameter"/>
-
+    <xsl:if test="$parameters">
       <xsl:sequence select="'&lt;'"/>
 
       <xsl:for-each select="$parameters">
@@ -1077,11 +1076,19 @@
     <xsl:sequence select="t:get-comments(.)"/>
     <xsl:sequence select="t:get-annotations(., false())"/>
 
+    <xsl:variable name="static" as="xs:boolean?" select="@static"/>
+    <xsl:variable name="body" as="element()?" 
+      select="(block, $t:empty-block[$static])[1]"/>
     <xsl:variable name="throws" as="item()*" select="t:get-throws(.)"/>
 
     <xsl:variable name="name" as="xs:string" select="@name"/>
     <xsl:variable name="type-parameters" as="item()*"
       select="t:get-type-parameters(.)"/>
+
+    <xsl:if test="$body and not($static)">
+      <xsl:sequence select="'default'"/>
+      <xsl:sequence select="' '"/>
+    </xsl:if>
 
     <xsl:sequence select="t:get-modifiers(.)"/>
 
@@ -1100,7 +1107,7 @@
       <xsl:sequence select="t:get-method-parameters(.)"/>
       <xsl:sequence select="')'"/>
 
-      <xsl:if test="empty($throws)">
+      <xsl:if test="empty($throws) and empty($body)">
         <xsl:sequence select="';'"/>
       </xsl:if>
     </xsl:variable>
@@ -1122,11 +1129,17 @@
       <xsl:sequence select="$t:indent"/>
 
       <xsl:sequence select="$throws"/>
-      <xsl:sequence select="';'"/>
+
+      <xsl:if test="empty($body)">
+        <xsl:sequence select="';'"/>
+      </xsl:if>
+
       <xsl:sequence select="$t:new-line"/>
 
       <xsl:sequence select="$t:unindent"/>
     </xsl:if>
+
+    <xsl:sequence select="$body/t:get-block(.)"/>
   </xsl:template>
 
   <!--
@@ -1285,7 +1298,7 @@
     Mode "t:classBodyDeclaration". Class method.
   -->
   <xsl:template mode="t:classBodyDeclaration"
-    match="class-method">
+    match="method | class-method">
     <xsl:sequence select="t:get-comments(.)"/>
     <xsl:sequence select="t:get-annotations(., false())"/>
 
@@ -1441,53 +1454,50 @@
 
     <xsl:variable name="parameters" as="element()?"
       select="$element/parameters"/>
+    <xsl:variable name="vararg" as="xs:boolean?"
+      select="$parameters/@vararg"/>
+    <xsl:variable name="formal-parameters" as="element()*"
+      select="$parameters/parameter"/>
 
-    <xsl:if test="$parameters">
-      <xsl:variable name="vararg" as="xs:boolean?"
-        select="$parameters/@vararg"/>
-      <xsl:variable name="formal-parameters" as="element()+"
-        select="$parameters/parameter"/>
+    <xsl:variable name="tokens" as="item()*">
+      <xsl:for-each select="$formal-parameters">
+        <xsl:variable name="name" as="xs:string" select="@name"/>
+        <xsl:variable name="final" as="xs:boolean?" select="@final"/>
+        <xsl:variable name="type" as="element()" select="type"/>
 
-      <xsl:variable name="tokens" as="item()*">
-        <xsl:for-each select="$formal-parameters">
-          <xsl:variable name="name" as="xs:string" select="@name"/>
-          <xsl:variable name="final" as="xs:boolean?" select="@final"/>
-          <xsl:variable name="type" as="element()" select="type"/>
+        <xsl:sequence select="t:get-annotations(., true())"/>
 
-          <xsl:sequence select="t:get-annotations(., true())"/>
-
-          <xsl:if test="$final">
-            <xsl:sequence select="'final'"/>
-            <xsl:sequence select="' '"/>
-          </xsl:if>
-
-          <xsl:choose>
-            <xsl:when test="$vararg">
-              <xsl:variable name="arity" as="xs:integer"
-                select="$type/@arity"/>
-
-              <xsl:sequence select="t:get-type($type, $arity - 1)"/>
-              <xsl:sequence select="'...'"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:sequence select="t:get-type($type)"/>
-            </xsl:otherwise>
-          </xsl:choose>
-
+        <xsl:if test="$final">
+          <xsl:sequence select="'final'"/>
           <xsl:sequence select="' '"/>
-          <xsl:sequence select="$name"/>
+        </xsl:if>
 
-          <xsl:if test="position() != last()">
-            <xsl:sequence select="','"/>
-          </xsl:if>
+        <xsl:choose>
+          <xsl:when test="(position() = last()) and $vararg">
+            <xsl:variable name="arity" as="xs:integer"
+              select="$type/@arity"/>
 
-          <xsl:sequence select="$t:terminator"/>
-        </xsl:for-each>
-      </xsl:variable>
+            <xsl:sequence select="t:get-type($type, $arity - 1)"/>
+            <xsl:sequence select="'...'"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:sequence select="t:get-type($type)"/>
+          </xsl:otherwise>
+        </xsl:choose>
 
-      <xsl:sequence select="
-        t:reformat-tokens($tokens, 3, ' ', $t:new-line, false(), false())"/>
-    </xsl:if>
+        <xsl:sequence select="' '"/>
+        <xsl:sequence select="$name"/>
+
+        <xsl:if test="position() != last()">
+          <xsl:sequence select="','"/>
+        </xsl:if>
+
+        <xsl:sequence select="$t:terminator"/>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:sequence select="
+      t:reformat-tokens($tokens, 3, ' ', $t:new-line, false(), false())"/>
   </xsl:function>
 
   <!--
@@ -1785,5 +1795,10 @@
         ''
       )"/>
   </xsl:function>
+  
+  <!-- An empty block.-->
+  <xsl:variable name="t:empty-block">
+    <block/>
+  </xsl:variable>
 
 </xsl:stylesheet>

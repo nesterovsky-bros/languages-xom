@@ -617,7 +617,7 @@
     <xsl:variable name="initialize" as="element()*"
       select="var-decl | initialize"/>
     <xsl:variable name="condition" as="element()?"
-      select="t:get-java-element(condition)"/>
+      select="condition/t:get-java-element(.)"/>
     <xsl:variable name="update" as="element()*" select="update"/>
     <xsl:variable name="block" as="element()" select="block"/>
 
@@ -684,7 +684,7 @@
     <xsl:sequence select="$condition-unreachable"/>
     
     <xsl:variable name="false-condition" as="xs:boolean" 
-      select="t:is-boolean-false-expression($condition)"/>
+      select="($condition/t:is-boolean-false-expression(.), true())[1]"/>
     
     <xsl:choose>
       <xsl:when test="

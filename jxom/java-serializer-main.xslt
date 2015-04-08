@@ -17,17 +17,22 @@
   <xsl:include href="java-qualified-name-normalizer.xslt"/>
   <xsl:include href="java-name-normalizer.xslt"/>
   <xsl:include href="java-optimizer.xslt"/>
+  <xsl:include href="java-complex-expression.xslt"/>
   <xsl:include href="java-optimize-unreacable-code.xslt"/>
 
   <xsl:output byte-order-mark="no" encoding="utf-8" method="text"/>
 
   <!-- Entry point. -->
   <xsl:template match="/unit">
+    
+    <xsl:variable name="unit-0" as="element()" select="
+      t:refactor-statements-with-complex-expressions(.)"/>
+
     <xsl:variable name="unit-1" as="element()" select="
-      if (t:is-name-normalization-required(.)) then
-        t:normalize-names(., ())
+      if (t:is-name-normalization-required($unit-0)) then
+        t:normalize-names($unit-0, ())
       else
-        ."/>
+        $unit-0"/>
 
     <xsl:message select="$unit-1"/>
 

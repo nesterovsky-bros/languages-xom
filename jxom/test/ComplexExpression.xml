@@ -1,0 +1,656 @@
+<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/java-1.5/2008-02-07">
+  <class name="test">
+    <class-method name="test1">
+      <returns>
+        <type name="int"/>
+      </returns>
+      <parameters>
+        <parameter name="var" name-id="p">
+          <type name="int"/>
+        </parameter>
+      </parameters>
+      <block>
+        <var-decl name="i">
+          <type name="int"/>
+          <initialize>
+            <static-invoke name="get">
+              <type name="Supplier" package="com.nesterovskyBros"/>
+              <arguments>
+                <lambda>
+                  <block>
+                    <var-decl name="j">
+                      <type name="int"/>
+                    </var-decl>
+
+                    <expression>
+                      <assign>
+                        <var name="j"/>
+                        <invoke name="f"/>
+                      </assign>
+                    </expression>
+
+                    <return>
+                      <var name="j"/>
+                    </return>
+                  </block>
+                </lambda>
+              </arguments>
+            </static-invoke>
+          </initialize>
+        </var-decl>
+
+        <expression>
+          <assign>
+            <var name="a"/>
+            <static-invoke name="get">
+              <type name="Supplier" package="com.nesterovskyBros"/>
+              <arguments>
+                <lambda>
+                  <block>
+                    <var-decl name="b">
+                      <type name="int"/>
+                      <initialize>
+                        <int value="7"/>
+                      </initialize>
+                    </var-decl>
+
+                    <return>
+                      <var name="b"/>
+                    </return>
+                  </block>
+                </lambda>
+              </arguments>
+            </static-invoke>
+          </assign>
+        </expression>
+
+        <assert>
+          <condition>
+            <var name="x"/>
+          </condition>
+          <message>
+            <string value="123"/>
+          </message>
+        </assert>
+
+        <assert>
+          <condition>
+            <static-invoke name="get">
+              <type name="Supplier" package="com.nesterovskyBros"/>
+              <arguments>
+                <lambda>
+                  <block>
+                    <var-decl name="b">
+                      <type name="int"/>
+                      <initialize>
+                        <int value="7"/>
+                      </initialize>
+                    </var-decl>
+
+                    <return>
+                      <var name="b"/>
+                    </return>
+                  </block>
+                </lambda>
+              </arguments>
+            </static-invoke>
+          </condition>
+        </assert>
+
+        <assert>
+          <condition>
+            <static-invoke name="get">
+              <type name="Supplier" package="com.nesterovskyBros"/>
+              <arguments>
+                <lambda>
+                  <block>
+                    <var-decl name="b">
+                      <type name="int"/>
+                      <initialize>
+                        <int value="7"/>
+                      </initialize>
+                    </var-decl>
+
+                    <return>
+                      <var name="b"/>
+                    </return>
+                  </block>
+                </lambda>
+              </arguments>
+            </static-invoke>
+          </condition>
+          <message>
+            <string value="123"/>
+          </message>
+        </assert>
+
+        <assert>
+          <condition>
+            <var name="x"/>
+          </condition>
+          <message>
+            <static-invoke name="get">
+              <type name="Supplier" package="com.nesterovskyBros"/>
+              <arguments>
+                <lambda>
+                  <block>
+                    <var-decl name="c">
+                      <type name="String"/>
+                      <initialize>
+                        <string value="123"/>
+                      </initialize>
+                    </var-decl>
+
+                    <return>
+                      <var name="c"/>
+                    </return>
+                  </block>
+                </lambda>
+              </arguments>
+            </static-invoke>
+          </message>
+        </assert>
+
+        <assert>
+          <condition>
+            <static-invoke name="get">
+              <type name="Supplier" package="com.nesterovskyBros"/>
+              <arguments>
+                <lambda>
+                  <block>
+                    <var-decl name="b">
+                      <type name="int"/>
+                      <initialize>
+                        <int value="7"/>
+                      </initialize>
+                    </var-decl>
+
+                    <return>
+                      <var name="b"/>
+                    </return>
+                  </block>
+                </lambda>
+              </arguments>
+            </static-invoke>
+          </condition>
+          <message>
+            <static-invoke name="get">
+              <type name="Supplier" package="com.nesterovskyBros"/>
+              <arguments>
+                <lambda>
+                  <block>
+                    <var-decl name="c">
+                      <type name="String"/>
+                      <initialize>
+                        <string value="123"/>
+                      </initialize>
+                    </var-decl>
+
+                    <return>
+                      <var name="c"/>
+                    </return>
+                  </block>
+                </lambda>
+              </arguments>
+            </static-invoke>
+          </message>
+        </assert>
+
+        <if>
+          <condition>
+            <eq>
+              <static-invoke name="get">
+                <type name="Supplier" package="com.nesterovskyBros"/>
+                <arguments>
+                  <lambda>
+                    <block>
+                      <var-decl name="if1">
+                        <type name="int"/>
+                        <initialize>
+                          <int value="7"/>
+                        </initialize>
+                      </var-decl>
+
+                      <return>
+                        <var name="if2"/>
+                      </return>
+                    </block>
+                  </lambda>
+                </arguments>
+              </static-invoke>
+              <static-invoke name="get">
+                <type name="Supplier" package="com.nesterovskyBros"/>
+                <arguments>
+                  <lambda>
+                    <block>
+                      <var-decl name="if3">
+                        <type name="int"/>
+                        <initialize>
+                          <int value="8"/>
+                        </initialize>
+                      </var-decl>
+
+                      <return>
+                        <var name="if4"/>
+                      </return>
+                    </block>
+                  </lambda>
+                </arguments>
+              </static-invoke>
+            </eq>            
+          </condition>
+          <then>
+            <return/>
+          </then>
+        </if>
+
+        <for>
+          <var-decl name="for1">
+            <type name="int"/>
+            <initialize>
+              <add>
+                <static-invoke name="get">
+                  <type name="Supplier" package="com.nesterovskyBros"/>
+                  <arguments>
+                    <lambda>
+                      <block>
+                        <var-decl name="for2">
+                          <type name="int"/>
+                          <initialize>
+                            <int value="8"/>
+                          </initialize>
+                        </var-decl>
+
+                        <return>
+                          <var name="for2"/>
+                        </return>
+                      </block>
+                    </lambda>
+                  </arguments>
+                </static-invoke>
+                <static-invoke name="get">
+                  <type name="Supplier" package="com.nesterovskyBros"/>
+                  <arguments>
+                    <lambda>
+                      <block>
+                        <var-decl name="for3">
+                          <type name="int"/>
+                          <initialize>
+                            <int value="8"/>
+                          </initialize>
+                        </var-decl>
+
+                        <return>
+                          <var name="for3"/>
+                        </return>
+                      </block>
+                    </lambda>
+                  </arguments>
+                </static-invoke>
+              </add>
+            </initialize>
+          </var-decl>
+          <block/>
+        </for>
+
+        <for>
+          <initialize>
+            <assign>
+              <var name="j"/>
+              <static-invoke name="get">
+                <type name="Supplier" package="com.nesterovskyBros"/>
+                <arguments>
+                  <lambda>
+                    <block>
+                      <var-decl name="for2">
+                        <type name="int"/>
+                        <initialize>
+                          <int value="8"/>
+                        </initialize>
+                      </var-decl>
+
+                      <return>
+                        <var name="for2"/>
+                      </return>
+                    </block>
+                  </lambda>
+                </arguments>
+              </static-invoke>
+            </assign>
+          </initialize>
+          <block/>
+        </for>
+
+        <for>
+          <condition>
+            <eq>
+              <var name="j"/>
+              <static-invoke name="get">
+                <type name="Supplier" package="com.nesterovskyBros"/>
+                <arguments>
+                  <lambda>
+                    <block>
+                      <var-decl name="for2">
+                        <type name="int"/>
+                        <initialize>
+                          <int value="8"/>
+                        </initialize>
+                      </var-decl>
+
+                      <return>
+                        <var name="for2"/>
+                      </return>
+                    </block>
+                  </lambda>
+                </arguments>
+              </static-invoke>
+            </eq>
+          </condition>
+          <block/>
+        </for>
+
+        <for>
+          <condition>
+            <eq>
+              <var name="j"/>
+              <static-invoke name="get">
+                <type name="Supplier" package="com.nesterovskyBros"/>
+                <arguments>
+                  <lambda>
+                    <block>
+                      <var-decl name="for2">
+                        <type name="int"/>
+                        <initialize>
+                          <int value="8"/>
+                        </initialize>
+                      </var-decl>
+
+                      <return>
+                        <var name="for2"/>
+                      </return>
+                    </block>
+                  </lambda>
+                </arguments>
+              </static-invoke>
+            </eq>
+          </condition>
+          <update>
+            <static-invoke name="get">
+              <type name="Supplier" package="com.nesterovskyBros"/>
+              <arguments>
+                <lambda>
+                  <block>
+                    <var-decl name="for4">
+                      <type name="int"/>
+                      <initialize>
+                        <int value="8"/>
+                      </initialize>
+                    </var-decl>
+
+                    <return>
+                      <var name="for4"/>
+                    </return>
+                  </block>
+                </lambda>
+              </arguments>
+            </static-invoke>
+          </update>
+          <block>
+            <continue/>
+          </block>
+        </for>
+
+        <for-each>
+          <var-decl name="i">
+            <type name="int"/>
+            <initialize>
+              <static-invoke name="get">
+                <meta>
+                  <type name="int" arity="1"/>
+                </meta>
+                <type name="Supplier" package="com.nesterovskyBros"/>
+                <arguments>
+                  <lambda>
+                    <block>
+                      <var-decl name="foreach7">
+                        <type name="int" arity="1"/>
+                      </var-decl>
+
+                      <return>
+                        <var name="foreach7"/>
+                      </return>
+                    </block>
+                  </lambda>
+                </arguments>
+              </static-invoke>
+            </initialize>            
+          </var-decl>
+          <block>
+          </block>
+        </for-each>
+
+        <while>
+          <condition>
+            <eq>
+              <var name="j"/>
+              <static-invoke name="get">
+                <type name="Supplier" package="com.nesterovskyBros"/>
+                <arguments>
+                  <lambda>
+                    <block>
+                      <var-decl name="while1">
+                        <type name="int"/>
+                        <initialize>
+                          <int value="8"/>
+                        </initialize>
+                      </var-decl>
+
+                      <return>
+                        <var name="while1"/>
+                      </return>
+                    </block>
+                  </lambda>
+                </arguments>
+              </static-invoke>
+            </eq>
+          </condition>
+          <block>
+          </block>
+        </while>
+
+        <do-while>
+          <condition>
+            <eq>
+              <var name="j"/>
+              <static-invoke name="get">
+                <type name="Supplier" package="com.nesterovskyBros"/>
+                <arguments>
+                  <lambda>
+                    <block>
+                      <var-decl name="while2">
+                        <type name="int"/>
+                        <initialize>
+                          <int value="8"/>
+                        </initialize>
+                      </var-decl>
+
+                      <return>
+                        <var name="while2"/>
+                      </return>
+                    </block>
+                  </lambda>
+                </arguments>
+              </static-invoke>
+            </eq>
+          </condition>
+          <block>
+          </block>
+        </do-while>
+
+        <do-while>
+          <condition>
+            <eq>
+              <var name="j"/>
+              <static-invoke name="get">
+                <type name="Supplier" package="com.nesterovskyBros"/>
+                <arguments>
+                  <lambda>
+                    <block>
+                      <var-decl name="while3">
+                        <type name="int"/>
+                        <initialize>
+                          <int value="8"/>
+                        </initialize>
+                      </var-decl>
+
+                      <return>
+                        <var name="while3"/>
+                      </return>
+                    </block>
+                  </lambda>
+                </arguments>
+              </static-invoke>
+            </eq>
+          </condition>
+          <block>
+            <continue/>
+          </block>
+        </do-while>
+
+        <switch>
+          <test>
+            <static-invoke name="get">
+              <type name="Supplier" package="com.nesterovskyBros"/>
+              <arguments>
+                <lambda>
+                  <block>
+                    <var-decl name="switch1">
+                      <type name="int"/>
+                      <initialize>
+                        <int value="8"/>
+                      </initialize>
+                    </var-decl>
+
+                    <return>
+                      <var name="switch2"/>
+                    </return>
+                  </block>
+                </lambda>
+              </arguments>
+            </static-invoke>
+          </test>
+          <case>
+            <value>
+              <int value="1"/>
+            </value>
+          </case>
+        </switch>
+
+        <synchronized>
+          <monitor>
+            <static-invoke name="get">
+              <type name="Supplier" package="com.nesterovskyBros"/>
+              <arguments>
+                <lambda>
+                  <block>
+                    <var-decl name="synchronized1">
+                      <type name="int"/>
+                      <initialize>
+                        <int value="8"/>
+                      </initialize>
+                    </var-decl>
+
+                    <return>
+                      <var name="synchronized2"/>
+                    </return>
+                  </block>
+                </lambda>
+              </arguments>
+            </static-invoke>
+          </monitor>
+          <block>
+            <return/>
+          </block>
+        </synchronized>
+
+        <return>
+          <static-invoke name="get">
+            <type name="Supplier" package="com.nesterovskyBros"/>
+            <arguments>
+              <lambda>
+                <block>
+                  <var-decl name="return1">
+                    <type name="int"/>
+                    <initialize>
+                      <int value="8"/>
+                    </initialize>
+                  </var-decl>
+
+                  <return>
+                    <var name="return1"/>
+                  </return>
+                </block>
+              </lambda>
+            </arguments>
+          </static-invoke>
+        </return>
+
+        <throw>
+          <new-object>
+            <type name="Exception"/>
+            <arguments>
+              <add>
+                <string value=""/>
+                <static-invoke name="get">
+                  <type name="Supplier" package="com.nesterovskyBros"/>
+                  <arguments>
+                    <lambda>
+                      <block>
+                        <var-decl name="throw1">
+                          <type name="int"/>
+                          <initialize>
+                            <int value="8"/>
+                          </initialize>
+                        </var-decl>
+
+                        <return>
+                          <var name="throw1"/>
+                        </return>
+                      </block>
+                    </lambda>
+                  </arguments>
+                </static-invoke>
+              </add>
+            </arguments>
+          </new-object>
+        </throw>
+
+        <expression>
+          <assign>
+            <var name="expression1"/>
+            <static-invoke name="get">
+              <type name="Supplier" package="com.nesterovskyBros"/>
+              <arguments>
+                <lambda>
+                  <block>
+                    <var-decl name="expression2">
+                      <type name="int"/>
+                      <initialize>
+                        <int value="8"/>
+                      </initialize>
+                    </var-decl>
+
+                    <return>
+                      <var name="expression2"/>
+                    </return>
+                  </block>
+                </lambda>
+              </arguments>
+            </static-invoke>
+          </assign>
+        </expression>
+      </block>
+    </class-method>
+  </class>
+</unit>

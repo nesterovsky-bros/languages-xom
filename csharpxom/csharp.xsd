@@ -5,10 +5,7 @@
   elementFormDefault="qualified">
 
   <xs:annotation>
-    <xs:documentation>
-      <![CDATA[
-      $Id$
-
+    <xs:documentation xml:space="preserve">
       This xml schema is based on the C# Language Specification Version 3.0,
       which can be found at:
         http://download.microsoft.com/download/3/8/8/388e7205-bc10-4226-b2a8-75351c669b09/csharp%20language%20specification.doc
@@ -16,13 +13,12 @@
       This xml schema is based on the C# Language Specification Version 4.0,
       which can be found at:
         http://download.microsoft.com/download/7/E/6/7E6A548C-9C20-4C80-B3B8-860FAF20887A/CSharp%204.0%20Specification.doc
-      ]]>
     </xs:documentation>
   </xs:annotation>
 
   <xs:simpleType name="ids">
     <xs:annotation>
-      <xs:documentation>
+      <xs:documentation xml:space="preserve">
         A list of ids.
       </xs:documentation>
     </xs:annotation>
@@ -31,7 +27,7 @@
 
   <xs:complexType name="base-element">
     <xs:annotation>
-      <xs:documentation>
+      <xs:documentation xml:space="preserve">
         Base element of the C# xml object model.
       </xs:documentation>
     </xs:annotation>
@@ -45,7 +41,7 @@
 
   <xs:element name="meta">
     <xs:annotation>
-      <xs:documentation>
+      <xs:documentation xml:space="preserve">
         Meta information, allowing to attach custom information to any element.
       </xs:documentation>
     </xs:annotation>
@@ -60,7 +56,7 @@
   <xs:attributeGroup name="name-id">
     <xs:attribute name="name-id" type="ids" use="optional">
       <xs:annotation>
-        <xs:documentation>
+        <xs:documentation xml:space="preserve">
           A name id used for the name normalization.
         </xs:documentation>
       </xs:annotation>
@@ -70,7 +66,7 @@
   <xs:attributeGroup name="name-ref">
     <xs:attribute name="name-ref" type="xs:string" use="optional">
       <xs:annotation>
-        <xs:documentation>
+        <xs:documentation xml:space="preserve">
           A name ref used for the name normalization.
         </xs:documentation>
       </xs:annotation>
@@ -91,7 +87,7 @@
 
       <xs:element name="c">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Set text in a code-like font
           </xs:documentation>
         </xs:annotation>
@@ -103,7 +99,7 @@
 
       <xs:element name="code">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Set one or more lines of source code or program output
           </xs:documentation>
         </xs:annotation>
@@ -136,7 +132,7 @@
 
       <xs:element name="example">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Indicate an example
           </xs:documentation>
         </xs:annotation>
@@ -148,7 +144,7 @@
 
       <xs:element name="exception">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Identifies the exceptions a method can throw
           </xs:documentation>
         </xs:annotation>
@@ -161,7 +157,7 @@
 
       <xs:element name="include">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Includes XML from an external file
           </xs:documentation>
         </xs:annotation>
@@ -175,7 +171,7 @@
 
       <xs:element name="list">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Create a list or table
           </xs:documentation>
         </xs:annotation>
@@ -218,7 +214,7 @@
 
       <xs:element name="para">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Permit structure to be added to text
           </xs:documentation>
         </xs:annotation>
@@ -230,7 +226,7 @@
 
       <xs:element name="param">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Describe a parameter for a method or constructor
           </xs:documentation>
         </xs:annotation>
@@ -244,7 +240,7 @@
 
       <xs:element name="paramref">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Identify that a word is a parameter name
           </xs:documentation>
         </xs:annotation>
@@ -258,7 +254,7 @@
 
       <xs:element name="permission">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Document the security accessibility of a member
           </xs:documentation>
         </xs:annotation>
@@ -271,7 +267,7 @@
 
       <xs:element name="summary">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Describe a type or a member of a type
           </xs:documentation>
         </xs:annotation>
@@ -283,7 +279,7 @@
 
       <xs:element name="remarks">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Remarks for a type or a member of a type
           </xs:documentation>
         </xs:annotation>
@@ -295,7 +291,7 @@
 
       <xs:element name="returns">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Describe the return value of a method
           </xs:documentation>
         </xs:annotation>
@@ -307,7 +303,7 @@
 
       <xs:element name="see">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Specify a link
           </xs:documentation>
         </xs:annotation>
@@ -320,7 +316,7 @@
 
       <xs:element name="seealso">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Generate a See Also entry
           </xs:documentation>
         </xs:annotation>
@@ -333,7 +329,7 @@
 
       <xs:element name="value">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Describe a property
           </xs:documentation>
         </xs:annotation>
@@ -347,7 +343,7 @@
 
       <xs:element name="typeparam">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Describe a generic type parameter
           </xs:documentation>
         </xs:annotation>
@@ -361,7 +357,7 @@
 
       <xs:element name="typeparamref">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Identify that a word is a type parameter name
           </xs:documentation>
         </xs:annotation>
@@ -379,7 +375,7 @@
 
   <xs:group name="preprocessor-instruction">
     <xs:annotation>
-      <xs:documentation>
+      <xs:documentation xml:space="preserve">
         Defines a preprocessor instructions.
       </xs:documentation>
     </xs:annotation>
@@ -466,7 +462,7 @@
         <xs:attribute name="implicit" type="xs:boolean"
           use="optional" default="false">
           <xs:annotation>
-            <xs:documentation>
+            <xs:documentation xml:space="preserve">
               Implicit region defines a means for the logical groupping.
             </xs:documentation>
           </xs:annotation>
@@ -509,7 +505,7 @@
       <xs:attribute name="implicit" type="xs:boolean"
         use="optional" default="false">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             Implicit region defines a means for the logical groupping.
           </xs:documentation>
         </xs:annotation>
@@ -573,11 +569,11 @@
 
   <xs:group name="delegate-type">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 delegate-type:
   type-name
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -611,11 +607,11 @@ delegate-type:
 
   <xs:complexType name="namespace-name">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 namespace-name:
   namespace-or-type-name
-      ]]>
+      
       </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
@@ -625,11 +621,11 @@ namespace-name:
 
   <xs:complexType name="type-name">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 type-name:
   namespace-or-type-name
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
@@ -639,8 +635,8 @@ type-name:
 
   <xs:complexType name="namespace-or-type-name">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 namespace-or-type-name:
   identifier   type-argument-listopt
   namespace-or-type-name   .   identifier   type-argument-listop
@@ -655,12 +651,12 @@ unbound-type-name:
   unbound-type-name   .   identifier   generic-dimension-specifieropt
 
 generic-dimension-specifier:
-  <   commasopt   >
+  &lt;   commasopt   &gt;
 
 commas:
   ,
   commas   ,
-      ]]>
+      
       </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
@@ -668,7 +664,7 @@ commas:
         <xs:sequence>
           <xs:group ref="type-arguments" minOccurs="0">
             <xs:annotation>
-              <xs:documentation>
+              <xs:documentation xml:space="preserve">
                 Note: if type elements in this group have neither
                 name nor nested part elements, then it's considered
                 to be unbounded type.
@@ -677,7 +673,7 @@ commas:
           </xs:group>
           <xs:element ref="type" minOccurs="0">
             <xs:annotation>
-              <xs:documentation>
+              <xs:documentation xml:space="preserve">
                 Container type.
               </xs:documentation>
             </xs:annotation>
@@ -720,8 +716,8 @@ commas:
   <xs:element name="type">
     <xs:complexType>
       <xs:annotation>
-        <xs:documentation>
-          <![CDATA[
+        <xs:documentation xml:space="preserve">
+          
 type:
   value-type
   reference-type
@@ -805,7 +801,7 @@ delegate-type:
   type-name
 
 type-argument-list:
-  <   type-arguments   >
+  &lt;   type-arguments   &gt;
 
 type-arguments:
   type-argument
@@ -816,7 +812,7 @@ type-argument:
 
 type-parameter:
   identifier
-        ]]>
+        
         </xs:documentation>
       </xs:annotation>
       <xs:complexContent>
@@ -825,7 +821,7 @@ type-parameter:
             default="0" use="optional"/>
           <xs:attribute name="rank" use="optional">
             <xs:annotation>
-              <xs:documentation>
+              <xs:documentation xml:space="preserve">
                 If specified, defines an array type.
                 Number of elements in the list is equal to a number of ranks.
                 Each number defines a dimension of a specified rank.
@@ -837,7 +833,7 @@ type-parameter:
           </xs:attribute>
           <xs:attribute name="struct" type="xs:boolean" use="optional">
             <xs:annotation>
-              <xs:documentation>
+              <xs:documentation xml:space="preserve">
                 Optional meta information used to distinguish reference
                 types from structs.
               </xs:documentation>
@@ -850,12 +846,12 @@ type-parameter:
 
   <xs:group name="argument-list">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 argument-list:
   argument
   argument-list   ,   argument
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -877,14 +873,14 @@ argument-list:
 
   <xs:group name="argument">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 argument:
   argument-nameopt   argument-value
 
 argument-name:
   identifier   :
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -907,13 +903,13 @@ argument-name:
 
   <xs:group name="argument-value">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 argument-value:
   expression
   ref   variable-reference
   out   variable-reference
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -921,20 +917,20 @@ argument-value:
 
       <xs:element name="ref" type="lvalue-expression">
         <xs:annotation>
-          <xs:documentation>
-            <![CDATA[
+          <xs:documentation xml:space="preserve">
+            
 ref   variable-reference
-        ]]>
+        
           </xs:documentation>
         </xs:annotation>
       </xs:element>
 
       <xs:element name="out" type="lvalue-expression">
         <xs:annotation>
-          <xs:documentation>
-            <![CDATA[
+          <xs:documentation xml:space="preserve">
+            
 out   variable-reference
-        ]]>
+        
           </xs:documentation>
         </xs:annotation>
       </xs:element>
@@ -943,12 +939,12 @@ out   variable-reference
 
   <xs:group name="primary-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 primary-expression:
   primary-no-array-creation-expression
   array-creation-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -959,8 +955,8 @@ primary-expression:
 
   <xs:group name="primary-no-array-creation-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 primary-no-array-creation-expression:
   literal
   simple-name
@@ -984,7 +980,7 @@ primary-no-array-creation-expression:
   pointer-element-access
   sizeof-expression
   await-expression
-      ]]>
+      
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -1011,8 +1007,8 @@ primary-no-array-creation-expression:
 
   <xs:group name="literal">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 literal:
   boolean-literal
   integer-literal
@@ -1020,7 +1016,7 @@ literal:
   character-literal
   string-literal
   null-literal
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -1041,12 +1037,12 @@ literal:
 
   <xs:element name="bool">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 boolean-literal:
   true
   false
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
@@ -1060,8 +1056,8 @@ boolean-literal:
 
   <xs:group name="integer-literal">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 integer-literal:
   decimal-integer-literal
   hexadecimal-integer-literal
@@ -1089,7 +1085,7 @@ hex-digits:
 
 hex-digit:  one of
   0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  a  b  c  d  e  f
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -1106,8 +1102,8 @@ hex-digit:  one of
 
   <xs:group name="real-literal">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 decimal-digits:
   decimal-digit
   decimal-digits   decimal-digit
@@ -1144,7 +1140,7 @@ sign:  one of
 
 real-type-suffix:  one of
   F  f  D  d  M  m
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -1182,8 +1178,8 @@ real-type-suffix:  one of
 
   <xs:element name="char">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 character-literal:
   '   character   '
 
@@ -1200,7 +1196,7 @@ single-character:
 
 hexadecimal-escape-sequence:
   \x   hex-digit   hex-digitopt   hex-digitopt   hex-digitopt
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
@@ -1214,8 +1210,8 @@ hexadecimal-escape-sequence:
 
   <xs:group name="string-literal">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 string-literal:
   regular-string-literal
   verbatim-string-literal
@@ -1252,7 +1248,7 @@ single-verbatim-string-literal-character:
 
 quote-escape-sequence:
   ""
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1284,8 +1280,8 @@ quote-escape-sequence:
 
   <xs:group name="member-or-variable-access">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 simple-name:
   identifier   type-argument-listopt
 
@@ -1293,7 +1289,7 @@ member-access:
   primary-expression   .   identifier  type-argument-listopt
   predefined-type   .   identifier  type-argument-listopt
   qualified-alias-member   .   identifier
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -1311,10 +1307,10 @@ member-access:
 
   <xs:group name="lvalue-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
         lvalue expressions
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -1346,11 +1342,11 @@ member-access:
 
   <xs:group name="invocation-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 invocation-expression:
   primary-expression   (   argument-listopt   )
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1373,11 +1369,11 @@ invocation-expression:
 
   <xs:group name="element-access">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 element-access:
   primary-no-array-creation-expression   [   expression-list   ]
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1400,12 +1396,12 @@ element-access:
 
   <xs:group name="expression-list">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 expression-list:
   expression
   expression-list   ,   expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1415,11 +1411,11 @@ expression-list:
 
   <xs:group name="this-access">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 this-access:
   this
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1431,12 +1427,12 @@ this-access:
 
   <xs:group name="base-access">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 base-access:
   base   .   identifier
   base   [   expression-list   ]
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1448,11 +1444,11 @@ base-access:
 
   <xs:group name="post-increment-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 post-increment-expression:
   primary-expression   ++
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1464,11 +1460,11 @@ post-increment-expression:
 
   <xs:group name="post-decrement-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 post-decrement-expression:
   primary-expression   --
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1480,15 +1476,15 @@ post-decrement-expression:
 
   <xs:group name="object-creation-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 object-creation-expression:
   new   type   (   argument-listopt   )   object-or-collection-initializeropt
   new   type   object-or-collection-initializer
 
 anonymous-object-creation-expression:
   new   anonymous-object-initializer
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1520,12 +1516,12 @@ anonymous-object-creation-expression:
 
   <xs:group name="object-or-collection-initializer">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 object-or-collection-initializer:
   object-initializer
   collection-initializer
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -1536,12 +1532,12 @@ object-or-collection-initializer:
 
   <xs:group name="initializer-value">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 initializer-value:
   expression
   object-or-collection-initializer
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -1552,8 +1548,8 @@ initializer-value:
 
   <xs:group name="object-initializer">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 object-initializer:
   {   member-initializer-listopt   }
   {   member-initializer-list   ,   }
@@ -1569,7 +1565,7 @@ anonymous-object-initializer:
 member-declarator-list:
   member-declarator
   member-declarator-list   ,   member-declarator
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1579,8 +1575,8 @@ member-declarator-list:
 
   <xs:group name="member-initializer">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 member-initializer:
   identifier   =   initializer-value
 
@@ -1588,7 +1584,7 @@ member-declarator:
   simple-name
   member-access
   identifier   =   expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1599,7 +1595,7 @@ member-declarator:
               <xs:group ref="initializer-value"/>
               <xs:attribute name="name" type="identifier" use="optional">
                 <xs:annotation>
-                  <xs:documentation>
+                  <xs:documentation xml:space="preserve">
                     Name is optional only in case of
                     anonymous-object-initializer, and when
                     initializer-value belongs to member-or-variable-access
@@ -1617,8 +1613,8 @@ member-declarator:
 
   <xs:group name="collection-initializer">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 collection-initializer:
   {   element-initializer-list   }
   {   element-initializer-list   ,   }
@@ -1642,7 +1638,7 @@ variable-initializer-list:
 variable-initializer:
   expression
   array-initializer
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1662,8 +1658,8 @@ variable-initializer:
 
   <xs:group name="array-creation-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 array-creation-expression:
   new   non-array-type   [   expression-list   ]   rank-specifiersopt
     array-initializeropt
@@ -1672,7 +1668,7 @@ array-creation-expression:
 
 rank-specifier:
   [   dim-separatorsopt   ]
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1715,11 +1711,11 @@ rank-specifier:
 
   <xs:group name="stackalloc-initializer">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 stackalloc-initializer:
   stackalloc   unmanaged-type   [   expression   ]
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -1742,11 +1738,11 @@ stackalloc-initializer:
 
   <xs:group name="delegate-creation-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 delegate-creation-expression:
   new   delegate-type   (   expression   )
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1769,13 +1765,13 @@ delegate-creation-expression:
 
   <xs:group name="typeof-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 typeof-expression:
   typeof   (   type   )
   typeof   (   unbound-type-name   )
   typeof ( void )
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1797,11 +1793,11 @@ typeof-expression:
 
   <xs:group name="checked-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 checked-expression:
   checked   (   expression   )
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1813,11 +1809,11 @@ checked-expression:
 
   <xs:group name="unchecked-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 unchecked-expression:
   unchecked   (   expression   )
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1829,11 +1825,11 @@ unchecked-expression:
 
   <xs:group name="pointer-member-access">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 pointer-member-access:
   primary-expression   ->   identifier
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1853,11 +1849,11 @@ pointer-member-access:
 
   <xs:group name="pointer-element-access">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 pointer-element-access:
   primary-no-array-creation-expression   [   expression   ]
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1869,11 +1865,11 @@ pointer-element-access:
 
   <xs:group name="sizeof-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 sizeof-expression:
   sizeof   (   unmanaged-type   )
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1885,11 +1881,11 @@ sizeof-expression:
 
   <xs:group name="await-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 sizeof-expression:
   await unary-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1902,11 +1898,11 @@ sizeof-expression:
 
   <xs:group name="default-value-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 default-value-expression:
   default   (   type   )
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1918,8 +1914,8 @@ default-value-expression:
 
   <xs:group name="unary-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 unary-expression:
   primary-expression
   +   unary-expression
@@ -1931,7 +1927,7 @@ unary-expression:
   cast-expression
   pointer-indirection-expression
   addressof-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -1955,11 +1951,11 @@ unary-expression:
 
   <xs:group name="pre-increment-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 pre-increment-expression:
   ++   unary-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1971,11 +1967,11 @@ pre-increment-expression:
 
   <xs:group name="pre-decrement-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 pre-decrement-expression:
   --   unary-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -1987,11 +1983,11 @@ pre-decrement-expression:
 
   <xs:group name="cast-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 cast-expression:
   (   type   )   unary-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2013,11 +2009,11 @@ cast-expression:
 
   <xs:group name="pointer-indirection-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 pointer-indirection-expression:
   *   unary-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2029,11 +2025,11 @@ pointer-indirection-expression:
 
   <xs:group name="addressof-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 addressof-expression:
-  &   unary-expression
-        ]]>
+  &amp;   unary-expression
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2045,14 +2041,14 @@ addressof-expression:
 
   <xs:group name="multiplicative-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 multiplicative-expression:
   unary-expression
   multiplicative-expression   *   unary-expression
   multiplicative-expression   /   unary-expression
   multiplicative-expression   %   unary-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2069,13 +2065,13 @@ multiplicative-expression:
 
   <xs:group name="additive-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 additive-expression:
   multiplicative-expression
   additive-expression   +   multiplicative-expression
   additive-expression   –   multiplicative-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2090,13 +2086,13 @@ additive-expression:
 
   <xs:group name="shift-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 shift-expression:
   additive-expression
-  shift-expression   <<   additive-expression
+  shift-expression   &lt;&lt;   additive-expression
   shift-expression   right-shift   additive-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2111,17 +2107,17 @@ shift-expression:
 
   <xs:group name="relational-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 relational-expression:
   shift-expression
-  relational-expression   <   shift-expression
-  relational-expression   >   shift-expression
-  relational-expression   <=   shift-expression
-  relational-expression   >=   shift-expression
+  relational-expression   &lt;   shift-expression
+  relational-expression   &gt;   shift-expression
+  relational-expression   &lt;=   shift-expression
+  relational-expression   &gt;=   shift-expression
   relational-expression   is   type
   relational-expression   as   type
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2144,13 +2140,13 @@ relational-expression:
 
   <xs:group name="equality-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 equality-expression:
   relational-expression
   equality-expression   ==   relational-expression
   equality-expression   !=   relational-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2165,12 +2161,12 @@ equality-expression:
 
   <xs:group name="and-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 and-expression:
   equality-expression
-  and-expression   &   equality-expression
-        ]]>
+  and-expression   &amp;   equality-expression
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2183,12 +2179,12 @@ and-expression:
 
   <xs:group name="exclusive-or-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 exclusive-or-expression:
   and-expression
   exclusive-or-expression   ^   and-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2201,12 +2197,12 @@ exclusive-or-expression:
 
   <xs:group name="inclusive-or-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 inclusive-or-expression:
   exclusive-or-expression
   inclusive-or-expression   |   exclusive-or-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2219,12 +2215,12 @@ inclusive-or-expression:
 
   <xs:group name="conditional-and-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 conditional-and-expression:
   inclusive-or-expression
-  conditional-and-expression   &&   inclusive-or-expression
-        ]]>
+  conditional-and-expression   &amp;&amp;   inclusive-or-expression
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2237,12 +2233,12 @@ conditional-and-expression:
 
   <xs:group name="conditional-or-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 conditional-or-expression:
   conditional-and-expression
   conditional-or-expression   ||   conditional-and-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2255,12 +2251,12 @@ conditional-or-expression:
 
   <xs:group name="null-coalescing-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 null-coalescing-expression:
   conditional-or-expression
   conditional-or-expression   ??   null-coalescing-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2273,12 +2269,12 @@ null-coalescing-expression:
 
   <xs:group name="conditional-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 conditional-expression:
   null-coalescing-expression
   null-coalescing-expression   ?   expression   :   expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2303,11 +2299,11 @@ conditional-expression:
 
   <xs:group name="lambda-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 lambda-expression:
   anonymous-function-signature   =>   anonymous-function-body
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2324,7 +2320,6 @@ lambda-expression:
               minOccurs="0"/>
             <xs:group ref="anonymous-function-body"/>
           </xs:sequence>
-          <!-- Verify async syntax. -->
           <xs:attribute name="async" type="xs:boolean"
             default="false" use="optional"/>
         </xs:extension>
@@ -2334,9 +2329,8 @@ lambda-expression:
 
   <xs:group name="anonymous-method-expression">
     <xs:annotation>
-      <xs:documentation>
-        <!-- Verify async syntax. -->
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 anonymous-method-expression:
   asyncopt delegate   explicit-anonymous-function-signatureopt   block
 
@@ -2354,7 +2348,7 @@ explicit-anonymous-function-parameter:
 anonymous-function-parameter-modifier:
   ref
   out
-   ]]>
+   
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2380,9 +2374,8 @@ anonymous-function-parameter-modifier:
 
   <xs:group name="anonymous-function-signature">
     <xs:annotation>
-      <!-- Verify async syntax. -->
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 anonymous-function-signature:
   asyncopt explicit-anonymous-function-signature
   asyncopt implicit-anonymous-function-signature
@@ -2413,7 +2406,7 @@ implicit-anonymous-function-parameter-list:
 
 implicit-anonymous-function-parameter:
   identifier
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2449,12 +2442,12 @@ implicit-anonymous-function-parameter:
 
   <xs:group name="anonymous-function-body">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 anonymous-function-body:
   expression
   block
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2465,11 +2458,11 @@ anonymous-function-body:
 
   <xs:group name="query-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 query-expression:
   from-clause   query-body
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2492,11 +2485,11 @@ query-expression:
 
   <xs:group name="from-clause">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 from-clause:
   from   typeopt   identifier   in   expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2521,14 +2514,14 @@ from-clause:
 
   <xs:group name="query-body">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 query-body:
   query-body-clausesopt   select-or-group-clause   query-continuationopt
 
 query-continuation:
   into   identifier   query-body
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2541,12 +2534,12 @@ query-continuation:
 
   <xs:group name="query-body-clauses">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 query-body-clauses:
   query-body-clause
   query-body-clauses   query-body-clause
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2556,8 +2549,8 @@ query-body-clauses:
 
   <xs:group name="query-body-clause">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 query-body-clause:
   from-clause
   let-clause
@@ -2565,7 +2558,7 @@ query-body-clause:
   join-clause
   join-into-clause
   orderby-clause
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2579,11 +2572,11 @@ query-body-clause:
 
   <xs:group name="let-clause">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 let-clause:
   let   identifier   =   expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2605,11 +2598,11 @@ let-clause:
 
   <xs:group name="where-clause">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 where-clause:
   where   boolean-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2629,8 +2622,8 @@ where-clause:
 
   <xs:group name="join-clause">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 join-clause:
   join   typeopt   identifier   in   expression   on
     expression   equals   expression
@@ -2638,7 +2631,7 @@ join-clause:
 join-into-clause:
   join   typeopt   identifier   in   expression   on
     expression   equals   expression   into   identifier
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2666,11 +2659,11 @@ join-into-clause:
 
   <xs:group name="orderby-clause">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 orderby-clause:
   orderby   orderings
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2692,8 +2685,8 @@ orderby-clause:
 
   <xs:group name="orderings">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 orderings:
   ordering
   orderings   ,   ordering
@@ -2701,7 +2694,7 @@ orderings:
 ordering-direction:
   ascending
   descending
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2711,11 +2704,11 @@ ordering-direction:
 
   <xs:group name="ordering">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 ordering:
   expression    ordering-directionopt
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2749,12 +2742,12 @@ ordering:
 
   <xs:group name="select-or-group-clause">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 select-or-group-clause:
   select-clause
   group-clause
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2765,14 +2758,14 @@ select-or-group-clause:
 
   <xs:group name="select-clause">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 select-clause:
   select   expression
 
 query-continuation:
   into   identifier   query-body
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2795,14 +2788,14 @@ query-continuation:
 
   <xs:group name="group-clause">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 group-clause:
   group   expression   by   expression
 
 query-continuation:
   into   identifier   query-body
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2826,8 +2819,8 @@ query-continuation:
 
   <xs:group name="assignment">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 assignment:
   unary-expression   assignment-operator   expression
 
@@ -2838,12 +2831,12 @@ assignment-operator:
   *=
   /=
   %=
-  &=
+  &amp;=
   |=
   ^=
-  <<=
+  &lt;&lt;=
   right-shift-assignment
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2875,12 +2868,12 @@ assignment-operator:
 
   <xs:group name="expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 expression:
   non-assignment-expression
   assignment
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2893,7 +2886,7 @@ expression:
 
   <xs:element name="transparent-expression" type="unary-expression">
     <xs:annotation>
-      <xs:documentation>
+      <xs:documentation xml:space="preserve">
         A transparent expression wrapper.
       </xs:documentation>
     </xs:annotation>
@@ -2901,7 +2894,7 @@ expression:
 
   <xs:element name="snippet-expression">
     <xs:annotation>
-      <xs:documentation>
+      <xs:documentation xml:space="preserve">
         An artificial expression.
       </xs:documentation>
     </xs:annotation>
@@ -2916,13 +2909,13 @@ expression:
 
   <xs:group name="non-assignment-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 non-assignment-expression:
   conditional-expression
   lambda-expression
   query-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -2934,11 +2927,11 @@ non-assignment-expression:
 
   <xs:group name="constant-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 constant-expression:
   expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -2948,11 +2941,11 @@ constant-expression:
 
   <xs:group name="boolean-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 boolean-expression:
   expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3059,11 +3052,11 @@ boolean-expression:
 
   <xs:group name="variable-reference">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 variable-reference:
   expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3073,13 +3066,13 @@ variable-reference:
 
   <xs:group name="statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 statement:
   labeled-statement
   declaration-statement
   embedded-statement
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -3092,7 +3085,7 @@ statement:
 
   <xs:element name="snippet-statement">
     <xs:annotation>
-      <xs:documentation>
+      <xs:documentation xml:space="preserve">
         An artificial statement.
       </xs:documentation>
     </xs:annotation>
@@ -3107,8 +3100,8 @@ statement:
 
   <xs:group name="embedded-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 embedded-statement:
   block
   empty-statement
@@ -3123,7 +3116,7 @@ embedded-statement:
   using-statement
   yield-statement
   fixed-statement
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -3143,8 +3136,8 @@ embedded-statement:
 
   <xs:group name="block">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 block:
   {   statement-listopt   }
 
@@ -3153,7 +3146,7 @@ checked-statement:
 
 unchecked-statement:
   unchecked   block
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3182,12 +3175,12 @@ unchecked-statement:
 
   <xs:group name="statement-list">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 statement-list:
   statement
   statement-list   statement
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3241,11 +3234,11 @@ statement-list:
 
   <xs:group name="empty-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 empty-statement:
   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3257,11 +3250,11 @@ empty-statement:
 
   <xs:group name="labeled-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 labeled-statement:
   identifier   :   statement
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3289,8 +3282,8 @@ labeled-statement:
 
   <xs:group name="local-variable-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 declaration-statement:
   local-variable-declaration   ;
   local-constant-declaration   ;
@@ -3323,7 +3316,7 @@ constant-declarators:
 
 constant-declarator:
   identifier   =   constant-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3350,13 +3343,13 @@ constant-declarator:
 
   <xs:group name="variable-initializer">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 variable-initializer:
   expression
   array-initializer
   stackalloc-initializer
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3378,11 +3371,11 @@ variable-initializer:
 
   <xs:group name="expression-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 expression-statement:
   statement-expression   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3402,8 +3395,8 @@ expression-statement:
 
   <xs:group name="statement-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 statement-expression:
   invocation-expression
   object-creation-expression
@@ -3412,7 +3405,7 @@ statement-expression:
   post-decrement-expression
   pre-increment-expression
   pre-decrement-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -3429,12 +3422,12 @@ statement-expression:
 
   <xs:group name="selection-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 selection-statement:
   if-statement
   switch-statement
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -3445,13 +3438,13 @@ selection-statement:
 
   <xs:group name="if-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 if-statement:
   if   (   boolean-expression   )   embedded-statement
   if   (   boolean-expression   )   embedded-statement
     else   embedded-statement
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3499,8 +3492,8 @@ if-statement:
 
   <xs:group name="switch-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 switch-statement:
   switch   (   expression   )   switch-block
 
@@ -3510,7 +3503,7 @@ switch-block:
 switch-sections:
   switch-section
   switch-sections   switch-section
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3541,8 +3534,8 @@ switch-sections:
 
   <xs:group name="switch-section">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 switch-section:
   switch-labels   statement-list
 
@@ -3553,7 +3546,7 @@ switch-labels:
 switch-label:
   case   constant-expression   :
   default   :
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3584,14 +3577,14 @@ switch-label:
 
   <xs:group name="iteration-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 iteration-statement:
   while-statement
   do-statement
   for-statement
   foreach-statement
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -3604,11 +3597,11 @@ iteration-statement:
 
   <xs:group name="while-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 while-statement:
   while   (   boolean-expression   )   embedded-statement
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3639,11 +3632,11 @@ while-statement:
 
   <xs:group name="do-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 do-statement:
   do   embedded-statement   while   (   boolean-expression   )   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3655,8 +3648,8 @@ do-statement:
 
   <xs:group name="for-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 for-statement:
   for   (   for-initializeropt   ;   for-conditionopt   ;   for-iteratoropt   )
     embedded-statement
@@ -3674,7 +3667,7 @@ for-iterator:
 statement-expression-list:
   statement-expression
   statement-expression-list   ,   statement-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3729,8 +3722,8 @@ statement-expression-list:
 
   <xs:group name="foreach-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 foreach-statement:
   foreach   (   local-variable-type   identifier   in   expression   )
     embedded-statement
@@ -3738,7 +3731,7 @@ foreach-statement:
 local-variable-type:
   type
   var
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3761,15 +3754,15 @@ local-variable-type:
 
   <xs:group name="jump-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 jump-statement:
   break-statement
   continue-statement
   goto-statement
   return-statement
   throw-statement
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -3783,11 +3776,11 @@ jump-statement:
 
   <xs:group name="break-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 break-statement:
   break   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3799,11 +3792,11 @@ break-statement:
 
   <xs:group name="continue-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 continue-statement:
   continue   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3815,13 +3808,13 @@ continue-statement:
 
   <xs:group name="goto-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 goto-statement:
   goto   identifier   ;
   goto   case   constant-expression   ;
   goto   default   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3834,7 +3827,7 @@ goto-statement:
       <xs:complexContent>
         <xs:extension base="statement">
           <xs:annotation>
-            <xs:documentation>
+            <xs:documentation xml:space="preserve">
               constant-expression and label are mutually exclusive.
               when constant-expression is present then the statement is:
                 goto case;
@@ -3854,11 +3847,11 @@ goto-statement:
 
   <xs:group name="return-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 return-statement:
   return   expressionopt   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3878,11 +3871,11 @@ return-statement:
 
   <xs:group name="throw-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 throw-statement:
   throw   expressionopt   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3902,8 +3895,8 @@ throw-statement:
 
   <xs:group name="try-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 try-statement:
   try   block   catch-clauses
   try   block   finally-clause
@@ -3925,7 +3918,7 @@ general-catch-clause:
 
 finally-clause:
   finally   block
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -3971,11 +3964,11 @@ finally-clause:
 
   <xs:group name="lock-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 lock-statement:
   lock   (   expression   )   embedded-statement
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4006,15 +3999,15 @@ lock-statement:
 
   <xs:group name="using-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 using-statement:
   using   (    resource-acquisition   )    embedded-statement
 
 resource-acquisition:
   local-variable-declaration
   expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4048,12 +4041,12 @@ resource-acquisition:
 
   <xs:group name="yield-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 yield-statement:
   yield   return   expression   ;
   yield   break   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4073,8 +4066,8 @@ yield-statement:
 
   <xs:group name="fixed-statement">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 fixed-statement:
   fixed   (   pointer-type   fixed-pointer-declarators   )   embedded-statement
 
@@ -4086,9 +4079,9 @@ fixed-pointer-declarator:
   identifier   =   fixed-pointer-initializer
 
 fixed-pointer-initializer:
-  &   variable-reference
+  &amp;   variable-reference
   expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4117,12 +4110,12 @@ fixed-pointer-initializer:
 
   <xs:group name="compilation-unit">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 compilation-unit:
   extern-alias-directivesopt   using-directivesopt  global-attributesopt
 		  namespace-member-declarationsopt
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4143,7 +4136,7 @@ compilation-unit:
 
   <xs:group name="unit-declaration">
     <xs:annotation>
-      <xs:documentation>
+      <xs:documentation xml:space="preserve">
         Note that namespace-member-declarations must not preceed
         extern-alias-directives, using-directives, and global-attributes.
       </xs:documentation>
@@ -4203,11 +4196,11 @@ compilation-unit:
 
   <xs:group name="namespace-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 namespace-declaration:
   namespace   qualified-identifier   namespace-body   ;opt
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4229,12 +4222,12 @@ namespace-declaration:
 
   <xs:group name="namespace-body">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 namespace-body:
   {   extern-alias-directivesopt   using-directivesopt
     namespace-member-declarationsopt   }
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4298,12 +4291,12 @@ namespace-body:
 
   <xs:group name="extern-alias-directives">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 extern-alias-directives:
   extern-alias-directive
   extern-alias-directives   extern-alias-directive
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4313,11 +4306,11 @@ extern-alias-directives:
 
   <xs:group name="extern-alias-directive">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 extern-alias-directive:
   extern   alias   identifier   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -4337,12 +4330,12 @@ extern-alias-directive:
 
   <xs:group name="using-directives">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 using-directives:
   using-directive
   using-directives   using-directive
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4352,12 +4345,12 @@ using-directives:
 
   <xs:group name="using-directive">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 using-directive:
   using-alias-directive
   using-namespace-directive
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -4368,11 +4361,11 @@ using-directive:
 
   <xs:group name="using-alias-directive">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 using-alias-directive:
   using   identifier   =   namespace-or-type-name   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4396,11 +4389,11 @@ using-alias-directive:
 
   <xs:group name="using-namespace-directive">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 using-namespace-directive:
   using   namespace-name   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4421,12 +4414,12 @@ using-namespace-directive:
 
   <xs:group name="namespace-member-declarations">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 namespace-member-declarations:
   namespace-member-declaration
   namespace-member-declarations   namespace-member-declaration
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4436,12 +4429,12 @@ namespace-member-declarations:
 
   <xs:group name="namespace-member-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 namespace-member-declaration:
   namespace-declaration
   type-declaration
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -4452,15 +4445,15 @@ namespace-member-declaration:
 
   <xs:group name="type-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 type-declaration:
   class-declaration
   struct-declaration
   interface-declaration
   enum-declaration
   delegate-declaration
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -4474,8 +4467,8 @@ type-declaration:
 
   <xs:group name="class-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 class-declaration:
   attributesopt   class-modifiersopt   partialopt   class   identifier
     type-parameter-listopt class-baseopt
@@ -4497,7 +4490,7 @@ class-modifier:
 
 class-body:
 {   class-member-declarationsopt   }
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4538,11 +4531,11 @@ class-body:
 
   <xs:group name="type-parameter-list">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 type-parameter-list:
-  <   type-parameters   >
-        ]]>
+  &lt;   type-parameters   &gt;
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4562,14 +4555,14 @@ type-parameter-list:
 
   <xs:group name="type-parameter">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 type-parameters:
   attributesopt   type-parameter
   type-parameters   ,   attributesopt   type-parameter
   type-parameter:
   identifier
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4591,11 +4584,11 @@ type-parameters:
 
   <xs:group name="variant-type-parameter-list">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 variant-type-parameter-list:
-  <   variant-type-parameters   >
-        ]]>
+  &lt;   variant-type-parameters   &gt;
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4613,8 +4606,8 @@ variant-type-parameter-list:
 
   <xs:group name="variant-type-parameter">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 variant-type-parameters:
   attributesopt  variance-annotationopt  type-parameter
   variant-type-parameters   ,   attributesopt   variance-annotationopt  type-parameter
@@ -4622,7 +4615,7 @@ variant-type-parameters:
 variance-annotation:
   in
   out
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4652,8 +4645,8 @@ variance-annotation:
 
   <xs:group name="class-base">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 class-base:
   :   class-type
   :   interface-type-list
@@ -4662,7 +4655,7 @@ class-base:
 interface-type-list:
   interface-type
   interface-type-list   ,   interface-type
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4693,12 +4686,12 @@ interface-type-list:
 
   <xs:group name="type-parameter-constraints-clauses">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 type-parameter-constraints-clauses:
   type-parameter-constraints-clause
   type-parameter-constraints-clauses   type-parameter-constraints-clause
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4708,11 +4701,11 @@ type-parameter-constraints-clauses:
 
   <xs:group name="type-parameter-constraints-clause">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 type-parameter-constraints-clause:
   where   type-parameter   :   type-parameter-constraints
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4735,8 +4728,8 @@ type-parameter-constraints-clause:
 
   <xs:group name="type-parameter-constraints">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 type-parameter-constraints:
   primary-constraint
   secondary-constraints
@@ -4759,7 +4752,7 @@ secondary-constraints:
 
 constructor-constraint:
   new   (   )
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -4772,12 +4765,12 @@ constructor-constraint:
 
   <xs:group name="class-member-declarations">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 class-member-declarations:
   class-member-declaration
   class-member-declarations   class-member-declaration
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4787,8 +4780,8 @@ class-member-declarations:
 
   <xs:group name="class-member-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 class-member-declaration:
   constant-declaration
   field-declaration
@@ -4801,7 +4794,7 @@ class-member-declaration:
   destructor-declaration
   static-constructor-declaration
   type-declaration
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -4869,8 +4862,8 @@ class-member-declaration:
 
   <xs:group name="field-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 constant-declaration:
   attributesopt   constant-modifiersopt   const   type   constant-declarators ;
 
@@ -4916,7 +4909,7 @@ variable-declarators:
 variable-declarator:
   identifier
   identifier   =   variable-initializer
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -4956,8 +4949,8 @@ variable-declarator:
 
   <xs:group name="method-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 method-declaration:
   method-header   method-body
 
@@ -4995,7 +4988,7 @@ member-name:
 method-body:
   block
   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -5041,8 +5034,8 @@ method-body:
 
   <xs:group name="formal-parameter-list">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 formal-parameter-list:
   fixed-parameters
   fixed-parameters   ,   parameter-array
@@ -5065,7 +5058,7 @@ parameter-modifier:
 
 parameter-array:
   attributesopt   params   array-type   identifier
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -5113,15 +5106,15 @@ parameter-array:
 
   <xs:simpleType name="parameter-modifier">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 parameter-modifier:
   ref
   out
   this
 
   params
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
@@ -5134,8 +5127,8 @@ parameter-modifier:
 
   <xs:group name="property-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 property-declaration:
   attributesopt   property-modifiersopt   type   member-name
     {   accessor-declarations   }
@@ -5184,7 +5177,7 @@ indexer-modifier:
 indexer-declarator:
   type   this   [   formal-parameter-list   ]
   type   interface-type   .   this   [   formal-parameter-list   ]
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -5224,8 +5217,8 @@ indexer-declarator:
 
   <xs:group name="accessor-declarations">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 accessor-declarations:
   get-accessor-declaration   set-accessor-declarationopt
   set-accessor-declaration   get-accessor-declarationopt
@@ -5246,7 +5239,7 @@ accessor-modifier:
 accessor-body:
   block
   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -5270,8 +5263,8 @@ accessor-body:
 
   <xs:group name="event-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 event-declaration:
   attributesopt   event-modifiersopt   event   type   variable-declarators   ;
   attributesopt   event-modifiersopt   event   type   member-name
@@ -5293,7 +5286,7 @@ event-modifier:
   override
   abstract
   extern
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -5335,12 +5328,12 @@ event-modifier:
 
   <xs:group name="event-accessor-declarations">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 event-accessor-declarations:
   add-accessor-declaration   remove-accessor-declaration
   remove-accessor-declaration   add-accessor-declaration
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -5370,8 +5363,8 @@ event-accessor-declarations:
 
   <xs:group name="operator-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 operator-declaration:
   attributesopt   operator-modifiers   operator-declarator   operator-body
 
@@ -5404,7 +5397,7 @@ operator-body:
 conversion-operator-declarator:
   implicit   operator   type   (   type   identifier   )
   explicit   operator   type   (   type   identifier   )
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -5441,8 +5434,8 @@ conversion-operator-declarator:
 
   <xs:simpleType name="overloadable-operator">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 overloadable-unary-operator:  one of
   +   -   !   ~   ++   --   true   false
 
@@ -5452,18 +5445,18 @@ overloadable-binary-operator:
   *
   /
   %
-  &
+  &amp;
   |
   ^
-  <<
+  &lt;&lt;
   right-shift
   ==
   !=
-  >
-  <
-  >=
-  <=
-        ]]>
+  &gt;
+  &lt;
+  &gt;=
+  &lt;=
+        
       </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
@@ -5518,8 +5511,8 @@ overloadable-binary-operator:
 
   <xs:group name="constructor-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 constructor-declaration:
   attributesopt   constructor-modifiersopt   constructor-declarator
     constructor-body
@@ -5557,7 +5550,7 @@ static-constructor-modifiers:
 static-constructor-body:
   block
   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -5607,15 +5600,15 @@ static-constructor-body:
 
   <xs:group name="destructor-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 destructor-declaration:
   attributesopt   externopt   ~   identifier   (   )    destructor-body
 
 destructor-body:
   block
   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -5644,8 +5637,8 @@ destructor-body:
 
   <xs:group name="struct-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 struct-declaration:
   attributesopt   struct-modifiersopt   partialopt   struct   identifier
   type-parameter-listopt  struct-interfacesopt
@@ -5671,7 +5664,7 @@ struct-body:
 struct-member-declarations:
   struct-member-declaration
   struct-member-declarations   struct-member-declaration
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -5709,8 +5702,8 @@ struct-member-declarations:
 
   <xs:group name="struct-member-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 struct-member-declaration:
   constant-declaration
   field-declaration
@@ -5723,7 +5716,7 @@ struct-member-declaration:
   static-constructor-declaration
   type-declaration
   fixed-size-buffer-declaration
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -5785,8 +5778,8 @@ struct-member-declaration:
 
   <xs:group name="fixed-size-buffer-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 fixed-size-buffer-declaration:
   attributesopt   fixed-size-buffer-modifiersopt   fixed   buffer-element-type
     fixed-size-buffer-declarators   ;
@@ -5812,7 +5805,7 @@ fixed-size-buffer-declarators:
 
 fixed-size-buffer-declarator:
   identifier   [   const-expression   ]
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -5843,8 +5836,8 @@ fixed-size-buffer-declarator:
 
   <xs:group name="interface-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 interface-declaration:
   attributesopt   interface-modifiersopt   partialopt   interface   identifier
   variant-type-parameter-listopt interface-baseopt
@@ -5869,7 +5862,7 @@ interface-body:
 interface-member-declarations:
   interface-member-declaration
   interface-member-declarations   interface-member-declaration
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -5907,14 +5900,14 @@ interface-member-declarations:
 
   <xs:group name="interface-member-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 interface-member-declaration:
   interface-method-declaration
   interface-property-declaration
   interface-event-declaration
   interface-indexer-declaration
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -5971,12 +5964,12 @@ interface-member-declaration:
 
   <xs:group name="interface-method-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 interface-method-declaration:
   attributesopt   newopt   return-type   identifier   type-parameter-list
   (   formal-parameter-listopt   )   type-parameter-constraints-clausesopt   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -5986,15 +5979,15 @@ interface-method-declaration:
 
   <xs:group name="interface-property-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 interface-property-declaration:
   attributesopt   newopt   type   identifier   {   interface-accessors   }
 
 interface-indexer-declaration:
   attributesopt   newopt   type   this   [   formal-parameter-list   ]
     {   interface-accessors   }
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -6004,11 +5997,11 @@ interface-indexer-declaration:
 
   <xs:group name="interface-event-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 interface-event-declaration:
   attributesopt   newopt   event   type   identifier   ;
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -6018,8 +6011,8 @@ interface-event-declaration:
 
   <xs:group name="enum-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 enum-declaration:
   attributesopt   enum-modifiersopt   enum   identifier   enum-baseopt
     enum-body   ;opt
@@ -6045,7 +6038,7 @@ enum-body:
 enum-member-declarations:
   enum-member-declaration
   enum-member-declarations   ,   enum-member-declaration
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -6076,12 +6069,12 @@ enum-member-declarations:
 
   <xs:group name="enum-member-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 enum-member-declaration:
   attributesopt   identifier
   attributesopt   identifier   =   constant-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -6148,8 +6141,8 @@ enum-member-declaration:
 
   <xs:group name="delegate-declaration">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 delegate-declaration:
   attributesopt   delegate-modifiersopt   delegate   return-type
     identifier  variant-type-parameter-listopt
@@ -6165,7 +6158,7 @@ delegate-modifier:
   protected
   internal
   private
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -6205,8 +6198,8 @@ delegate-modifier:
 
   <xs:group name="attributes">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 global-attributes:
   global-attribute-sections
 
@@ -6234,7 +6227,7 @@ attribute-section:
 
 attribute-target-specifier:
   attribute-target   :
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -6254,8 +6247,8 @@ attribute-target-specifier:
 
   <xs:simpleType name="attribute-target">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 global-attribute-target:
   assembly
   module
@@ -6268,7 +6261,7 @@ attribute-target:
   property
   return
   type
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
@@ -6287,12 +6280,12 @@ attribute-target:
 
   <xs:group name="attribute-list">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 attribute-list:
   attribute
   attribute-list   ,   attribute
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -6302,11 +6295,11 @@ attribute-list:
 
   <xs:group name="attribute">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 attribute:
   attribute-name   attribute-argumentsopt
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -6330,17 +6323,17 @@ attribute:
 
   <xs:group name="attribute-name">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 attribute-name:
   type-name
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
       <xs:element ref="type">
         <xs:annotation>
-          <xs:documentation>
+          <xs:documentation xml:space="preserve">
             remove-attribute-suffix="false" extended attribute hints
             to the serializer that Attribute name suffix should not be trimmed.
           </xs:documentation>
@@ -6351,13 +6344,13 @@ attribute-name:
 
   <xs:group name="attribute-arguments">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 attribute-arguments:
   (   positional-argument-listopt   )
   (   positional-argument-list   ,   named-argument-list   )
   (   named-argument-list   )
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -6380,12 +6373,12 @@ attribute-arguments:
 
   <xs:group name="positional-argument-list">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 positional-argument-list:
   positional-argument
   positional-argument-list   ,   positional-argument
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -6395,11 +6388,11 @@ positional-argument-list:
 
   <xs:group name="positional-argument">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 positional-argument:
   attribute-argument-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -6409,12 +6402,12 @@ positional-argument:
 
   <xs:group name="named-argument-list">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 named-argument-list:
   named-argument
   named-argument-list   ,   named-argument
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -6424,11 +6417,11 @@ named-argument-list:
 
   <xs:group name="named-argument">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 named-argument:
   identifier   =   attribute-argument-expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -6448,11 +6441,11 @@ named-argument:
 
   <xs:group name="attribute-argument-expression">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 attribute-argument-expression:
   expression
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -6462,15 +6455,15 @@ attribute-argument-expression:
 
   <xs:group name="type-argument-list">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 type-argument-list:
-  <   type-arguments   >
+  &lt;   type-arguments   &gt;
 
 type-arguments:
   type-argument
   type-arguments   ,   type-argument
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -6480,11 +6473,11 @@ type-arguments:
 
   <xs:group name="type-argument">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 type-argument:
   type
-        ]]>
+        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -6494,12 +6487,12 @@ type-argument:
 
   <xs:simpleType name="qualified-identifier">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 qualified-identifier:
   identifier
   qualified-identifier   .   identifier
-      ]]>
+      
       </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string"/>
@@ -6507,8 +6500,8 @@ qualified-identifier:
 
   <xs:simpleType name="identifier">
     <xs:annotation>
-      <xs:documentation>
-        <![CDATA[
+      <xs:documentation xml:space="preserve">
+        
 identifier:
   available-identifier
   @   identifier-or-keyword
@@ -6554,7 +6547,7 @@ connecting-character:
 formatting-character:
   A Unicode character of the class Cf
   A unicode-escape-sequence representing a character of the class Cf
-      ]]>
+      
       </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string"/>
