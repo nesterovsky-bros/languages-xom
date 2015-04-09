@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
   This xml schema defines simplified schema of the tsql statements.
-
-  $Id$
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns="http://www.bphx.com/basic-sql/2008-12-11/tsql"

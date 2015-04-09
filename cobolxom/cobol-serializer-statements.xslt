@@ -2,8 +2,6 @@
 <!--
   This stylesheet serializes COBOL xml object model document down to
   the COBOL text.
-
-  $Id$
  -->
 <xsl:stylesheet version="2.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"

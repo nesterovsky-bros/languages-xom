@@ -6,8 +6,6 @@
 
   <xs:annotation>
     <xs:documentation>
-      $Id$
-
       This xml schema is based on the COBOL grammar defined in cobol.html,
       which also can be found at:
       http://www.few.vu.nl/~x/grammars/vs-cobol-ii/index.html

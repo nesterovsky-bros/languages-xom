@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   This stylesheet provides functions to optimize and simplify jxom expressions.
-
-  $Id$
 -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -445,7 +443,7 @@
         error
         (
           xs:QName('t:invalid-type'),
-          concat('Unknown type of: ', name())
+          concat('Unknown type of: ', t:get-path(.))
         )"/>
     </xsl:if>
   </xsl:template>
@@ -585,6 +583,35 @@
   </xsl:template>
 
   <!--
+    Mode "t:get-type-of". condition.
+      $required - true if type is required, and
+        false if empty sequence can be returned for unknown type.
+  -->
+  <xsl:template mode="t:get-type-of" match="condition">
+    <xsl:param name="required" tunnel="yes" as="xs:boolean" select="true()"/>
+
+    <xsl:variable name="expressions" as="element()+"
+      select="t:get-java-element(.)"/>
+
+    <xsl:variable name="type" as="element()?" select="
+      (
+        t:get-type-of($expressions[2], false()), 
+        t:get-type-of($expressions[3], false())
+      )[1]"/>
+
+    <xsl:if test="$required and not($type)">
+      <xsl:sequence select="
+        error
+        (
+          xs:QName('t:invalid-type'),
+          concat('Unknown type of: ', t:get-path(.))
+        )"/>
+    </xsl:if>
+
+    <xsl:sequence select="$type"/>
+  </xsl:template>
+
+<!--
     Returns a boxed type for some scalar types.
       $type - a type to get a boxed type for.
       Returns boxed type.
