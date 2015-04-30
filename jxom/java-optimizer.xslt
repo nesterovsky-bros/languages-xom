@@ -10,6 +10,58 @@
   xpath-default-namespace="http://www.bphx.com/java-1.5/2008-02-07"
   exclude-result-prefixes="xs t p">
 
+  <!--
+    Builds friendly xpath to the element or attribute.
+      $node - a node to build xpath for.
+      Returns node's xpath.
+  -->
+  <xsl:function name="t:get-path" as="xs:string">
+    <xsl:param name="node" as="node()"/>
+
+    <xsl:sequence select="
+      string-join
+      (
+        if ($node instance of document-node()) then
+        (
+          '/'
+        )
+        else
+        (
+          for $node in $node/ancestor-or-self::* return
+          (
+            if ($node instance of attribute()) then
+            (
+              '/@*[self::',
+              name($node),
+              ']'
+            )
+            else
+            (
+              '/*[',
+              xs:string(count($node/preceding-sibling::*) + 1),
+              '][self::*:',
+              name($node),
+              ']',
+                  
+              for 
+                $suffix in ('id', 'ref', 'name', 'type'),
+                $attribute in 
+                  $node/@*[ends-with(lower-case(local-name()), $suffix)]
+              return
+              (
+                '[@', 
+                name($attribute), 
+                ' = ''',
+                xs:string($attribute),
+                ''']'
+              )
+            )
+          )
+        ),
+        ''
+      )"/>
+  </xsl:function>
+
   <!-- 
     Splits id list into into a sequence of ids.
       $value - a value to split.
