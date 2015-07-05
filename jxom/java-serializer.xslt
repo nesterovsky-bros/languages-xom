@@ -1743,7 +1743,7 @@
         $t:new-line
       )"/>
   </xsl:function>
-
+  
   <!-- An empty block.-->
   <xsl:variable name="t:empty-block">
     <block/>

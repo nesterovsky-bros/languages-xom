@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/java-1.5/2008-02-07">
+
+  <class name="AlphabetEnumerator">
+    <class-field name="result" access="public">
+      <type name="String"/>
+    </class-field>
+    <class-method name="getLetters" access="public">
+      <block>
+        <var-decl name="buf">
+          <type name="StringBuffer"/>
+          <initialize>
+            <new-object>
+              <type name="StringBuffer"/>
+            </new-object>
+          </initialize>
+        </var-decl>
+        <var-decl name="list">
+          <type package="java.util">
+            <part name="ArrayList">
+              <argument>
+                <type name="Integer"/>
+              </argument>
+            </part>
+          </type>
+          <initialize>
+            <new-object>
+              <type package="java.util">
+                <part name="ArrayList">
+                  <argument>
+                    <type name="Integer"/>
+                  </argument>
+                </part>
+              </type>
+            </new-object>
+          </initialize>
+        </var-decl>
+
+        <expression>
+          <invoke name="append">
+            <instance>
+              <var name="buf"/>
+            </instance>
+            <arguments>
+              <string>Start: </string>
+            </arguments>
+          </invoke>
+        </expression>
+
+        <expression>
+          <invoke name="append">
+            <instance>
+              <var name="buf"/>
+            </instance>
+            <arguments>
+              <static-invoke name="getLetter">
+                <type name="Test"/>
+              </static-invoke>
+            </arguments>
+          </invoke>
+        </expression>
+
+        <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+
+        <for>
+          <var-decl name="i">
+            <type name="int"/>
+            <initialize>
+              <int>0</int>
+            </initialize>
+          </var-decl>
+          <condition>
+            <lt>
+              <var name="i"/>
+              <int>100</int>
+            </lt>
+          </condition>
+          <update>
+            <add-to>
+              <var name="i"/>
+              <int>1</int>
+            </add-to>
+          </update>
+          <block>
+
+            <var-decl name="number">
+              <type name="int"/>
+              <initialize>
+                <static-invoke name="getNumber">
+                  <type name="Test"/>
+                </static-invoke>
+              </initialize>
+            </var-decl>
+
+            <expression>
+              <invoke name="append">
+                <instance>
+                  <var name="buf"/>
+                </instance>
+                <arguments>
+                  <static-invoke name="getLetter">
+                    <type name="Test"/>
+                  </static-invoke>
+                </arguments>
+              </invoke>
+            </expression>
+
+            <if>
+              <condition>
+                <gt>
+                  <var name="number"/>
+                  <int>66</int>
+                </gt>
+              </condition>
+              <then>
+                <expression>
+                  <invoke name="append">
+                    <instance>
+                      <var name="buf"/>
+                    </instance>
+                    <arguments>
+                      <string>[</string>
+                    </arguments>
+                  </invoke>
+                </expression>
+
+              </then>
+              <else>
+                <if>
+                  <condition>
+                    <gt>
+                      <var name="number"/>
+                      <int>33</int>
+                    </gt>
+                  </condition>
+                  <then>
+                    <expression>
+                      <invoke name="append">
+                        <instance>
+                          <var name="buf"/>
+                        </instance>
+                        <arguments>
+                          <string>]</string>
+                        </arguments>
+                      </invoke>
+                    </expression>
+                  </then>
+                  <else>
+                    <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+
+                    <expression>
+                      <invoke name="append">
+                        <instance>
+                          <var name="buf"/>
+                        </instance>
+                        <arguments>
+                          <string>.</string>
+                        </arguments>
+                      </invoke>
+                    </expression>
+
+                    <expression>
+                      <invoke name="add">
+                        <instance>
+                          <var name="list"/>
+                        </instance>
+                        <arguments>
+                          <var name="number"/>
+                        </arguments>
+                      </invoke>
+                    </expression>
+                  </else>
+                </if>
+              </else>
+            </if>
+
+            <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+          </block>
+        </for>
+
+        <for-each label="loop">
+          <var-decl name="digit">
+            <type name="int"/>
+            <initialize>
+              <var name="list"/>
+            </initialize>
+          </var-decl>
+          <block>
+            <if>
+              <condition>
+                <lt>
+                  <var name="digit"/>
+                  <int>7</int>
+                </lt>
+              </condition>
+              <then>
+                <try>
+                  <block>
+                    <expression>
+                      <invoke name="append">
+                        <instance>
+                          <var name="buf"/>
+                        </instance>
+                        <arguments>
+                          <div>
+                            <int>100</int>
+                            <var name="digit"/>
+                          </div>
+                        </arguments>
+                      </invoke>
+                    </expression>
+
+                    <switch>
+                      <test>
+                        <var name="digit"/>
+                      </test>
+                      <case>
+                        <value><int>5</int></value>
+                        <block>
+                          <expression>
+                            <invoke name="append">
+                              <instance>
+                                <var name="buf"/>
+                              </instance>
+                              <arguments>
+                                <string>+</string>
+                              </arguments>
+                            </invoke>
+                          </expression>
+                          <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+                          <break/>
+                        </block>
+                      </case>
+                      <case>
+                        <value><int>1</int></value>
+                      </case>
+                      <case>
+                        <value><int>2</int></value>
+                        <block>
+                          <expression>
+                            <invoke name="append">
+                              <instance>
+                                <var name="buf"/>
+                              </instance>
+                              <arguments>
+                                <string>-</string>
+                              </arguments>
+                            </invoke>
+                          </expression>
+                        </block>
+                      </case>
+                      <case>
+                        <block>
+                          <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+                          <expression>
+                            <invoke name="append">
+                              <instance>
+                                <var name="buf"/>
+                              </instance>
+                              <arguments>
+                                <string>!</string>
+                              </arguments>
+                            </invoke>
+                          </expression>
+                          <break/>
+                        </block>
+                      </case>
+                    </switch>
+                  </block>
+                  <catch>
+                    <parameter name="e">
+                      <type name="Exception"/>
+                    </parameter>
+                    <block>
+
+                      <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+
+                      <expression>
+                        <invoke name="append">
+                          <instance>
+                            <var name="buf"/>
+                          </instance>
+                          <arguments>
+                            <string>Inf</string>
+                          </arguments>
+                        </invoke>
+                      </expression>
+
+                      <break destination-label="loop"/>
+
+                    </block>
+                  </catch>
+                  <finally>
+                    <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+                  </finally>
+                </try>
+              </then>
+              <else>
+
+                <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+
+                <continue destination-label="loop"/>
+              </else>
+            </if>
+
+            <expression>
+              <invoke name="append">
+                <instance>
+                  <var name="buf"/>
+                </instance>
+                <arguments>
+                  <static-invoke name="getLetter">
+                    <type name="Test"/>
+                  </static-invoke>
+                </arguments>
+              </invoke>
+            </expression>
+            <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+          </block>
+        </for-each>
+
+        <var-decl name="i">
+          <type name="int"/>
+          <initialize>
+            <int>0</int>
+          </initialize>
+        </var-decl>
+        <while label="w1">
+          <condition>
+            <lt>
+              <var name="i"/>
+              <int>100</int>
+            </lt>
+          </condition>
+          <block>
+            <expression>
+              <inc>
+                <var name="i"/>
+              </inc>
+            </expression>
+            <var-decl name="j">
+              <type name="int"/>
+              <initialize>
+                <int>0</int>
+              </initialize>
+            </var-decl>
+            <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+            <do-while label="w2">
+              <block>
+                <expression>
+                  <inc>
+                    <var name="j"/>
+                  </inc>
+                </expression>
+                <expression>
+                  <invoke name="append">
+                    <instance>
+                      <var name="buf"/>
+                    </instance>
+                    <arguments>
+                      <add>
+                        <var name="i"/>
+                        <var name="j"/>
+                      </add>
+                    </arguments>
+                  </invoke>
+                </expression>
+                <if>
+                  <condition>
+                    <eq>
+                      <add>
+                        <var name="i"/>
+                        <var name="j"/>
+                      </add>
+                      <int>177</int>
+                    </eq>
+                  </condition>
+                  <then>
+                    <block>
+                      <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+                      <continue destination-label="w1"/>
+                    </block>
+                  </then>
+                </if>
+                <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+                <expression>
+                  <invoke name="append">
+                    <instance>
+                      <var name="buf"/>
+                    </instance>
+                    <arguments>
+                      <string>.</string>
+                    </arguments>
+                  </invoke>
+                </expression>
+              </block>
+              <condition>
+                <lt>
+                  <var name="j"/>
+                  <int>100</int>
+                </lt>
+              </condition>
+            </do-while>
+          </block>
+        </while>
+
+        <expression>
+          <invoke name="append">
+            <instance>
+              <var name="buf"/>
+            </instance>
+            <arguments>
+              <string> :End</string>
+            </arguments>
+          </invoke>
+        </expression>
+        <expression>
+          <invoke name="println">
+            <instance>
+              <static-field name="out">
+                <type name="System"/>
+              </static-field>
+            </instance>
+            <arguments>
+              <var name="buf"/>
+            </arguments>
+          </invoke>
+        </expression>
+
+        <expression>
+          <assign>
+            <var name="result"/>
+            <invoke name="toString">
+              <instance>
+                <var name="buf"/>
+              </instance>
+            </invoke>
+          </assign>
+        </expression>
+      </block>
+    </class-method>
+
+  </class>
+</unit>

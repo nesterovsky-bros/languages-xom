@@ -190,14 +190,18 @@
   -->
   <xsl:template mode="p:refactor-complex-condition"
     match="and[t:contains-complex-expression(.)]">
-    
+
     <xsl:variable name="arguments" as="element()+"
       select="t:get-java-element(.)"/>
     <xsl:variable name="name-id" as="xs:string" 
       select="concat(generate-id(), '.complex-condition')"/>
     
     <xsl:variable name="condition" as="element()">
-      <var name="condition" name-ref="{$name-id}"/>
+      <var name="condition" name-ref="{$name-id}">
+        <meta>
+          <type name="boolean"/>
+        </meta>
+      </var>
     </xsl:variable>
 
     <xsl:variable name="statements" as="element()+">
@@ -242,7 +246,11 @@
       select="concat(generate-id(), '.complex-condition')"/>
 
     <xsl:variable name="condition" as="element()">
-      <var name="condition" name-ref="{$name-id}"/>
+      <var name="condition" name-ref="{$name-id}">
+        <meta>
+          <type name="boolean"/>
+        </meta>
+      </var>
     </xsl:variable>
 
     <xsl:variable name="statements" as="element()+">
@@ -290,14 +298,21 @@
       select="t:get-java-element(.)"/>
     <xsl:variable name="name-id" as="xs:string"
       select="concat(generate-id(), '.complex-condition')"/>
+    
+    <xsl:variable name="type" as="element()" 
+      select="t:get-type-of(., true())"/>
 
     <xsl:variable name="value" as="element()">
-      <var name="value" name-ref="{$name-id}"/>
+      <var name="value" name-ref="{$name-id}">
+        <meta>
+          <xsl:sequence select="$type"/>
+        </meta>
+      </var>
     </xsl:variable>
 
     <xsl:variable name="statements" as="element()+">
       <var-decl name="value" name-id="{$name-id}">
-        <xsl:sequence select="t:get-type-of(., true())"/>
+        <xsl:sequence select="$type"/>
       </var-decl>
 
       <if>
