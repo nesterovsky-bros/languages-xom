@@ -864,7 +864,7 @@ argument-list:
       <xs:complexContent>
         <xs:extension base="base-element">
           <xs:sequence>
-            <xs:group ref="argument" minOccurs="1" maxOccurs="unbounded"/>
+            <xs:group ref="argument" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:extension>
       </xs:complexContent>

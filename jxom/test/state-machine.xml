@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/java-1.5/2008-02-07">
+  <class name="test">
+    <class-method name="test1">
+      <block>0
+        <expression>
+          <invoke name="A"/>
+        </expression>
+
+        <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+        
+        <expression>
+          <invoke name="B"/>
+        </expression>
+      </block>
+    </class-method>
+
+    <class-method name="test2">
+      <parameters>
+        <parameter name="p">
+          <type name="String"/>
+        </parameter>
+      </parameters>
+      <block>
+        <var-decl name="i">
+          <type name="int"/>
+          <initialize>
+            <int>7</int>
+          </initialize>
+        </var-decl>
+        
+        <expression>
+          <invoke name="A"/>
+        </expression>
+
+        <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+
+        <if>
+          <condition>
+            <boolean>true</boolean>
+          </condition>
+          <then>
+            <expression>
+              <invoke name="B"/>
+            </expression>
+
+            <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+
+            <expression>
+              <invoke name="C"/>
+            </expression>
+          </then>
+          <else>
+            <expression>
+              <invoke name="D"/>
+            </expression>
+          </else>
+        </if>
+
+        <expression>
+          <invoke name="E"/>
+        </expression>
+      </block>
+    </class-method>
+
+    <class-method name="test3">
+      <block>
+        <try label="l">
+          <block>
+            <expression>
+              <invoke name="A"/>
+            </expression>
+
+            <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+
+            <if>
+              <condition>
+                <invoke name="B"/>
+              </condition>
+              <then>
+                <try>
+                  <block>
+                    <break destination-label="l"/>
+                  </block>
+                  <finally/>
+                </try>
+              </then>
+            </if>
+          </block>
+          <catch>
+            <parameter name="e">
+              <type name="Exception"/>
+            </parameter>
+            <block>
+              <expression>
+                <invoke name="C">
+                  <arguments>
+                    <var name="e"/>
+                  </arguments>
+                </invoke>
+              </expression>
+            </block>
+          </catch>
+          <finally>
+            <expression>
+              <invoke name="D"/>
+            </expression>
+          </finally>
+        </try>
+
+        <expression>
+          <invoke name="E"/>
+        </expression>
+      </block>
+    </class-method>
+
+    <class-method name="test4">
+      <block>
+        <expression>
+          <new-object>
+            <type name="MyClass"/>
+          </new-object>
+        </expression>
+
+        <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+
+        <var-decl name="x">
+          <type name="MyClass"/>
+          <initialize>
+            <new-object>
+              <type name="MyClass"/>
+            </new-object>
+          </initialize>
+        </var-decl>
+
+        <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+
+        <expression>
+          <assign>
+            <var name="x"></var>
+            <int>10</int>
+          </assign>
+        </expression>
+      </block>
+    </class-method>
+
+    <!-- for -->
+    <!-- empty for -->
+    <class-method name="testEmptyFor">
+      <block>
+        <for>
+          <block>
+            <expression>
+              <invoke name="A"></invoke>
+            </expression>
+
+            <if>
+              <condition>
+                <var name="x"/>
+              </condition>
+              <then/>
+              <else>
+                <break/>
+              </else>
+            </if>
+
+            <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+
+            <expression>
+              <invoke name="A"></invoke>
+            </expression>
+          </block>
+        </for>
+      </block>
+    </class-method>
+
+    <!-- for with the same var in declaration and increment -->
+    <!-- for with more than one statement in "update" section -->
+    <class-method name="testFor">
+      <block>
+        <for>
+          <var-decl name="j">
+            <type name="int"/>
+            <initialize>
+              <int>0</int>
+            </initialize>
+          </var-decl>
+          <condition>
+            <var name="b"/>
+          </condition>
+          <update>
+            <add-to>
+              <var name="j"/>
+              <int>50</int>
+            </add-to>
+          </update>
+          <update>
+            <add-to>
+              <var name="j"/>
+              <int>50</int>
+            </add-to>
+          </update>
+          <block>
+            <expression>
+              <invoke name="A"></invoke>
+            </expression>
+
+            <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+
+            <expression>
+              <invoke name="A"></invoke>
+            </expression>
+          </block>
+        </for>
+
+        <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+
+        <expression>
+          <invoke name="A"></invoke>
+        </expression>
+      </block>
+    </class-method>
+
+    <class-method name="testFor2">
+      <block>
+        <for>
+          <initialize>
+            <invoke name="A"></invoke>
+          </initialize>
+          <initialize>
+            <invoke name="A"></invoke>
+          </initialize>
+          <condition>
+            <invoke name="A"></invoke>
+          </condition>
+          <update>
+            <invoke name="A"></invoke>
+          </update>
+          <update>
+            <invoke name="A"></invoke>
+          </update>
+          <block>
+            <expression>
+              <invoke name="A"></invoke>
+            </expression>
+
+            <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+          </block>
+        </for>
+      </block>
+    </class-method>
+
+    <class-method name="testFor3">
+      <block>
+        <for>
+          <block>
+            <expression>
+              <invoke name="A"></invoke>
+            </expression>
+
+            <if>
+              <condition><boolean>true</boolean></condition>
+              <then>
+                <expression>
+                  <invoke name="C"></invoke>
+                </expression>
+                <break/>
+              </then>
+            </if>
+
+            <if>
+              <condition><boolean>true</boolean></condition>
+              <then>
+                <expression>
+                  <invoke name="C"></invoke>
+                </expression>
+                <continue/>
+              </then>
+            </if>
+
+            <for>
+              <block>
+                <expression>
+                  <invoke name="B"></invoke>
+                </expression>
+
+                <if>
+                  <condition><boolean>true</boolean></condition>
+                  <then>
+                    <expression>
+                      <invoke name="C"></invoke>
+                    </expression>
+                  </then>
+                  <else>
+                    <break/>
+                  </else>
+                </if>
+
+                <if>
+                  <condition><boolean>true</boolean></condition>
+                  <then>
+                    <expression>
+                      <invoke name="C"></invoke>
+                    </expression>
+                  </then>
+                  <else>
+                    <continue/>
+                  </else>
+                </if>
+
+                <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+              </block>
+            </for>
+
+            <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+          </block>
+        </for>
+      </block>
+    </class-method>
+
+    <class-method name="testForEach">
+      <block>
+        <for-each>
+          <var-decl name="x">
+            <type name="MyClass"/>
+            <initialize>
+                <invoke name="A"></invoke>
+            </initialize>
+          </var-decl>
+          <block>
+            <expression>
+              <invoke name="A"></invoke>
+            </expression>
+
+            <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+          </block>
+        </for-each>
+
+      </block>
+    </class-method>
+
+    <class-method name="testForEachArrayItem">
+      <block>
+        <for-each>
+          <var-decl name="x">
+            <type name="MyClass"/>
+            <initialize>
+              <invoke name="A">
+                <meta>
+                  <type name="MyClass" arity="1"/>
+                </meta>
+              </invoke>
+            </initialize>
+          </var-decl>
+          <block>
+            <expression>
+              <invoke name="A"></invoke>
+            </expression>
+
+            <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+          </block>
+        </for-each>
+      </block>
+    </class-method>
+
+    <class-method name="testWhile">
+      <block>
+        <while>
+          <condition>
+            <var name="b"/>
+          </condition>
+          <block>
+            <expression>
+              <invoke name="A"></invoke>
+            </expression>
+
+            <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+
+            <expression>
+              <invoke name="A"></invoke>
+            </expression>
+          </block>
+        </while>
+      </block>
+    </class-method>
+
+    <class-method name="testDoWhile">
+      <block>
+        <do-while>
+          <condition>
+            <var name="b"/>
+          </condition>
+          <block>
+            <expression>
+              <invoke name="A"></invoke>
+            </expression>
+
+            <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+
+            <expression>
+              <invoke name="A"></invoke>
+            </expression>
+          </block>
+        </do-while>
+      </block>
+    </class-method>
+
+    <class-method name="testSwitch">
+      <block>
+        <switch>
+          <test>
+            <var name="x"/>
+          </test>
+          <case>
+            <value><int>10</int></value>
+            <block>
+              <expression>
+                <invoke name="A"></invoke>
+              </expression>
+              <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+              <break/>
+            </block>
+          </case>
+          <case>
+            <value><int>11</int></value>
+            <block>
+              <expression>
+                <invoke name="A"></invoke>
+              </expression>
+              <break/>
+            </block>
+          </case>
+        </switch>
+      </block>
+    </class-method>
+
+    <class-method name="testSwitch2">
+      <block>
+        <switch>
+          <test>
+            <var name="x"/>
+          </test>
+          <case>
+            <value><int>10</int></value>
+            <block>
+              <expression>
+                <invoke name="A"></invoke>
+              </expression>
+              <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
+            </block>
+          </case>
+          <case>
+            <value><int>11</int></value>
+            <block>
+              <expression>
+                <invoke name="A"></invoke>
+              </expression>
+            </block>
+          </case>
+        </switch>
+      </block>
+    </class-method>
+
+    <class-method name="A">
+      <block>
+        <comment>logic A</comment>
+      </block>
+    </class-method>
+    <class-method name="B">
+      <block>
+        <comment>logic B</comment>
+      </block>
+    </class-method>
+    <class-method name="C">
+      <parameters>
+        <parameter name="e">
+          <type name="Exception"/>
+        </parameter>
+      </parameters>
+      <block>
+        <comment>logic C</comment>
+      </block>
+    </class-method>
+    <class-method name="D">
+      <block>
+        <comment>logic D</comment>
+      </block>
+    </class-method>
+    <class-method name="E">
+      <block>
+        <comment>logic E</comment>
+      </block>
+    </class-method>
+  </class>
+</unit>
