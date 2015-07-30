@@ -125,7 +125,7 @@
             ancestor::and, 
             ancestor::or, 
             ancestor::coalesce,
-            ancestor::condition[count(t:get-elements(.) = 3)]
+            ancestor::condition[count(t:get-elements(.)) = 3]
           )">
 
         <xsl:variable name="condition" as="element()">
