@@ -46,7 +46,7 @@
   <xsl:variable name="t:nullable-decimal" as="element()"
     select="t:get-nullable($t:decimal)"/>
 
-    <!-- Predefined types. double -->
+  <!-- Predefined types. double -->
   <xsl:variable name="t:double" as="element()">
     <type name="double"/>
   </xsl:variable>
@@ -238,7 +238,7 @@
     ]">
 
     <xsl:variable name="rank" as="xs:integer?" select="@rank"/>
-    
+
     <xsl:sequence select="
       if ($rank) then
         concat(@name, '_', $rank)
@@ -636,10 +636,10 @@
   <!--
     Mode "t:get-type-of". Complex expression.
   -->
-  <xsl:template mode="t:get-type-of" 
+  <xsl:template mode="t:get-type-of"
     match="invoke[t:is-complex-expression(.)]">
-    <xsl:apply-templates mode="#current" 
-      select="cast/(anonymous-method, lambda)/block/t:get-elements(return)"/>                         
+    <xsl:apply-templates mode="#current"
+      select="cast/(anonymous-method, lambda)/block/t:get-elements(return)"/>
   </xsl:template>
 
   <!-- Mode "t:get-type-of". byte. -->
@@ -973,14 +973,11 @@
         <xsl:sequence select="t:get-elements($simplified-expression)"/>
       </xsl:when>
       <xsl:when
-        test="$simplified-expression[xs:boolean(@value)]">
+        test="$simplified-expression/self::bool/xs:boolean(@value) = true()">
         <bool value="false"/>
       </xsl:when>
-      <xsl:when test="
-        $simplified-expression
-        [
-          self::boolean[xs:boolean(@value) = false()]
-        ]">
+      <xsl:when
+        test="$simplified-expression/self::bool/xs:boolean(@value) = false()">
         <bool value="true"/>
       </xsl:when>
       <xsl:when test="$simplified-expression[self::parens]">
