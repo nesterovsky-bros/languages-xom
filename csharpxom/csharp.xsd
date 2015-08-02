@@ -6289,7 +6289,7 @@ attribute-list:
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
-      <xs:group ref="attribute" maxOccurs="unbounded"/>
+      <xs:group ref="attribute" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:group>
 

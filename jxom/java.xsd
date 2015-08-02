@@ -868,7 +868,7 @@
     <xs:complexContent>
       <xs:extension base="java-element">
         <xs:sequence>
-          <xs:element ref="annotation" minOccurs="1" maxOccurs="unbounded"/>
+          <xs:element ref="annotation" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>

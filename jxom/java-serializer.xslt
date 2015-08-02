@@ -130,15 +130,8 @@
     <xsl:param name="element" as="element()"/>
     <xsl:param name="inline" as="xs:boolean"/>
 
-    <xsl:variable name="annotations" as="element()?"
-      select="$element/annotations"/>
-
-    <xsl:if test="$annotations">
-      <xsl:variable name="annotation" as="element()+"
-        select="$annotations/annotation"/>
-
-      <xsl:sequence select="t:get-annotation($annotation, $inline)"/>
-    </xsl:if>
+    <xsl:sequence 
+      select="t:get-annotation($element/annotations/annotation, $inline)"/>
   </xsl:function>
 
   <!--
@@ -148,7 +141,7 @@
       Returns annotations, if any, as sequence of tokens.
   -->
   <xsl:function name="t:get-annotation" as="item()*">
-    <xsl:param name="annotation" as="element()+"/>
+    <xsl:param name="annotation" as="element()*"/>
     <xsl:param name="inline" as="xs:boolean"/>
 
     <xsl:for-each select="$annotation">
