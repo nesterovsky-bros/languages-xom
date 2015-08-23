@@ -65,7 +65,7 @@
         <xsl:variable name="converted-method" as="element()" select="
           t:convert-method-to-state-machine
           (
-            .,
+            $method,
             concat(@name, 'AsStateMachine'),
             true(),
             false()

@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/csharp-3.0/2009-05-23">
+  <comment>Null-conditional operators</comment>
+
+  <class access="public" name="Program">
+    <method static="true" access="public" name="Main">
+      <block>
+        <var name="length">
+          <comment>null if customers is null</comment>
+          <type name="Nullable" namespace="System">
+            <type-arguments>
+              <type name="int"/>
+            </type-arguments>
+          </type>
+          <initialize>
+            <property-ref name="Length">
+              <null-conditional>
+                <var-ref name="customers"/>
+              </null-conditional>
+            </property-ref>
+          </initialize>
+        </var>
+
+        <var name="first">
+          <comment>null if customers is null</comment>
+          <type name="Customer"/>
+          <initialize>
+            <subscript>
+              <null-conditional>
+                <var-ref name="customers"/>
+              </null-conditional>
+              <int value="0"/>
+            </subscript>
+          </initialize>
+        </var>
+
+        <var name="length2">
+          <comment>0 if customers is null</comment>
+          <type name="int"/>
+          <initialize>
+            <coalesce>
+              <property-ref name="Length">
+                <null-conditional>
+                  <var-ref name="customers"/>
+                </null-conditional>
+              </property-ref>
+
+              <int value="0"/>
+            </coalesce>
+          </initialize>
+        </var>
+
+        <var name="first2">
+          <type name="Nullable" namespace="System">
+            <type-arguments>
+              <type name="int"/>
+            </type-arguments>
+          </type>
+          <initialize>
+            <invoke>
+              <method-ref name="Count">
+                <property-ref name="Orders">
+                  <subscript>
+                    <null-conditional>
+                      <var-ref name="customers"/>
+                    </null-conditional>
+                    <int value="0"/>
+                  </subscript>
+                </property-ref>
+              </method-ref>
+            </invoke>
+          </initialize>
+        </var>
+
+        <var name="first3">
+          <type name="Nullable" namespace="System">
+            <type-arguments>
+              <type name="int"/>
+            </type-arguments>
+          </type>
+          <initialize>
+            <invoke>
+              <method-ref name="Count">
+                <null-conditional>
+                  <property-ref name="Orders">
+                    <subscript>
+                      <null-conditional>
+                        <var-ref name="customers"/>
+                      </null-conditional>
+                      <int value="0"/>
+                    </subscript>
+                  </property-ref>
+                </null-conditional>
+              </method-ref>
+            </invoke>
+          </initialize>
+        </var>
+
+        <if>
+          <condition>
+            <coalesce>
+              <invoke>
+                <method-ref name="Invoke">
+                  <null-conditional>
+                    <var-ref name="predicate"/>
+                  </null-conditional>
+                </method-ref>
+                <arguments>
+                  <var-ref name="e"/>
+                </arguments>
+              </invoke>
+              <bool value="false"/>
+            </coalesce>
+          </condition>
+          <then>
+            <comment>...</comment>
+          </then>
+        </if>
+
+        <expression>
+          <invoke>
+            <method-ref name="Invoke">
+              <null-conditional>
+                <property-ref name="PropertyChanged"/>
+              </null-conditional>
+            </method-ref>
+            <arguments>
+              <this/>
+              <var-ref name="args"/>
+            </arguments>
+          </invoke>
+        </expression>
+      </block>
+    </method>
+
+  </class>
+
+</unit>

@@ -99,9 +99,9 @@
   <xsl:function name="t:can-convert-method-to-state-machine" as="xs:string">
     <xsl:param name="method" as="element()"/>
 
-    <xsl:variable name="block" as="element()" select="$method/block"/>
+    <xsl:variable name="block" as="element()?" select="$method/block"/>
     <xsl:variable name="yield-statements" as="element()*"
-      select="p:get-yield-statements($block)"/>
+      select="$block/p:get-yield-statements(.)"/>
     <xsl:variable name="synchronized" as="xs:boolean?"
       select="$method/@synchronized"/>
     <xsl:variable name="return-type" as="element()?"
@@ -188,13 +188,10 @@
     <xsl:variable name="id" as="xs:string" select="generate-id($method)"/>
     <xsl:variable name="pseudo-code" as="element()"
       select="p:build-pseudo-code($method)"/>
-
     <xsl:variable name="has-try" as="xs:boolean"
       select="exists($pseudo-code//try[@p:try])"/>
-
     <xsl:variable name="has-next-state" as="xs:boolean"
       select="exists($pseudo-code//snippet-statement[@p:goto and @p:next])"/>
-
     <xsl:variable name="parameters" as="element()*"
       select="$method/parameters/parameter"/>
     <xsl:variable name="state-variables" as="element()*" select="
@@ -644,6 +641,14 @@
     <block>
       <xsl:choose>
         <xsl:when test="$has-try">
+          <xsl:variable name="error-cases" as="element()*" select="
+            p:generate-error-cases
+            (
+              $pseudo-code,
+              $scopes,
+              $states
+            )"/>
+          
           <while>
             <condition>
               <boolean value="true"/>
@@ -681,15 +686,6 @@
                     <type name="Throwable"/>
                   </parameter>
                   <block>
-                    <expression>
-                      <assign>
-                        <field
-                          name="currentError"
-                          name-ref="currentError.state-machine"/>
-                        <null/>
-                      </assign>
-                    </expression>
-
                     <xsl:if test="$has-next-state">
                       <expression>
                         <assign>
@@ -701,21 +697,26 @@
                       </expression>
                     </xsl:if>
 
-                    <switch>
-                      <test>
-                        <field
-                          name="state"
-                          name-ref="state.state-machine"/>
-                      </test>
+                    <xsl:if test="$error-cases">
+                      <expression>
+                        <assign>
+                          <field
+                            name="currentError"
+                            name-ref="currentError.state-machine"/>
+                          <null/>
+                        </assign>
+                      </expression>
+          
+                      <switch>
+                        <test>
+                          <field
+                            name="state"
+                            name-ref="state.state-machine"/>
+                        </test>
 
-                      <xsl:sequence select="
-                        p:generate-error-cases
-                        (
-                          $pseudo-code,
-                          $scopes,
-                          $states
-                        )"/>
-                    </switch>
+                        <xsl:sequence select="$error-cases"/>
+                      </switch>
+                    </xsl:if>
 
                     <expression>
                       <assign>
@@ -932,6 +933,7 @@
 
         <xsl:variable name="finally" as="element()?"
           select="$handlers[self::finally]"/>
+        
         <xsl:variable name="throwable-handler" as="element()?" select="
           $handlers[self::catch]
           [
@@ -2150,12 +2152,13 @@
                   generate-id($next-try),
                   '.try.state-machine'
                 )"/>
+
               <xsl:attribute name="p:next-finally" select="
                 concat
                 (
                   'statement.',
                   generate-id($next-try/finally),
-                  '.begin'
+                  '.begin.state-machine'                             
                 )"/>
             </xsl:if>
           </snippet-statement>

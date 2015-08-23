@@ -560,12 +560,6 @@
         <comment>Rule 12</comment>
 
         <do-while>
-          <condition>
-            <ne>
-              <var name="a"/>
-              <var name="b"/>
-            </ne>
-          </condition>
           <block>
             <expression>
               <add-to>
@@ -580,6 +574,12 @@
               </inc>
             </expression>
           </block>
+          <condition>
+            <ne>
+              <var name="a"/>
+              <var name="b"/>
+            </ne>
+          </condition>
         </do-while>
 
         <expression>
@@ -589,12 +589,6 @@
         </expression>
 
         <do-while>
-          <condition>
-            <ne>
-              <var name="a"/>
-              <var name="b"/>
-            </ne>
-          </condition>
           <block>
             <expression>
               <add-to>
@@ -621,6 +615,12 @@
               </inc>
             </expression>
           </block>
+          <condition>
+            <ne>
+              <var name="a"/>
+              <var name="b"/>
+            </ne>
+          </condition>
         </do-while>
 
         <expression>
@@ -630,12 +630,6 @@
         </expression>
 
         <do-while>
-          <condition>
-            <ne>
-              <var name="a"/>
-              <var name="b"/>
-            </ne>
-          </condition>
           <block>
             <expression>
               <add-to>
@@ -662,6 +656,12 @@
               </inc>
             </expression>
           </block>
+          <condition>
+            <ne>
+              <var name="a"/>
+              <var name="b"/>
+            </ne>
+          </condition>
         </do-while>
 
         <expression>
@@ -671,9 +671,6 @@
         </expression>
 
         <do-while>
-          <condition>
-            <boolean value="true"/>
-          </condition>
           <block>
             <expression>
               <add-to>
@@ -694,6 +691,9 @@
               </else>
             </if>
           </block>
+          <condition>
+            <boolean value="true"/>
+          </condition>
         </do-while>
 
         <expression>

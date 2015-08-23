@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/csharp-3.0/2009-05-23">
+  <comment>Expression bodied methods and properties.</comment>
+
+  <namespace name="N1">
+    <class access="public" name="Program">
+      <method access="public" name="Move">
+        <returns>
+          <type name="Point"/>
+        </returns>
+        <parameters>
+          <parameter name="dx">
+            <type name="int"/>
+          </parameter>
+          <parameter name="dy">
+            <type name="int"/>
+          </parameter>
+        </parameters>
+        <block expression="true">
+          <return>
+            <new-object>
+              <type name="Point"/>
+              <arguments>
+                <var-ref name="dx"/>
+                <var-ref name="dy"/>
+              </arguments>
+            </new-object>
+          </return>
+        </block>
+      </method>
+      
+      <operator access="public" static="true" name="plus">
+        <returns>
+          <type name="Complex"/>
+        </returns>
+        <parameters>
+          <parameter name="a">
+            <type name="Complex"/>
+          </parameter>
+          <parameter name="b">
+            <type name="Complex"/>
+          </parameter>
+        </parameters>
+        <block expression="true">
+          <return>
+            <invoke>
+              <method-ref name="Add">
+                <var-ref name="a"/>
+              </method-ref>
+              <arguments>
+                <var-ref name="b"/>
+              </arguments>
+            </invoke>
+          </return>
+        </block>
+      </operator>
+
+      <operator access="public" static="true" implicit="true">
+        <returns>
+          <type name="string"/>
+        </returns>
+        <parameters>
+          <parameter name="p">
+            <type name="Person"/>
+          </parameter>
+        </parameters>
+        <block expression="true">
+          <return>
+            <add>
+              <add>
+                <property-ref name="Field">
+                  <var-ref name="p"/>
+                </property-ref>
+                <string value=" "/>
+              </add>
+
+              <property-ref name="Last">
+                <var-ref name="p"/>
+              </property-ref>
+            </add>
+          </return>
+        </block>
+      </operator>
+
+
+      <method access="public" name="Print">
+        <block expression="true">
+          <return>
+            <invoke>
+              <static-method-ref name="WriteLine">
+                <type name="Console"/>
+              </static-method-ref>
+              <arguments>
+                <add>
+                  <add>
+                    <property-ref name="Field"/>
+                    <string value=" "/>
+                  </add>
+                  <property-ref name="Last"/>
+                </add>
+              </arguments>
+            </invoke>
+          </return>
+        </block>
+      </method>
+
+      <property access="public" name="Name">
+        <type name="string"/>
+        <get>
+          <block expression="true">
+            <return>
+              <add>
+                <add>
+                  <property-ref name="First"/>
+                  <string value=" "/>
+                </add>
+                <property-ref name="Last"/>
+              </add>
+            </return>
+          </block>
+        </get>
+      </property>
+
+      <property access="public" name="this">
+        <type name="Customer"/>
+        <parameters>
+          <parameter name="id">
+            <type name="long"/>
+          </parameter>
+        </parameters>
+        <get>
+          <block expression="true">
+            <return>
+              <invoke>
+                <method-ref name="LookupCustomer">
+                  <var-ref name="store"/>
+                </method-ref>
+                <arguments>
+                  <var-ref name="id"/>
+                </arguments>
+              </invoke>
+            </return>
+          </block>
+        </get>
+      </property>
+    </class>
+  </namespace>
+
+</unit>

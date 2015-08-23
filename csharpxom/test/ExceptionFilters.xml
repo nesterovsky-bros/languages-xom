@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/csharp-3.0/2009-05-23">
+  <comment>Expression bodied methods and properties.</comment>
+
+  <class access="public" name="Program">
+    <method access="public" name="Test">
+      <block>
+        <try>
+          <expression>
+            <invoke>
+              <method-ref name="A"/>
+            </invoke>
+          </expression>
+          
+          <catch name="e">
+            <type name="Exception" namespace="System"/>
+            <when>
+              <invoke>
+                <static-method-ref name="myFilter"/>
+                <arguments>
+                  <var-ref name="e"/>
+                </arguments>
+              </invoke>
+            </when>
+
+            <expression>
+              <invoke>
+                <method-ref name="B"/>
+              </invoke>
+            </expression>
+          </catch>
+        </try>
+      </block>
+    </method>
+
+  </class>
+
+</unit>

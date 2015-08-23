@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/csharp-3.0/2009-05-23">
+  <comment>Expression bodied methods and properties.</comment>
+
+  <class access="public" name="Program">
+    <method access="public" name="Test">
+      <block>
+        <var name="numbers">
+          <initialize>
+            <new-object>
+              <type name="Dictionary">
+                <type-arguments>
+                  <type name="int"/>
+                  <type name="string"/>
+                </type-arguments>
+              </type>
+              <initialize>
+                <item>
+                  <index>
+                    <int value="7"/>
+                    <string value="seven"/>
+                  </index>
+                </item>
+                <item>
+                  <index>
+                    <int value="9"/>
+                    <string value="nine"/>
+                  </index>
+                </item>
+                <item>
+                  <index>
+                    <int value="13"/>
+                    <string value="thirteen"/>
+                  </index>
+                </item>
+              </initialize>
+            </new-object>
+          </initialize>
+        </var>
+      </block>
+    </method>
+
+  </class>
+
+</unit>

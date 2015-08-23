@@ -1059,6 +1059,10 @@
     <xsl:variable name="constraints" as="element()*" select="constraints"/>
     <xsl:variable name="block" as="element()?" select="block"/>
 
+    <xsl:variable name="expression" as="element()?" select="
+      $block[xs:boolean(@expression) and (count(*) = 1)]/
+        return/t:get-elements(.)"/>
+
     <xsl:sequence select="t:get-attributes($attributes)"/>
     <xsl:sequence select="t:get-modifiers(.)"/>
 
@@ -1091,13 +1095,21 @@
     </xsl:if>
 
     <xsl:choose>
-      <xsl:when test="exists($block)">
-        <xsl:sequence select="$t:new-line"/>
-        <xsl:sequence select="t:get-statement($block)"/>
-      </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="not($block)">
         <xsl:sequence select="';'"/>
         <xsl:sequence select="$t:new-line"/>
+      </xsl:when>
+      <xsl:when test="$expression">
+        <xsl:sequence select="' '"/>
+        <xsl:sequence select="'=>'"/>
+        <xsl:sequence select="' '"/>
+        <xsl:sequence select="t:get-expression($expression)"/>
+        <xsl:sequence select="';'"/>
+        <xsl:sequence select="$t:new-line"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="$t:new-line"/>
+        <xsl:sequence select="t:get-statement($block)"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -1116,6 +1128,7 @@
     <xsl:variable name="parameters" as="element()?" select="parameters"/>
     <xsl:variable name="getter" as="element()?" select="get"/>
     <xsl:variable name="setter" as="element()?" select="set"/>
+    <xsl:variable name="initializer" as="element()?" select="initialize"/>
 
     <xsl:if test="empty($getter) and empty($setter)">
       <xsl:sequence select="
@@ -1147,58 +1160,82 @@
 
     <xsl:variable name="compact" as="xs:boolean"
       select="empty(($getter, $setter)/(attributes, block))"/>
+    
+    <xsl:variable name="expression" as="element()?" select="
+      $getter[not($setter) and not(attributes) and not(@access)]/
+        block[xs:boolean(@expression) and (count(*) = 1)]/
+          return/t:get-elements(.)"/>
 
     <xsl:choose>
-      <xsl:when test="$compact">
+      <xsl:when test="$expression">
         <xsl:sequence select="' '"/>
-        <xsl:sequence select="'{'"/>
+        <xsl:sequence select="'=>'"/>
         <xsl:sequence select="' '"/>
+        <xsl:sequence select="t:get-expression($expression)"/>
+        <xsl:sequence select="';'"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:sequence select="$t:new-line"/>
-        <xsl:sequence select="'{'"/>
-        <xsl:sequence select="$t:new-line"/>
-      </xsl:otherwise>
-    </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="$compact">
+            <xsl:sequence select="' '"/>
+            <xsl:sequence select="'{'"/>
+            <xsl:sequence select="' '"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:sequence select="$t:new-line"/>
+            <xsl:sequence select="'{'"/>
+            <xsl:sequence select="$t:new-line"/>
+          </xsl:otherwise>
+        </xsl:choose>
 
-    <xsl:sequence select="$t:indent"/>
+        <xsl:sequence select="$t:indent"/>
 
-    <xsl:for-each select="$getter, $setter">
-      <xsl:variable name="accessor-attributes" as="element()?"
-        select="attributes"/>
-      <xsl:variable name="accessor-body" as="element()?" select="block"/>
+        <xsl:for-each select="$getter, $setter">
+          <xsl:variable name="accessor-attributes" as="element()?"
+            select="attributes"/>
+          <xsl:variable name="accessor-body" as="element()?" select="block"/>
 
-      <xsl:sequence select="t:get-attributes($accessor-attributes)"/>
-      <xsl:sequence select="t:get-modifiers(.)"/>
+          <xsl:sequence select="t:get-attributes($accessor-attributes)"/>
+          <xsl:sequence select="t:get-modifiers(.)"/>
 
-      <xsl:sequence select="
-        if (self::get) then
-          'get'
-        else
-          'set'"/>
-
-      <xsl:choose>
-        <xsl:when test="exists($accessor-body)">
-          <xsl:sequence select="$t:new-line"/>
-          <xsl:sequence select="t:get-statement($accessor-body)"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:sequence select="';'"/>
+          <xsl:sequence select="
+            if (self::get) then
+              'get'
+            else
+              'set'"/>
 
           <xsl:choose>
-            <xsl:when test="$compact">
-              <xsl:sequence select="' '"/>
+            <xsl:when test="exists($accessor-body)">
+              <xsl:sequence select="$t:new-line"/>
+              <xsl:sequence select="t:get-statement($accessor-body)"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:sequence select="$t:new-line"/>
+              <xsl:sequence select="';'"/>
+
+              <xsl:choose>
+                <xsl:when test="$compact">
+                  <xsl:sequence select="' '"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:sequence select="$t:new-line"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:otherwise>
           </xsl:choose>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:for-each>
+        </xsl:for-each>
 
-    <xsl:sequence select="$t:unindent"/>
-    <xsl:sequence select="'}'"/>
+        <xsl:sequence select="$t:unindent"/>
+        <xsl:sequence select="'}'"/>
+
+        <xsl:if test="exists($initializer)">
+          <xsl:sequence select="' '"/>
+          <xsl:sequence select="'='"/>
+          <xsl:sequence select="' '"/>
+          <xsl:sequence select="t:get-variable-initializer($initializer)"/>
+          <xsl:sequence select="';'"/>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
 
     <xsl:sequence select="$t:new-line"/>
   </xsl:template>
@@ -1315,6 +1352,10 @@
     <xsl:variable name="parameters" as="element()" select="parameters"/>
     <xsl:variable name="block" as="element()?" select="block"/>
 
+    <xsl:variable name="expression" as="element()?" select="
+      $block[xs:boolean(@expression) and (count(*) = 1)]/
+        return/t:get-elements(.)"/>
+
     <xsl:sequence select="t:get-attributes($attributes)"/>
     <xsl:sequence select="t:get-modifiers(.)"/>
 
@@ -1346,13 +1387,21 @@
     <xsl:sequence select="')'"/>
 
     <xsl:choose>
-      <xsl:when test="exists($block)">
-        <xsl:sequence select="$t:new-line"/>
-        <xsl:sequence select="t:get-statement($block)"/>
-      </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="not($block)">
         <xsl:sequence select="';'"/>
         <xsl:sequence select="$t:new-line"/>
+      </xsl:when>
+      <xsl:when test="$expression">
+        <xsl:sequence select="' '"/>
+        <xsl:sequence select="'=>'"/>
+        <xsl:sequence select="' '"/>
+        <xsl:sequence select="t:get-expression($expression)"/>
+        <xsl:sequence select="';'"/>
+        <xsl:sequence select="$t:new-line"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="$t:new-line"/>
+        <xsl:sequence select="t:get-statement($block)"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -1367,6 +1416,10 @@
     <xsl:variable name="parameters" as="element()?" select="parameters"/>
     <xsl:variable name="initializer" as="element()?" select="initialize"/>
     <xsl:variable name="block" as="element()?" select="block"/>
+
+    <xsl:variable name="expression" as="element()?" select="
+      $block[xs:boolean(@expression) and (count(*) = 1)]/
+        return/t:get-elements(.)"/>
 
     <xsl:sequence select="t:get-attributes($attributes)"/>
     <xsl:sequence select="t:get-modifiers(.)"/>
@@ -1392,13 +1445,21 @@
     </xsl:if>
 
     <xsl:choose>
-      <xsl:when test="exists($block)">
-        <xsl:sequence select="$t:new-line"/>
-        <xsl:sequence select="t:get-statement($block)"/>
-      </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="not($block)">
         <xsl:sequence select="';'"/>
         <xsl:sequence select="$t:new-line"/>
+      </xsl:when>
+      <xsl:when test="$expression">
+        <xsl:sequence select="' '"/>
+        <xsl:sequence select="'=>'"/>
+        <xsl:sequence select="' '"/>
+        <xsl:sequence select="t:get-expression($expression)"/>
+        <xsl:sequence select="';'"/>
+        <xsl:sequence select="$t:new-line"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="$t:new-line"/>
+        <xsl:sequence select="t:get-statement($block)"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -1409,6 +1470,10 @@
     <xsl:variable name="attributes" as="element()?" select="attributes"/>
     <xsl:variable name="block" as="element()?" select="block"/>
 
+    <xsl:variable name="expression" as="element()?" select="
+      $block[xs:boolean(@expression) and (count(*) = 1)]/
+        return/t:get-elements(.)"/>
+
     <xsl:sequence select="t:get-attributes($attributes)"/>
     <xsl:sequence select="t:get-modifiers(.)"/>
     <xsl:sequence select="'~'"/>
@@ -1417,13 +1482,21 @@
     <xsl:sequence select="')'"/>
 
     <xsl:choose>
-      <xsl:when test="exists($block)">
-        <xsl:sequence select="$t:new-line"/>
-        <xsl:sequence select="t:get-statement($block)"/>
-      </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="not($block)">
         <xsl:sequence select="';'"/>
         <xsl:sequence select="$t:new-line"/>
+      </xsl:when>
+      <xsl:when test="$expression">
+        <xsl:sequence select="' '"/>
+        <xsl:sequence select="'=>'"/>
+        <xsl:sequence select="' '"/>
+        <xsl:sequence select="t:get-expression($expression)"/>
+        <xsl:sequence select="';'"/>
+        <xsl:sequence select="$t:new-line"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="$t:new-line"/>
+        <xsl:sequence select="t:get-statement($block)"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

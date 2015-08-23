@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/csharp-3.0/2009-05-23">
+  <comment>Expression bodied methods and properties.</comment>
+
+  <class access="public" name="Program">
+    <method access="public" name="Test">
+      <parameters>
+        <parameter name="x">
+          <type name="string"/>
+        </parameter>
+      </parameters>
+      <block>
+        <if>
+          <condition>
+            <eq>
+              <var-ref name="x"/>
+              <null/>
+            </eq>
+          </condition>
+          <then>
+            <throw>
+              <new-object>
+                <type name="ArgumentNullException" namespace="System"/>
+                <arguments>
+                  <nameof>
+                    <var-ref name="x"/>
+                  </nameof>
+                </arguments>
+              </new-object>
+            </throw>
+          </then>
+        </if>
+
+        <expression>
+          <comment>prints "ZipCode"</comment>
+          <invoke>
+            <method-ref name="WriteLine"/>
+            <arguments>
+              <nameof>
+                <property-ref name="ZipCode">
+                  <property-ref name="Address">
+                    <field-ref name="person"/>
+                  </property-ref>
+                </property-ref>
+              </nameof>
+            </arguments>
+          </invoke>
+        </expression>
+      </block>
+    </method>
+
+  </class>
+
+</unit>

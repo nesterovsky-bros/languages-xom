@@ -358,7 +358,6 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:sequence select="false()"/>
-        <xsl:message select="p:get-descendant-statements(.)"/>
         <xsl:sequence select="$unreachable"/>
       </xsl:otherwise>
     </xsl:choose>
@@ -682,7 +681,7 @@
     <xsl:sequence select="$condition-unreachable"/>
     
     <xsl:variable name="false-condition" as="xs:boolean" 
-      select="($condition/t:is-boolean-false-expression(.), true())[1]"/>
+      select="($condition/t:is-boolean-false-expression(.), false())[1]"/>
     
     <xsl:choose>
       <xsl:when test="

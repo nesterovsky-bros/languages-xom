@@ -439,11 +439,11 @@
 
   <!-- Mode "t:statement". for-statement. -->
   <xsl:template mode="t:statement" match="for">
-    <xsl:variable name="condition" as="element()" select="condition"/>
-    <xsl:variable name="var" as="element()*"
-      select="$condition/preceding-sibling::var"/>
+    <xsl:variable name="condition" as="element()?" select="condition"/>
     <xsl:variable name="initializer" as="element()*" select="initialize"/>
     <xsl:variable name="update" as="element()*" select="update"/>
+    <xsl:variable name="var" as="element()*"
+      select="($initializer, $condition, $update)/preceding-sibling::var"/>
     <xsl:variable name="statements" as="element()*" select="
       t:get-elements(.) except ($var, $initializer, $condition, $update)"/>
     <xsl:variable name="condition-expression" as="element()?"
@@ -460,6 +460,20 @@
             'mutually exclusive in ''for'' statement.'
           ),
           ($var, $initializer)
+        )"/>
+    </xsl:if>
+
+    <xsl:if test="$statements[self::var]">
+      <xsl:sequence select="
+        error
+        (
+          xs:QName('for-var-in-statement-list'),
+          concat
+          (
+            'Variable declaration is not allowed in statement list of for. ', 
+            'Use block statement instead.'
+          ),
+          $statements
         )"/>
     </xsl:if>
 
@@ -698,8 +712,9 @@
     <xsl:for-each select="$catch">
       <xsl:variable name="name" as="xs:string?" select="@name"/>
       <xsl:variable name="type" as="element()?" select="type"/>
+      <xsl:variable name="filter" as="element()?" select="when"/>
       <xsl:variable name="catch-statements" as="element()*"
-        select="t:get-elements(.) except $type"/>
+        select="t:get-elements(.) except ($type, $filter)"/>
 
       <xsl:sequence select="'catch'"/>
 
@@ -712,6 +727,14 @@
           <xsl:sequence select="$name"/>
         </xsl:if>
 
+        <xsl:sequence select="')'"/>
+      </xsl:if>
+
+      <xsl:if test="$filter">
+        <xsl:sequence select="' '"/>
+        <xsl:sequence select="'when'"/>
+        <xsl:sequence select="'('"/>
+        <xsl:sequence select="t:get-expression(t:get-elements($filter))"/>
         <xsl:sequence select="')'"/>
       </xsl:if>
 

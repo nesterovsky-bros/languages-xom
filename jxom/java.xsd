@@ -1154,11 +1154,27 @@
   </xs:group>
 
   <xs:group name="lambda-body">
-    <xs:choice>
-      <xs:element ref="block"/>
-      <xs:element ref="expression"/>
-    </xs:choice>
+    <xs:sequence>
+      <xs:element name="block" type="lambdaBlock"/>
+    </xs:sequence>
   </xs:group>
+
+  <xs:complexType name="lambdaBlock">
+    <xs:annotation>
+      <xs:documentation xml:space="preserve">
+        If @expression is true, and the only content of body is return statement
+        then it's considered a lambda expression body.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:group ref="statement" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:attribute name="expression" type="xs:boolean"
+          use="optional" default="false"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
 
   <xs:complexType name="lambda-parameters">
     <xs:annotation>
@@ -1631,17 +1647,7 @@
     <xs:complexContent>
       <xs:extension base="statement">
         <xs:sequence>
-          <xs:element name="condition">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension base="java-element">
-                  <xs:sequence>
-                    <xs:group ref="expression"/>
-                  </xs:sequence>
-                </xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
+          <xs:element name="condition" type="condition"/>
           <xs:element name="message" minOccurs="0" maxOccurs="1">
             <xs:complexType>
               <xs:complexContent>
@@ -1658,21 +1664,21 @@
     </xs:complexContent>
   </xs:complexType>
 
+  <xs:complexType name="condition">
+    <xs:complexContent>
+      <xs:extension base="java-element">
+        <xs:sequence>
+          <xs:group ref="expression"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="ifStatement">
     <xs:complexContent>
       <xs:extension base="statement">
         <xs:sequence>
-          <xs:element name="condition">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension base="java-element">
-                  <xs:sequence>
-                    <xs:group ref="expression"/>
-                  </xs:sequence>
-                </xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
+          <xs:element name="condition" type="condition"/>
           <xs:element name="then">
             <xs:complexType>
               <xs:complexContent>
@@ -1763,17 +1769,7 @@
             </xs:element>
             <xs:group ref="initialize"/>
           </xs:choice>
-          <xs:element name="condition" minOccurs="0" maxOccurs="1">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension base="java-element">
-                  <xs:sequence>
-                    <xs:group ref="expression"/>
-                  </xs:sequence>
-                </xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
+          <xs:element name="condition" type="condition" minOccurs="0"/>
           <xs:element name="update" minOccurs="0" maxOccurs="unbounded">
             <xs:complexType>
               <xs:complexContent>
@@ -1841,17 +1837,7 @@
     <xs:complexContent>
       <xs:extension base="statement">
         <xs:sequence>
-          <xs:element name="condition">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension base="java-element">
-                  <xs:sequence>
-                    <xs:group ref="expression"/>
-                  </xs:sequence>
-                </xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
+          <xs:element name="condition" type="condition"/>
           <xs:element name="block" type="block"/>
         </xs:sequence>
       </xs:extension>
@@ -1862,18 +1848,8 @@
     <xs:complexContent>
       <xs:extension base="statement">
         <xs:sequence>
-          <xs:element name="condition">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension base="java-element">
-                  <xs:sequence>
-                    <xs:group ref="expression"/>
-                  </xs:sequence>
-                </xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
           <xs:element name="block" type="block"/>
+          <xs:element name="condition" type="condition"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>

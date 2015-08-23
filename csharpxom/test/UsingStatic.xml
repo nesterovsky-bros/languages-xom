@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/csharp-3.0/2009-05-23">
+  <comment>Using static.</comment>
+
+  <namespace name="N1">
+    <using-static>
+      <type name="Console" namespace="System"/>
+    </using-static>
+    <using-static>
+      <type name="Math" namespace="System"/>
+    </using-static>
+    <using-static>
+      <type name="DayOfWeek" namespace="System"/>
+    </using-static>
+
+    <class access="public" name="Program">
+      <method static="true" name="Main">
+        <block>
+          <expression>
+            <invoke>
+              <static-method-ref name="WriteLine">
+                <type name="Console" namespace="System"/>
+              </static-method-ref>
+              <arguments>
+                <invoke>
+                  <static-method-ref name="Sqrt">
+                    <type name="Math" namespace="System"/>
+                  </static-method-ref>
+                  <arguments>
+                    <add>
+                      <mul>
+                        <int value="3"/>
+                        <int value="3"/>
+                      </mul>
+                      <mul>
+                        <int value="4"/>
+                        <int value="4"/>
+                      </mul>
+                    </add>
+                  </arguments>
+                </invoke>
+              </arguments>
+            </invoke>
+          </expression>
+
+          <expression>
+            <invoke>
+              <static-method-ref name="WriteLine" using-static="false">
+                <type name="Console" namespace="System"/>
+              </static-method-ref>
+              <arguments>
+                <static-field-ref name="Friday">
+                  <type name="DayOfWeek" namespace="System"/>
+                </static-field-ref>
+                <static-field-ref name="Monday">
+                  <type name="DayOfWeek" namespace="System"/>
+                </static-field-ref>
+              </arguments>
+            </invoke>
+          </expression>
+        </block>
+      </method>
+    </class>
+  </namespace>
+
+  <namespace name="N2">
+    <using-static>
+      <type name="Enumerable" namespace="System.Linq.Enumerable"/>
+    </using-static>
+
+    <class name="Program">
+      <method static="true" name="Main">
+        <block>
+          <var name="range">
+            <comment>Ok: not extension</comment>
+            <initialize>
+              <invoke>
+                <static-method-ref name="Range"/>
+                <arguments>
+                  <int value="5"/>
+                  <int value="17"/>
+                </arguments>
+              </invoke>
+            </initialize>
+          </var>
+          <var name="odd">
+            <comment>Error, not in scope</comment>
+            <initialize>
+              <invoke>
+                <static-method-ref name="Where"/>
+                <arguments>
+                  <var-ref name="range"/>
+                  <lambda>
+                    <parameters>
+                      <parameter name="i"/>
+                    </parameters>
+                    <block expression="true">
+                      <return>
+                        <eq>
+                          <mod>
+                            <var-ref name="i"/>
+                            <int value="2"/>
+                          </mod>
+                          <int value="1"/>
+                        </eq>
+                      </return>
+                    </block>
+                  </lambda>
+                </arguments>
+              </invoke>
+            </initialize>
+          </var>
+          <var name="even">
+            <comment>Ok</comment>
+            <initialize>
+              <invoke>
+                <method-ref name="Where">
+                  <var-ref name="range"/>
+                </method-ref>
+                <arguments>
+                  <lambda>
+                    <parameters>
+                      <parameter name="i"/>
+                    </parameters>
+                    <block expression="true">
+                      <return>
+                        <eq>
+                          <mod>
+                            <var-ref name="i"/>
+                            <int value="2"/>
+                          </mod>
+                          <int value="0"/>
+                        </eq>
+                      </return>
+                    </block>
+                  </lambda>
+                </arguments>
+              </invoke>
+            </initialize>
+          </var>
+        </block>
+      </method>
+    </class>
+  </namespace>
+
+</unit>

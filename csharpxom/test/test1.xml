@@ -277,12 +277,6 @@
           </while>
 
           <do-while>
-            <condition>
-              <lt>
-                <var-ref name="i" name-ref="id-i1"/>
-                <int value="10"/>
-              </lt>
-            </condition>
             <block>
               <expression>
                 <inc>
@@ -290,8 +284,14 @@
                 </inc>
               </expression>
             </block>
+            <condition>
+              <lt>
+                <var-ref name="i" name-ref="id-i1"/>
+                <int value="10"/>
+              </lt>
+            </condition>
           </do-while>
-
+          
           <for>
             <var name="j" name-id="id-j2">
               <type name="int"/>

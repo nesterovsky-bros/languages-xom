@@ -451,15 +451,13 @@
   <xsl:template mode="t:expression" match="lambda">
     <xsl:variable name="parameters" as="element()*"
       select="parameters/parameter"/>
-    <xsl:variable name="block" as="element()?" select="block"/>
-    <xsl:variable name="expression" as="element()?" select="expression"/>
-
-    <xsl:if test="not($block) = not($expression)">
-      <xsl:sequence select="error(xs:QName('lambda-body'), t:get-path(.))"/>
-    </xsl:if>
-
-    <xsl:variable name="inferred" as="xs:boolean" 
+    <xsl:variable name="inferred" as="xs:boolean"
       select="exists($parameters[not(type)])"/>
+    <xsl:variable name="block" as="element()" select="block"/>
+
+    <xsl:variable name="expression" as="element()?" select="
+      $block[xs:boolean(@expression) and (count(*) = 1)]/
+        return/t:get-java-element(.)"/>
 
     <xsl:if test="$parameters[type] and $inferred">
       <xsl:sequence select="
@@ -502,9 +500,12 @@
     <xsl:sequence select="' '"/>
     <xsl:sequence select="'->'"/>
     <xsl:sequence select="' '"/>
-
+    
     <xsl:choose>
-      <xsl:when test="$block">
+      <xsl:when test="$expression">
+        <xsl:sequence select="t:get-expression($expression)"/>
+      </xsl:when>
+      <xsl:otherwise>
         <xsl:sequence select="$t:new-line"/>
         <xsl:sequence select="'{'"/>
         <xsl:sequence select="$t:new-line"/>
@@ -513,10 +514,6 @@
         <xsl:sequence select="t:get-statement-scope($block)"/>
         <xsl:sequence select="$t:unindent"/>
         <xsl:sequence select="'}'"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:sequence 
-          select="t:get-expression(t:get-java-element($expression))"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

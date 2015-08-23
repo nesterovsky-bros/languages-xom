@@ -16,6 +16,17 @@
     </xs:documentation>
   </xs:annotation>
 
+  <xs:attributeGroup name="using-static">
+    <xs:attribute name="using-static" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          A hint to indicate whether to forbid "using static" normalization.
+          If value is false then no "using static" is normalized for the place.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
   <xs:simpleType name="ids">
     <xs:annotation>
       <xs:documentation xml:space="preserve">
@@ -679,6 +690,8 @@ commas:
             </xs:annotation>
           </xs:element>
         </xs:sequence>
+
+        <xs:attributeGroup ref="using-static"/>
         <xs:attribute name="qualifier" type="identifier" use="optional"/>
         <xs:attribute name="namespace" type="qualified-identifier"
           use="optional"/>
@@ -985,6 +998,7 @@ primary-no-array-creation-expression:
     </xs:annotation>
     <xs:choice>
       <xs:group ref="literal"/>
+      <xs:group ref="interpolated-string"/>
       <xs:group ref="member-or-variable-access"/>
       <xs:group ref="parenthesized-expression"/>
       <xs:group ref="invocation-expression"/>
@@ -996,11 +1010,11 @@ primary-no-array-creation-expression:
       <xs:group ref="object-creation-expression"/>
       <xs:group ref="delegate-creation-expression"/>
       <xs:group ref="typeof-expression"/>
+      <xs:group ref="nameof-expression"/>
       <xs:group ref="checked-expression"/>
       <xs:group ref="unchecked-expression"/>
       <xs:group ref="default-value-expression"/>
       <xs:group ref="anonymous-method-expression"/>
-      <!-- TODO: verify await precedence. -->
       <xs:group ref="await-expression"/>
     </xs:choice>
   </xs:group>
@@ -1270,6 +1284,62 @@ quote-escape-sequence:
     </xs:complexType>
   </xs:element>
 
+  <xs:group name="interpolated-string">
+    <xs:annotation>
+      <xs:documentation xml:space="preserve">
+interpolated-string-expression:
+    interpolated-string-start interpolations interpolated-string-end
+
+interpolations:
+    single-interpolation
+    single-interpolation interpolated-string-mid interpolations
+
+single-interpolation:
+    interpolation-start
+    interpolation-start : regular-string-literal
+
+interpolation-start:
+    expression
+    expression , expression
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element ref="interpolated-string"/>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:element name="interpolated-string" type="interpolated-string"/>
+  
+  <xs:complexType name="interpolated-string">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:group ref="interpolated-string-part" 
+          minOccurs="1" maxOccurs="unbounded"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:group name="interpolated-string-part">
+    <xs:choice>
+      <xs:group ref="expression"/>
+      <xs:group ref="interpolated-format-expression"/>
+    </xs:choice>
+  </xs:group>
+  
+  <xs:group name="interpolated-format-expression">
+    <xs:sequence>
+      <xs:element name="format" type="interpolated-format-expression"/>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:complexType name="interpolated-format-expression">
+    <xs:complexContent>
+      <xs:extension base="unary-expression">
+        <xs:group ref="string-literal"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+    
   <xs:group name="null-literal">
     <xs:sequence>
       <xs:element ref="null"/>
@@ -1289,8 +1359,11 @@ member-access:
   primary-expression   .   identifier  type-argument-listopt
   predefined-type   .   identifier  type-argument-listopt
   qualified-alias-member   .   identifier
-        
-      </xs:documentation>
+  primary-expression   ? .   identifier  type-argument-listopt
+  predefined-type   ? .   identifier  type-argument-listopt
+  qualified-alias-member   ? .   identifier
+
+    </xs:documentation>
     </xs:annotation>
     <xs:choice>
       <xs:element ref="var-ref"/>
@@ -1308,9 +1381,7 @@ member-access:
   <xs:group name="lvalue-expression">
     <xs:annotation>
       <xs:documentation xml:space="preserve">
-        
         lvalue expressions
-        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -1373,6 +1444,7 @@ invocation-expression:
         
 element-access:
   primary-no-array-creation-expression   [   expression-list   ]
+  primary-no-array-creation-expression   ? [   expression-list   ]
         
       </xs:documentation>
     </xs:annotation>
@@ -1386,7 +1458,7 @@ element-access:
       <xs:complexContent>
         <xs:extension base="expression">
           <xs:sequence>
-            <xs:group ref="expression"/>
+            <xs:group ref="null-conditional"/>
             <xs:group ref="expression-list"/>
           </xs:sequence>
         </xs:extension>
@@ -1543,8 +1615,23 @@ initializer-value:
     <xs:choice>
       <xs:group ref="expression"/>
       <xs:group ref="object-or-collection-initializer"/>
+      <xs:group ref="index-initializer"/>
     </xs:choice>
   </xs:group>
+  
+  <xs:group name="index-initializer">
+    <xs:sequence>
+      <xs:element name="index" type="index-initializer"/>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:complexType name="index-initializer">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:group ref="non-assignment-expression" minOccurs="2" maxOccurs="2"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
 
   <xs:group name="object-initializer">
     <xs:annotation>
@@ -1626,10 +1713,14 @@ element-initializer-list:
 element-initializer:
   non-assignment-expression
   {   expression-list   }
+  index-initializer
 
 array-initializer:
   {   variable-initializer-listopt   }
   {   variable-initializer-list   ,   }
+  
+index-initializer:
+  [ non-assignment-expression ] = non-assignment-expression
 
 variable-initializer-list:
   variable-initializer
@@ -1790,6 +1881,30 @@ typeof-expression:
   </xs:complexType>
 
   <xs:element name="typeof" type="typeof-expression"/>
+  
+  <xs:group name="nameof-expression">
+    <xs:annotation>
+      <xs:documentation xml:space="preserve">
+nameof-expression:
+  nameof ( member-or-variable-access )
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="nameof"/>
+    </xs:sequence>
+  </xs:group>
+  
+  <xs:element name="nameof" type="nameof-expression"/>
+  
+  <xs:complexType name="nameof-expression">
+    <xs:complexContent>
+      <xs:extension base="expression">
+        <xs:sequence>
+          <xs:group ref="member-or-variable-access"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
 
   <xs:group name="checked-expression">
     <xs:annotation>
@@ -2318,7 +2433,7 @@ lambda-expression:
           <xs:sequence>
             <xs:group ref="anonymous-function-signature"
               minOccurs="0"/>
-            <xs:group ref="anonymous-function-body"/>
+            <xs:group ref="implementation-block"/>
           </xs:sequence>
           <xs:attribute name="async" type="xs:boolean"
             default="false" use="optional"/>
@@ -2438,22 +2553,6 @@ implicit-anonymous-function-parameter:
         </xs:complexType>
       </xs:element>
     </xs:sequence>
-  </xs:group>
-
-  <xs:group name="anonymous-function-body">
-    <xs:annotation>
-      <xs:documentation xml:space="preserve">
-        
-anonymous-function-body:
-  expression
-  block
-        
-      </xs:documentation>
-    </xs:annotation>
-    <xs:choice>
-      <xs:group ref="expression-statement"/>
-      <xs:group ref="block"/>
-    </xs:choice>
   </xs:group>
 
   <xs:group name="query-expression">
@@ -2865,15 +2964,28 @@ assignment-operator:
   <xs:element name="binary-xor-with" type="binary-expression"/>
   <xs:element name="lsh-to" type="binary-expression"/>
   <xs:element name="rsh-to" type="binary-expression"/>
+  
+  <xs:group name="null-conditional">
+    <xs:annotation>
+      <xs:documentation xml:space="preserve">
+null-conditional:
+  expression
+  expression ?
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:group ref="expression"/>
+      <xs:element name="null-conditional" type="unary-expression"/>
+    </xs:choice>
+  </xs:group>
+  
 
   <xs:group name="expression">
     <xs:annotation>
       <xs:documentation xml:space="preserve">
-        
 expression:
   non-assignment-expression
   assignment
-        
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
@@ -3002,7 +3114,7 @@ boolean-expression:
     <xs:complexContent>
       <xs:extension base="named-expression">
         <xs:sequence>
-          <xs:group ref="expression" minOccurs="0"/>
+          <xs:group ref="null-conditional" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -3014,6 +3126,7 @@ boolean-expression:
         <xs:sequence>
           <xs:element ref="type" minOccurs="0"/>
         </xs:sequence>
+        <xs:attributeGroup ref="using-static"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -3134,6 +3247,24 @@ embedded-statement:
     </xs:choice>
   </xs:group>
 
+  <xs:group name="implementation-block">
+    <xs:annotation>
+      <xs:documentation xml:space="preserve">
+        
+anonymous-function-body:
+  implementation-block
+
+implementation-block:
+  {   statement-listopt   }
+  expression
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="block" type="implementation-block"/>
+    </xs:sequence>
+  </xs:group>
+
   <xs:group name="block">
     <xs:annotation>
       <xs:documentation xml:space="preserve">
@@ -3173,65 +3304,85 @@ unchecked-statement:
     </xs:complexType>
   </xs:element>
 
+  <xs:complexType name="implementation-block">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:group ref="statement-list" minOccurs="0"/>
+        <xs:attribute name="expression" type="xs:boolean"
+          use="optional" default="false">
+          <xs:annotation>
+            <xs:documentation>
+              A lambda expression hint.
+              If value is true, and content of the block is only 
+              a return statement then it's considered a lambda expression.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:group name="statement-list-groups">
+    <xs:choice>
+      <xs:group ref="preprocessor-instruction"/>
+
+      <xs:element name="pp-if">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="pp-if-base">
+              <xs:sequence>
+                <xs:element name="pp-then">
+                  <xs:complexType>
+                    <xs:complexContent>
+                      <xs:extension base="base-element">
+                        <xs:group ref="statement-list" minOccurs="0"/>
+                      </xs:extension>
+                    </xs:complexContent>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="pp-else" minOccurs="0">
+                  <xs:complexType>
+                    <xs:complexContent>
+                      <xs:extension base="base-element">
+                        <xs:group ref="statement-list" minOccurs="0"/>
+                      </xs:extension>
+                    </xs:complexContent>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="pp-region">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="pp-region-base">
+              <xs:group ref="statement-list" minOccurs="0"/>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+  </xs:group>
+
   <xs:group name="statement-list">
     <xs:annotation>
       <xs:documentation xml:space="preserve">
-        
 statement-list:
   statement
   statement-list   statement
-        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
       <xs:choice maxOccurs="unbounded">
-        <xs:group ref="statement" maxOccurs="unbounded"/>
-
-        <xs:group ref="preprocessor-instruction"/>
-
-        <xs:element name="pp-if">
-          <xs:complexType>
-            <xs:complexContent>
-              <xs:extension base="pp-if-base">
-                <xs:sequence>
-                  <xs:element name="pp-then">
-                    <xs:complexType>
-                      <xs:complexContent>
-                        <xs:extension base="base-element">
-                          <xs:group ref="statement-list" minOccurs="0"/>
-                        </xs:extension>
-                      </xs:complexContent>
-                    </xs:complexType>
-                  </xs:element>
-                  <xs:element name="pp-else" minOccurs="0">
-                    <xs:complexType>
-                      <xs:complexContent>
-                        <xs:extension base="base-element">
-                          <xs:group ref="statement-list" minOccurs="0"/>
-                        </xs:extension>
-                      </xs:complexContent>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:extension>
-            </xs:complexContent>
-          </xs:complexType>
-        </xs:element>
-
-        <xs:element name="pp-region">
-          <xs:complexType>
-            <xs:complexContent>
-              <xs:extension base="pp-region-base">
-                <xs:group ref="statement-list" minOccurs="0"/>
-              </xs:extension>
-            </xs:complexContent>
-          </xs:complexType>
-        </xs:element>
-
+        <xs:group ref="statement"/>
+        <xs:group ref="statement-list-groups"/>
       </xs:choice>
     </xs:sequence>
   </xs:group>
-
+  
   <xs:group name="empty-statement">
     <xs:annotation>
       <xs:documentation xml:space="preserve">
@@ -3457,15 +3608,7 @@ if-statement:
       <xs:complexContent>
         <xs:extension base="statement">
           <xs:sequence>
-            <xs:element name="condition">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension base="base-element">
-                    <xs:group ref="boolean-expression"/>
-                  </xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
+            <xs:element name="condition" type="condition"/>
             <xs:element name="then">
               <xs:complexType>
                 <xs:complexContent>
@@ -3609,19 +3752,19 @@ while-statement:
     </xs:sequence>
   </xs:group>
 
+  <xs:complexType name="condition">
+    <xs:complexContent>
+      <xs:extension base="base-element">
+        <xs:group ref="boolean-expression"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="while-statement">
     <xs:complexContent>
       <xs:extension base="statement">
         <xs:sequence>
-          <xs:element name="condition">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension base="base-element">
-                  <xs:group ref="boolean-expression"/>
-                </xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
+          <xs:element name="condition" type="condition"/>
           <xs:group ref="statement-list" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
@@ -3644,7 +3787,18 @@ do-statement:
     </xs:sequence>
   </xs:group>
 
-  <xs:element name="do-while" type="while-statement"/>
+  <xs:complexType name="do-while-statement">
+    <xs:complexContent>
+      <xs:extension base="statement">
+        <xs:sequence>
+          <xs:group ref="statement-list" minOccurs="0"/>
+          <xs:element name="condition" type="condition"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="do-while" type="do-while-statement"/>
 
   <xs:group name="for-statement">
     <xs:annotation>
@@ -3695,15 +3849,7 @@ statement-expression-list:
                 </xs:complexType>
               </xs:element>
             </xs:choice>
-            <xs:element name="condition">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension base="base-element">
-                    <xs:group ref="boolean-expression" minOccurs="0"/>
-                  </xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
+            <xs:element name="condition" type="condition" minOccurs="0"/>
             <xs:element name="update" minOccurs="0" maxOccurs="unbounded">
               <xs:complexType>
                 <xs:complexContent>
@@ -3713,7 +3859,19 @@ statement-expression-list:
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
-            <xs:group ref="statement-list" minOccurs="0"/>
+
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>
+                  A special case of statement-list without declaration 
+                  statements to resolve ambiguities.
+                </xs:documentation>
+              </xs:annotation>
+              <xs:group ref="labeled-statement"/>
+              <xs:group ref="embedded-statement"/>
+              <xs:element ref="snippet-statement"/>
+              <xs:group ref="statement-list-groups"/>
+            </xs:choice>
           </xs:sequence>
         </xs:extension>
       </xs:complexContent>
@@ -3911,7 +4069,10 @@ specific-catch-clauses:
   specific-catch-clauses   specific-catch-clause
 
 specific-catch-clause:
-  catch   (   class-type   identifieropt   )   block
+  catch   (   class-type   identifieropt   )  exception-filter(opt) block
+  
+exception-filter:
+  when ( boolean-expression )
 
 general-catch-clause:
   catch   block
@@ -3938,6 +4099,7 @@ finally-clause:
                   <xs:extension base="base-element">
                     <xs:sequence>
                       <xs:group ref="class-type" minOccurs="0"/>
+                      <xs:group ref="exception-filter" minOccurs="0"/>
                       <xs:group ref="statement-list" minOccurs="0"/>
                     </xs:sequence>
                     <xs:attribute name="name" type="identifier"
@@ -3962,6 +4124,12 @@ finally-clause:
     </xs:complexType>
   </xs:element>
 
+  <xs:group name="exception-filter">
+    <xs:sequence>
+      <xs:element name="when" type="condition"/>
+    </xs:sequence>
+  </xs:group>
+  
   <xs:group name="lock-statement">
     <xs:annotation>
       <xs:documentation xml:space="preserve">
@@ -4114,7 +4282,7 @@ fixed-pointer-initializer:
         
 compilation-unit:
   extern-alias-directivesopt   using-directivesopt  global-attributesopt
-		  namespace-member-declarationsopt
+      namespace-member-declarationsopt
         
       </xs:documentation>
     </xs:annotation>
@@ -4356,6 +4524,7 @@ using-directive:
     <xs:choice>
       <xs:group ref="using-alias-directive"/>
       <xs:group ref="using-namespace-directive"/>
+      <xs:group ref="using-static-directive"/>
     </xs:choice>
   </xs:group>
 
@@ -4407,6 +4576,32 @@ using-namespace-directive:
         <xs:extension base="base-element">
           <xs:attribute name="name" type="qualified-identifier"
             use="required"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name="using-static-directive">
+    <xs:annotation>
+      <xs:documentation xml:space="preserve">
+        
+using-static:
+  using   type-name   ;
+        
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element ref="using-static"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="using-static">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="base-element">
+          <xs:sequence>
+            <xs:element ref="type"/>
+          </xs:sequence>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -4987,8 +5182,9 @@ member-name:
 
 method-body:
   block
+  => expression
   ;
-        
+          
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -5007,7 +5203,7 @@ method-body:
             <xs:group ref="type-parameter-list" minOccurs="0"/>
             <xs:group ref="formal-parameter-list" minOccurs="0"/>
             <xs:group ref="type-parameter-constraints-clauses" minOccurs="0"/>
-            <xs:group ref="block" minOccurs="0"/>
+            <xs:group ref="implementation-block" minOccurs="0"/>
           </xs:sequence>
           <xs:attribute name="name" type="identifier" use="required"/>
           <xs:attributeGroup ref="name-id"/>
@@ -5131,7 +5327,7 @@ parameter-modifier:
         
 property-declaration:
   attributesopt   property-modifiersopt   type   member-name
-    {   accessor-declarations   }
+    accessor-declarations-or-lambda-get property-init-expression(opt)
 
 property-modifiers:
   property-modifier
@@ -5149,6 +5345,9 @@ property-modifier:
   override
   abstract
   extern
+  
+property-init-expression:
+  = variable-initializer;
 
 member-name:
   identifier
@@ -5156,7 +5355,7 @@ member-name:
 
 indexer-declaration:
   attributesopt   indexer-modifiersopt   indexer-declarator
-    {   accessor-declarations   }
+    accessor-declarations-or-lambda-get
 
 indexer-modifiers:
   indexer-modifier
@@ -5177,7 +5376,10 @@ indexer-modifier:
 indexer-declarator:
   type   this   [   formal-parameter-list   ]
   type   interface-type   .   this   [   formal-parameter-list   ]
-        
+    
+accessor-declarations-or-lambda-get:    
+  accessor-declarations
+  =>  expression        
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
@@ -5195,6 +5397,7 @@ indexer-declarator:
             <xs:element ref="type"/>
             <xs:group ref="formal-parameter-list" minOccurs="0"/>
             <xs:group ref="accessor-declarations"/>
+            <xs:group ref="variable-initializer" minOccurs="0"/>
           </xs:sequence>
           <xs:attribute name="name" type="identifier" use="required"/>
           <xs:attributeGroup ref="name-id"/>
@@ -5218,10 +5421,10 @@ indexer-declarator:
   <xs:group name="accessor-declarations">
     <xs:annotation>
       <xs:documentation xml:space="preserve">
-        
 accessor-declarations:
   get-accessor-declaration   set-accessor-declarationopt
   set-accessor-declaration   get-accessor-declarationopt
+  expression
 
 get-accessor-declaration:
   attributesopt   accessor-modifieropt    get   accessor-body
@@ -5243,8 +5446,12 @@ accessor-body:
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
-      <xs:element name="get" type="accessor-declaration" minOccurs="0"/>
-      <xs:element name="set" type="accessor-declaration" minOccurs="0"/>
+      <xs:choice>
+        <xs:sequence>
+          <xs:element name="get" type="accessor-declaration" minOccurs="0"/>
+          <xs:element name="set" type="accessor-declaration" minOccurs="0"/>
+        </xs:sequence>
+      </xs:choice>
     </xs:sequence>
   </xs:group>
 
@@ -5253,7 +5460,7 @@ accessor-body:
       <xs:extension base="base-element">
         <xs:sequence>
           <xs:group ref="attributes" minOccurs="0"/>
-          <xs:group ref="block" minOccurs="0"/>
+          <xs:group ref="implementation-block" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="access" type="access-modifier"
           use="optional"/>
@@ -5413,7 +5620,7 @@ conversion-operator-declarator:
             <xs:group ref="attributes" minOccurs="0"/>
             <xs:element ref="returns"/>
             <xs:group ref="formal-parameter-list" minOccurs="0"/>
-            <xs:group ref="block" minOccurs="0"/>
+            <xs:group ref="implementation-block" minOccurs="0"/>
           </xs:sequence>
           <xs:attribute name="name" type="overloadable-operator"
             use="optional"/>
@@ -5582,7 +5789,7 @@ static-constructor-body:
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
-            <xs:group ref="block" minOccurs="0"/>
+            <xs:group ref="implementation-block" minOccurs="0"/>
           </xs:sequence>
           <xs:attribute name="name" type="identifier" use="required"/>
           <xs:attributeGroup ref="name-id"/>
@@ -5622,7 +5829,7 @@ destructor-body:
         <xs:extension base="base-element">
           <xs:sequence>
             <xs:group ref="attributes" minOccurs="0"/>
-            <xs:group ref="block" minOccurs="0"/>
+            <xs:group ref="implementation-block" minOccurs="0"/>
           </xs:sequence>
           <xs:attribute name="name" type="identifier" use="required"/>
           <xs:attributeGroup ref="name-id"/>

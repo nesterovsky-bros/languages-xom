@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <unit xmlns="http://www.bphx.com/java-1.5/2008-02-07">
-
   <class name="AlphabetEnumerator">
     <class-field name="result" access="public">
       <type name="String"/>
@@ -16,21 +15,17 @@
           </initialize>
         </var-decl>
         <var-decl name="list">
-          <type package="java.util">
-            <part name="ArrayList">
-              <argument>
-                <type name="Integer"/>
-              </argument>
-            </part>
+          <type name="ArrayList" package="java.util">
+            <argument>
+              <type name="Integer"/>
+            </argument>
           </type>
           <initialize>
             <new-object>
-              <type package="java.util">
-                <part name="ArrayList">
-                  <argument>
-                    <type name="Integer"/>
-                  </argument>
-                </part>
+              <type name="ArrayList" package="java.util">
+                <argument>
+                  <type name="Integer"/>
+                </argument>
               </type>
             </new-object>
           </initialize>
@@ -42,7 +37,7 @@
               <var name="buf"/>
             </instance>
             <arguments>
-              <string>Start: </string>
+              <string value="Start: "/>
             </arguments>
           </invoke>
         </expression>
@@ -66,19 +61,19 @@
           <var-decl name="i">
             <type name="int"/>
             <initialize>
-              <int>0</int>
+              <int value="0"/>
             </initialize>
           </var-decl>
           <condition>
             <lt>
               <var name="i"/>
-              <int>100</int>
+              <int value="100"/>
             </lt>
           </condition>
           <update>
             <add-to>
               <var name="i"/>
-              <int>1</int>
+              <int value="1"/>
             </add-to>
           </update>
           <block>
@@ -109,7 +104,7 @@
               <condition>
                 <gt>
                   <var name="number"/>
-                  <int>66</int>
+                  <int value="66"/>
                 </gt>
               </condition>
               <then>
@@ -119,7 +114,7 @@
                       <var name="buf"/>
                     </instance>
                     <arguments>
-                      <string>[</string>
+                      <string value="["/>
                     </arguments>
                   </invoke>
                 </expression>
@@ -130,7 +125,7 @@
                   <condition>
                     <gt>
                       <var name="number"/>
-                      <int>33</int>
+                      <int value="33"/>
                     </gt>
                   </condition>
                   <then>
@@ -140,7 +135,7 @@
                           <var name="buf"/>
                         </instance>
                         <arguments>
-                          <string>]</string>
+                          <string value="]"/>
                         </arguments>
                       </invoke>
                     </expression>
@@ -154,7 +149,7 @@
                           <var name="buf"/>
                         </instance>
                         <arguments>
-                          <string>.</string>
+                          <string value="."/>
                         </arguments>
                       </invoke>
                     </expression>
@@ -190,7 +185,7 @@
               <condition>
                 <lt>
                   <var name="digit"/>
-                  <int>7</int>
+                  <int value="7"/>
                 </lt>
               </condition>
               <then>
@@ -203,7 +198,7 @@
                         </instance>
                         <arguments>
                           <div>
-                            <int>100</int>
+                            <int value="100"/>
                             <var name="digit"/>
                           </div>
                         </arguments>
@@ -215,7 +210,7 @@
                         <var name="digit"/>
                       </test>
                       <case>
-                        <value><int>5</int></value>
+                        <value><int value="5"/></value>
                         <block>
                           <expression>
                             <invoke name="append">
@@ -223,7 +218,7 @@
                                 <var name="buf"/>
                               </instance>
                               <arguments>
-                                <string>+</string>
+                                <string value="+"/>
                               </arguments>
                             </invoke>
                           </expression>
@@ -232,10 +227,10 @@
                         </block>
                       </case>
                       <case>
-                        <value><int>1</int></value>
+                        <value><int value="1"/></value>
                       </case>
                       <case>
-                        <value><int>2</int></value>
+                        <value><int value="2"/></value>
                         <block>
                           <expression>
                             <invoke name="append">
@@ -243,7 +238,7 @@
                                 <var name="buf"/>
                               </instance>
                               <arguments>
-                                <string>-</string>
+                                <string value="-"/>
                               </arguments>
                             </invoke>
                           </expression>
@@ -258,7 +253,7 @@
                                 <var name="buf"/>
                               </instance>
                               <arguments>
-                                <string>!</string>
+                                <string value="!"/>
                               </arguments>
                             </invoke>
                           </expression>
@@ -281,7 +276,7 @@
                             <var name="buf"/>
                           </instance>
                           <arguments>
-                            <string>Inf</string>
+                            <string value="Inf"/>
                           </arguments>
                         </invoke>
                       </expression>
@@ -322,14 +317,14 @@
         <var-decl name="i">
           <type name="int"/>
           <initialize>
-            <int>0</int>
+            <int value="0"/>
           </initialize>
         </var-decl>
         <while label="w1">
           <condition>
             <lt>
               <var name="i"/>
-              <int>100</int>
+              <int value="100"/>
             </lt>
           </condition>
           <block>
@@ -341,7 +336,7 @@
             <var-decl name="j">
               <type name="int"/>
               <initialize>
-                <int>0</int>
+                <int value="0"/>
               </initialize>
             </var-decl>
             <snippet-statement yield="true"><comment>yield</comment></snippet-statement>
@@ -372,7 +367,7 @@
                         <var name="i"/>
                         <var name="j"/>
                       </add>
-                      <int>177</int>
+                      <int value="177"/>
                     </eq>
                   </condition>
                   <then>
@@ -389,7 +384,7 @@
                       <var name="buf"/>
                     </instance>
                     <arguments>
-                      <string>.</string>
+                      <string value="."/>
                     </arguments>
                   </invoke>
                 </expression>
@@ -397,7 +392,7 @@
               <condition>
                 <lt>
                   <var name="j"/>
-                  <int>100</int>
+                  <int value="100"/>
                 </lt>
               </condition>
             </do-while>
@@ -410,7 +405,7 @@
               <var name="buf"/>
             </instance>
             <arguments>
-              <string> :End</string>
+              <string value=" :End"/>
             </arguments>
           </invoke>
         </expression>

@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/csharp-3.0/2009-05-23">
+  <comment>Auto properties</comment>
+
+  <namespace name="N1">
+    <class access="public" name="Customer">
+      <property access="public" name="First">
+        <type name="string"/>
+        <get/>
+        <set/>
+        <initialize>
+          <string value="Jane"/>
+        </initialize>
+      </property>
+      <property access="public" name="Second">
+        <type name="string"/>
+        <get/>
+        <set/>
+        <initialize>
+          <string value="Doe"/>
+        </initialize>
+      </property>
+    </class>
+  </namespace>
+
+  <namespace name="N2">
+    <class access="public" name="Customer">
+      <property access="public" name="First">
+        <type name="string"/>
+        <get/>
+        <initialize>
+          <string value="Jane"/>
+        </initialize>
+      </property>
+      <property access="public" name="Second">
+        <type name="string"/>
+        <get/>
+        <initialize>
+          <string value="Doe"/>
+        </initialize>
+      </property>
+    </class>
+  </namespace>
+
+  <namespace name="N3">
+    <class access="public" name="Customer">
+      <property access="public" name="Name">
+        <type name="string"/>
+        <get/>
+      </property>
+
+      <constructor access="public" name="Customer">
+        <parameters>
+          <parameter name="first">
+            <type name="string"/>
+          </parameter>
+          <parameter name="second">
+            <type name="string"/>
+          </parameter>
+        </parameters>
+        <block>
+          <expression>
+            <assign>
+              <property-ref name="Name"/>
+              <add>
+                <add>
+                  <var-ref name="first"/>
+                  <string value=" "/>
+                </add>
+                <var-ref name="second"/>
+              </add>
+            </assign>
+          </expression>
+        </block>
+      </constructor>
+    </class>
+  </namespace>
+
+</unit>

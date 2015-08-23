@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/csharp-3.0/2009-05-23">
+  <comment>Null-conditional operators</comment>
+
+  <class access="public" name="Program">
+    <method static="true" access="public" name="Main">
+      <block>
+        <var name="s1">
+          <initialize>
+            <interpolated-string>
+              <property-ref name="Name">
+                <var-ref name="p"/>
+              </property-ref>
+              <string value=" is "/>
+              <property-ref name="Age">
+                <var-ref name="p"/>
+              </property-ref>
+              <string value=" years{s} old"/>
+            </interpolated-string>
+          </initialize>
+        </var>
+        
+        <var name="s2">
+          <initialize>
+            <interpolated-string>
+              <format>
+                <property-ref name="Name">
+                  <var-ref name="p"/>
+                </property-ref>
+
+                <string value=",20"/>
+              </format>
+              <string value=" is "/>
+              <format>
+                <property-ref name="Age">
+                  <var-ref name="p"/>
+                </property-ref>
+                <string value=":D3"/>
+              </format>
+              <string value=" years{s} old"/>
+            </interpolated-string>
+          </initialize>
+        </var>
+        <var name="s3">
+          <initialize>
+            <interpolated-string>
+              <property-ref name="Name">
+                <var-ref name="p"/>
+              </property-ref>
+              <string value=" is "/>
+              <property-ref name="Age">
+                <var-ref name="p"/>
+              </property-ref>
+              <string value=" years"/>
+              <condition>
+                <eq>
+                  <property-ref name="Age">
+                    <var-ref name="p"/>
+                  </property-ref>
+                  <int value="1"/>
+                </eq>
+                <string value=""/>
+                <string value="s"/>
+              </condition>
+              <string value=" old"/>
+            </interpolated-string>
+          </initialize>
+        </var>
+      </block>
+    </method>
+
+  </class>
+
+</unit>

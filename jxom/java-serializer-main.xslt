@@ -32,8 +32,6 @@
       else
         $unit-0"/>
 
-    <xsl:message select="$unit-1"/>
-
     <xsl:variable name="unit-2" as="element()"
       select="t:optimize-type-qualifiers($unit-1)"/>
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<files xmlns="http://www.bphx.com/csharp">
+  <file name="Program.xml"/>
+  <file name="test1.xml"/>
+  <file name="AutoProperties.xml"/>
+  <file name="ExpressionBodied.xml"/>
+  <file name="UsingStatic.xml"/>
+  <file name="NullConditional.xml"/>
+  <file name="StringInterpolation.xml"/>
+  <file name="Nameof.xml"/>
+  <file name="IndexInitializers.xml"/>
+  <file name="ExceptionFilters.xml"/>
+</files>

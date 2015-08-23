@@ -1071,7 +1071,7 @@
           $resource and
           (
             $rewrite-using-regular-try or
-            $resource-vars/t:contains-complex-expression(.)
+            ($resource-vars/t:contains-complex-expression(.) = true())
           )
         ) and
         not($multi-catch)">

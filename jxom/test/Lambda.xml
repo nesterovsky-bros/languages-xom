@@ -114,12 +114,14 @@ public class Calculator {
                 <parameter name="a"/>
                 <parameter name="b"/>
               </parameters>
-              <expression>
-                <add>
-                  <var name="a"/>
-                  <var name="b"/>
-                </add>
-              </expression>
+              <block expression="true">
+                <return>
+                  <add>
+                    <var name="a"/>
+                    <var name="b"/>
+                  </add>
+                </return>
+              </block>
             </lambda>
           </initialize>
         </var-decl>
@@ -131,12 +133,14 @@ public class Calculator {
                 <parameter name="a"/>
                 <parameter name="b"/>
               </parameters>
-              <expression>
-                <sub>
-                  <var name="a"/>
-                  <var name="b"/>
-                </sub>
-              </expression>
+              <block expression="true">
+                <return>
+                  <sub>
+                    <var name="a"/>
+                    <var name="b"/>
+                  </sub>
+                </return>
+              </block>
             </lambda>
           </initialize>
         </var-decl>

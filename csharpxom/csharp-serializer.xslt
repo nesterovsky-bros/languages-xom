@@ -24,6 +24,7 @@
     <declaration name="extern-alias"/>
     <declaration name="using-alias"/>
     <declaration name="using-namespace"/>
+    <declaration name="using-static"/>
     <declaration name="attributes"/>
     <declaration name="namespace"/>
     <declaration name="class"/>
@@ -109,6 +110,7 @@
           (
             (self::using-namespace and $next[self::using-namespace]) or
             (self::using-alias and $next[self::using-alias]) or
+            (self::using-static and $next[self::using-static]) or
             (self::extern-alias and $next[self::extern-alias])
           ) or
           exists($next/comment)
@@ -192,6 +194,21 @@
       </xsl:otherwise>
     </xsl:choose>
 
+    <xsl:sequence select="';'"/>
+    <xsl:sequence select="$t:new-line"/>
+  </xsl:template>
+
+  <!--
+    Generates using-static directive.
+  -->
+  <xsl:template mode="t:unit-declaration" match="using-static">
+    <xsl:variable name="type" as="element()" select="type"/>
+
+    <xsl:sequence select="'using'"/>
+    <xsl:sequence select="' '"/>
+    <xsl:sequence select="'static'"/>
+    <xsl:sequence select="' '"/>
+    <xsl:sequence select="t:get-type($type)"/>
     <xsl:sequence select="';'"/>
     <xsl:sequence select="$t:new-line"/>
   </xsl:template>

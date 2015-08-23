@@ -53,10 +53,13 @@
   <!--
     Mode "optimize-type-qualifiers". unit or namespace.
       $using-namespaces - namespaces in scope.
+      $using-statics - using statics in scope.
+      $using-statics - using static types in scope.
       $using-aliases - type aliases in scope.
   -->
   <xsl:template mode="p:optimize-type-qualifiers" match="unit | namespace">
     <xsl:param name="using-namespaces" tunnel="yes" as="element()*"/>
+    <xsl:param name="using-statics" tunnel="yes" as="element()*"/>
     <xsl:param name="using-aliases" tunnel="yes" as="element()*"/>
 
     <xsl:variable name="element" as="element()" select="."/>
@@ -65,6 +68,8 @@
       select="t:get-scope-elements(., false())"/>
     <xsl:variable name="combined-using-namespaces" as="element()*"
       select="$using-namespaces | $elements[self::using-namespace]"/>
+    <xsl:variable name="combined-using-statics" as="element()*"
+      select="$using-statics | $elements[self::using-static]"/>
     <xsl:variable name="combined-using-aliases" as="element()*"
       select="$using-aliases | $elements[self::using-alias]"/>
 
@@ -87,7 +92,7 @@
     </xsl:variable>
 
     <xsl:variable name="last-using" as="element()?"
-      select="(using-namespace | using-alias)[last()]"/>
+      select="(using-namespace | using-alias | using-static)[last()]"/>
     <xsl:variable name="using" as="node()*"
       select="$last-using/(preceding-sibling::node(), .)"/>
 
@@ -98,16 +103,21 @@
         node()"/>
 
     <xsl:variable name="unordered-optimized-types" as="element()*">
-      <!-- Belongs to using-namespace. -->
-      <xsl:sequence select="
+      <xsl:variable name="type-referred-in-using" as="element()*" select="
         $types
         [
-          (@namespace = $combined-using-namespaces/@name) and
-          not(@name = $combined-using-aliases/@name)
+          (@namespace = $combined-using-namespaces/@name) or
+          (
+            t:get-type-qualified-name(.) = 
+              $combined-using-statics/type/t:get-type-qualified-name(.)
+          )
         ]"/>
+                    
+      <!-- Belongs to using-namespace or using-static. -->
+      <xsl:sequence select="
+        $type-referred-in-using[not(@name = $combined-using-aliases/@name)]"/>
 
-      <xsl:for-each-group
-        select="$types[not(@namespace = $combined-using-namespaces/@name)]"
+      <xsl:for-each-group select="$types except $type-referred-in-using"
         group-by="@name">
         <xsl:variable name="type-group" as="element()+"
           select="current-group()"/>
@@ -149,6 +159,11 @@
       $optimized-types
       [
         not(@namespace = $combined-using-namespaces/@name) and
+        not
+        (
+          t:get-type-qualified-name(.) = 
+            $combined-using-statics/type/t:get-type-qualified-name(.)
+        ) and
         not($namespace/@name = @namespace) and
         not
         (
@@ -201,6 +216,8 @@
         <xsl:apply-templates mode="#current" select="$using">
           <xsl:with-param name="using-namespaces" tunnel="yes"
             select="$combined-using-namespaces"/>
+          <xsl:with-param name="using-statics" tunnel="yes"
+            select="$combined-using-statics"/>
           <xsl:with-param name="using-aliases" tunnel="yes"
             select="$combined-using-aliases, $new-aliases"/>
           <xsl:with-param name="optimized-types" tunnel="yes"
@@ -212,10 +229,15 @@
 
       <xsl:perform-sort select="$result-usings">
         <xsl:sort select="empty(self::using-namespace)"/>
+        <xsl:sort select="empty(self::using-static)"/>
         <xsl:sort select="empty(self::using-alias)"/>
         <xsl:sort select="
           not(starts-with(self::using-namespace/@name, 'System'))"/>
         <xsl:sort select="self::using-namespace/xs:string(@name)"/>
+        <xsl:sort select="
+          not(starts-with(self::using-static/type/@namespace, 'System'))"/>
+        <xsl:sort select="self::using-static/type/xs:string(@namespace)"/>
+        <xsl:sort select="self::using-static/xs:string(@name)"/>
         <xsl:sort select="
           not(starts-with(self::using-alias/type/@namespace, 'System'))"/>
         <xsl:sort select="self::using-alias/type/xs:string(@namespace)"/>
@@ -225,6 +247,8 @@
       <xsl:apply-templates mode="#current" select="$after-using">
         <xsl:with-param name="using-namespaces" tunnel="yes"
           select="$combined-using-namespaces"/>
+        <xsl:with-param name="using-statics" tunnel="yes"
+          select="$combined-using-statics"/>
         <xsl:with-param name="using-aliases" tunnel="yes"
           select="$combined-using-aliases, $new-aliases"/>
         <xsl:with-param name="local-declarations" tunnel="yes" select="()"/>
@@ -262,13 +286,15 @@
   <!--
     Mode "optimize-type-qualifiers". Optimize type but not within using-alias.
       $using-namespaces - namespaces in scope.
+      $using-statics - using statics in scope.
       $using-aliases - type aliases in scope.
       $local-declarations - local declarations in scope.
       $optimized-types - a set of optimized types.
   -->
   <xsl:template mode="p:optimize-type-qualifiers"
-    match="type[not(ancestor::using-alias)]">
+    match="type[not(ancestor::using-alias or ancestor::using-static)]">
     <xsl:param name="using-namespaces" tunnel="yes" as="element()*"/>
+    <xsl:param name="using-statics" tunnel="yes" as="element()*"/>
     <xsl:param name="using-aliases" tunnel="yes" as="element()*"/>
     <xsl:param name="local-declarations" tunnel="yes" as="element()*"/>
     <xsl:param name="optimized-types" tunnel="yes" as="element()*"/>
@@ -276,8 +302,24 @@
     <xsl:variable name="type" as="element()" select="."/>
 
     <xsl:choose>
+      <xsl:when test="
+        (
+          parent::type or
+          parent::static-field-ref or
+          parent::static-property-ref or
+          parent::static-event-ref or
+          parent::static-method-ref
+        ) and
+        not(xs:boolean(parent::*/@using-static) = false()) and
+        (
+          $using-statics/type/t:get-type-qualified-name(.) = 
+            t:get-type-qualified-name($type)
+        )">
+
+        <!-- Remove type as per using static. -->
+      </xsl:when>
       <xsl:when
-        test="$type/@namespace and exists($optimized-types[. is $type])">
+        test="$type/@namespace and ($optimized-types intersect $type)">
         <xsl:copy>
           <!-- Get name from alias. -->
           <xsl:sequence select="

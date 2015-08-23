@@ -31,6 +31,7 @@
     <t:expression name="char" precedence="0"/>
     <t:expression name="string" precedence="0"/>
     <t:expression name="null" precedence="0"/>
+    <t:expression name="interpolated-string" precedence="0"/>
     <t:expression name="var-ref" precedence="1"/>
     <t:expression name="field-ref" precedence="1"/>
     <t:expression name="property-ref" precedence="1"/>
@@ -40,6 +41,7 @@
     <t:expression name="static-property-ref" precedence="1"/>
     <t:expression name="static-event-ref" precedence="1"/>
     <t:expression name="static-method-ref" precedence="1"/>
+    <t:expression name="null-conditional" precedence="1"/>
     <t:expression name="parens" precedence="0"/>
     <t:expression name="invoke" precedence="1" statement-expression="true"/>
     <t:expression name="subscript" precedence="1"/>
@@ -52,6 +54,7 @@
     <t:expression name="stackalloc" precedence="0"/>
     <t:expression name="new-delegate" precedence="1"/>
     <t:expression name="typeof" precedence="1"/>
+    <t:expression name="nameof" precedence="1"/>
     <t:expression name="checked" precedence="1"/>
     <t:expression name="unchecked" precedence="1"/>
     <t:expression name="pointer-member-ref" precedence="1"/>
@@ -412,6 +415,18 @@
             select="t:get-elements(.)"/>
 
           <xsl:choose>
+            <xsl:when test="$elements[self::index]">
+              <xsl:variable name="parts" as="element()+" 
+                select="t:get-elements($elements)"/>
+
+              <xsl:sequence select="'['"/>
+              <xsl:sequence select="t:get-nested-expression($parts[1])"/>
+              <xsl:sequence select="']'"/>
+              <xsl:sequence select="' '"/>
+              <xsl:sequence select="'='"/>
+              <xsl:sequence select="' '"/>
+              <xsl:sequence select="t:get-nested-expression(subsequence($parts, 2))"/>
+            </xsl:when>
             <xsl:when test="
               exists($elements) and
               empty($elements[self::member or self::item])">
@@ -531,6 +546,7 @@
 
   <!-- Mode "t:expression". Default match. -->
   <xsl:template mode="t:expression" match="*">
+    <xsl:message select="."/>
     <xsl:sequence select="
       error
       (
@@ -695,7 +711,39 @@
           ''''
         )"/>
   </xsl:template>
-
+  
+  <!--
+    Escape string value.  
+      $value - a value to quote.
+      Returns escaped string.
+  -->
+  <xsl:function name="t:escape-string" as="xs:string">
+    <xsl:param name="value" as="xs:string"/>
+  
+    <xsl:sequence select="
+      replace
+      (
+        replace
+        (
+          replace
+          (
+            replace
+            (
+              replace($value, '\\', '\\\\'),
+              '&quot;',
+              '\\&quot;'
+            ),
+            '\t',
+            '\\t'
+          ),
+          '\n',
+          '\\n'
+        ),
+        '\r',
+        '\\r'
+      )"/>
+  </xsl:function>
+  
   <!-- Mode "t:expression". string. -->
   <xsl:template mode="t:expression" match="string">
     <xsl:variable name="value" as="xs:string" select="@value"/>
@@ -717,40 +765,151 @@
           if ($escaped) then
             concat('&quot;', $value, '&quot;')
           else
-            concat
-            (
-              '&quot;',
-              replace
-              (
-                replace
-                (
-                  replace
-                  (
-                    replace
-                    (
-                      replace($value, '\\', '\\\\'),
-                      '&quot;',
-                      '\\&quot;'
-                    ),
-                    '\t',
-                    '\\t'
-                  ),
-                  '\n',
-                  '\\n'
-                ),
-                '\r',
-                '\\r'
-              ),
-              '&quot;'
-            )"/>
+            concat('&quot;', t:escape-string($value), '&quot;')"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
   <!-- Mode "t:expression". null-literal. -->
   <xsl:template mode="t:expression" match="null">
-
     <xsl:sequence select="'null'"/>
+  </xsl:template>
+  
+  <!-- Mode "t:expression". interpolated-string. -->
+  <xsl:template mode="t:expression" match="interpolated-string">
+    <xsl:variable name="parts" as="element()+" select="t:get-elements(.)"/>
+  
+    <xsl:for-each-group select="$parts"
+      group-adjacent="exists(self::string)">
+      <xsl:choose>
+        <xsl:when test="current-grouping-key()">
+          <xsl:variable name="parts" as="xs:string*">
+            <xsl:for-each select="current-group()">
+              <xsl:sequence select="
+                if (xs:boolean(@escaped)) then
+                  @value
+                else
+                  replace
+                  (
+                    replace(t:escape-string(@value), '\{', '{{'),
+                    '\}',
+                    '}}'
+                  )"/>
+            </xsl:for-each>
+          </xsl:variable>
+
+          <xsl:sequence select="
+            string-join
+            (
+              (
+                (
+                  if (position() = 1) then
+                    '$&quot;'
+                  else
+                    '}'
+                ),
+                $parts,
+                (
+                  if (position() = last()) then
+                    '&quot;'
+                  else
+                    '{'
+                )
+              ),
+              ''
+            )"/>
+        </xsl:when>
+        <xsl:when test="self::format">
+          <xsl:variable name="arguments" as="element()+" 
+            select="t:get-elements(.)"/>
+          <xsl:variable name="expression" as="element()" select="$arguments[1]"/>
+          <xsl:variable name="format" as="element()" 
+            select="exactly-one(subsequence($arguments, 2))[self::string]"/>
+          
+          <xsl:variable name="value" as="xs:string" select="
+            if ($format/xs:boolean(@escaped)) then
+              $format/@value
+            else
+              replace
+              (
+                replace(t:escape-string($format/@value), '\{', '{{'),
+                '\}',
+                '}}'
+              )"/>
+        
+          <xsl:if test="position() = 1">
+            <xsl:sequence select="'$&quot;{'"/>
+          </xsl:if>
+          
+          <xsl:variable name="fixed-expression" as="element()">
+            <xsl:choose>
+              <xsl:when test="
+                $expression
+                [
+                  self::parens or
+                  self::property-ref or
+                  self::static-property-ref or
+                  self::field-ref or
+                  self::static-field-ref or
+                  self::event-ref or
+                  self::static-event-ref or
+                  self::invoke
+                ]">
+                <xsl:sequence select="$expression"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <parens>
+                  <xsl:sequence select="$expression"/>
+                </parens>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+
+          <xsl:sequence select="t:get-nested-expression($fixed-expression)"/>
+
+          <xsl:choose>
+            <xsl:when test="position() = last()">
+              <xsl:sequence select="concat($value, '}&quot;')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:sequence select="$value"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="position() = 1">
+            <xsl:sequence select="'$&quot;{'"/>
+          </xsl:if>
+
+          <xsl:variable name="fixed-expression" as="element()">
+            <xsl:choose>
+              <xsl:when test="
+                self::parens or
+                self::property-ref or
+                self::static-property-ref or
+                self::field-ref or
+                self::static-field-ref or
+                self::event-ref or
+                self::static-event-ref or
+                self::invoke">
+                <xsl:sequence select="."/>
+              </xsl:when>
+              <xsl:otherwise>
+                <parens>
+                  <xsl:sequence select="."/>
+                </parens>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+
+          <xsl:sequence select="t:get-nested-expression($fixed-expression)"/>
+
+          <xsl:if test="position() = last()">
+            <xsl:sequence select="'}&quot;'"/>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each-group>
   </xsl:template>
 
   <!-- Mode "t:expression". var-ref. -->
@@ -948,6 +1107,14 @@
     <xsl:sequence select="'base'"/>
   </xsl:template>
 
+  <!-- Mode "t:expression". null-conditional. -->
+  <xsl:template mode="t:expression" match="null-conditional">
+    <xsl:variable name="expression" as="element()" select="t:get-elements(.)"/>
+
+    <xsl:sequence select="t:get-nested-expression($expression)"/>
+    <xsl:sequence select="'?'"/>
+  </xsl:template>
+
   <!-- Mode "t:expression". post-increment-expression. -->
   <xsl:template mode="t:expression" match="post-inc">
     <xsl:variable name="expression" as="element()" select="t:get-elements(.)"/>
@@ -1096,6 +1263,17 @@
     <xsl:sequence select="'typeof'"/>
     <xsl:sequence select="'('"/>
     <xsl:sequence select="t:get-type($type)"/>
+    <xsl:sequence select="')'"/>
+  </xsl:template>
+
+  <!-- Mode "t:expression". nameof-expression. -->
+  <xsl:template mode="t:expression" match="nameof">
+    <xsl:variable name="expression" as="element()"
+      select="t:get-elements(.)"/>
+
+    <xsl:sequence select="'nameof'"/>
+    <xsl:sequence select="'('"/>
+    <xsl:sequence select="t:get-nested-expression($expression)"/>
     <xsl:sequence select="')'"/>
   </xsl:template>
 
@@ -1383,18 +1561,11 @@
   <xsl:template mode="t:expression" match="lambda">
     <xsl:variable name="async" as="xs:boolean?" select="@async"/>
     <xsl:variable name="parameters" as="element()?" select="parameters"/>
-    <xsl:variable name="block" as="element()?" select="block"/>
-    <xsl:variable name="expression" as="element()?" select="expression"/>
+    <xsl:variable name="block" as="element()" select="block"/>
 
-    <xsl:if test="empty($block) and empty($expression)">
-      <xsl:sequence select="
-        error
-        (
-          xs:QName('lambda-body-expected'),
-          'Either block statement or expression is expected.',
-          .
-        )"/>
-    </xsl:if>
+    <xsl:variable name="expression" as="element()?" select="
+      $block[xs:boolean(@expression) and (count(*) = 1)]/
+        return/t:get-elements(.)"/>
 
     <xsl:if test="$async">
       <xsl:sequence select="'async'"/>
@@ -1461,7 +1632,7 @@
       <xsl:when test="exists($expression)">
         <xsl:sequence select="' '"/>
         <xsl:sequence
-          select="t:get-nested-expression(t:get-elements($expression))"/>
+          select="t:get-nested-expression($expression)"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:sequence select="$t:new-line"/>
