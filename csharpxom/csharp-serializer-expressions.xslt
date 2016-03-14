@@ -546,7 +546,6 @@
 
   <!-- Mode "t:expression". Default match. -->
   <xsl:template mode="t:expression" match="*">
-    <xsl:message select="."/>
     <xsl:sequence select="
       error
       (

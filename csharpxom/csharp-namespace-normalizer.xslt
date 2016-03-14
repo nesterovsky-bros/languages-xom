@@ -315,7 +315,6 @@
           $using-statics/type/t:get-type-qualified-name(.) = 
             t:get-type-qualified-name($type)
         )">
-
         <!-- Remove type as per using static. -->
       </xsl:when>
       <xsl:when

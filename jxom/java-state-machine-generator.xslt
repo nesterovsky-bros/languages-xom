@@ -788,7 +788,7 @@
         select="subsequence($block, 2)"/>
 
       <xsl:variable name="try" as="element()?"
-        select="$substatements[self::try][@p:try]"/>
+        select="$substatements[self::try[@p:try]]"/>
 
       <xsl:variable name="id" as="xs:string" select="
         if (exists($try)) then

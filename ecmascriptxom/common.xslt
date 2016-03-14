@@ -311,8 +311,8 @@
           (
             if ($node instance of attribute()) then
             (
-              '/@*[self::',
-              name($node),
+              '/@*[self::*:',
+              local-name($node),
               ']'
             )
             else
@@ -320,7 +320,7 @@
               '/*[',
               xs:string(count($node/preceding-sibling::*) + 1),
               '][self::*:',
-              name($node),
+              local-name($node),
               ']',
                   
               for 

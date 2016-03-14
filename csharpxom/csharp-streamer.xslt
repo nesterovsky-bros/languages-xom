@@ -396,7 +396,7 @@
 
   <!-- Line breaker priorities, used in t:get-breaker() function. -->
   <xsl:variable name="t:line-breaker-priorities" as="xs:integer*"
-    select="15,   5,   0,   0,   15,   5,   15,   2, 15"/>
+    select=" 30,  20,   0,   0,  15,  30,  30,   2,  30"/>
 
   <!--
     Gets a position of code line breaker.
