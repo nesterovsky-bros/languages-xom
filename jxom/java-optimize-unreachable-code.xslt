@@ -185,7 +185,7 @@
       Returns a closure:
         (
           $completes-normally as xs:boolean,
-          $unreacable-statements as element()*
+          $unreachable-statements as element()*
         ).
   -->
   <xsl:template mode="p:collect-unreachable" match="*" as="item()+">
@@ -209,7 +209,7 @@
       Returns a closure:
         (
           $completes-normally as xs:boolean,
-          $unreacable-statements as element()*
+          $unreachable-statements as element()*
         ).
   -->
   <xsl:template mode="p:collect-unreachable" match="var-decl" as="item()+">
@@ -233,7 +233,7 @@
       Returns a closure:
         (
           $completes-normally as xs:boolean,
-          $unreacable-statements as element()*
+          $unreachable-statements as element()*
         ).
   -->
   <xsl:template
@@ -258,7 +258,7 @@
       Returns a closure:
         (
           $completes-normally as xs:boolean,
-          $unreacable-statements as element()*
+          $unreachable-statements as element()*
         ).
   -->
   <xsl:template name="p:collect-unreachable" as="item()+">
@@ -318,7 +318,7 @@
       Returns a closure:
         (
           $completes-normally as xs:boolean,
-          $unreacable-statements as element()*
+          $unreachable-statements as element()*
         ).
   -->
   <xsl:template
@@ -369,7 +369,7 @@
       Returns a closure:
         (
           $completes-normally as xs:boolean,
-          $unreacable-statements as element()*
+          $unreachable-statements as element()*
         ).
   -->
   <xsl:template
@@ -418,7 +418,7 @@
       Returns a closure:
         (
           $completes-normally as xs:boolean,
-          $unreacable-statements as element()*
+          $unreachable-statements as element()*
         ).
   -->
   <xsl:template
@@ -469,7 +469,7 @@
       Returns a closure:
         (
           $completes-normally as xs:boolean,
-          $unreacable-statements as element()*
+          $unreachable-statements as element()*
         ).
   -->
   <xsl:template
@@ -527,7 +527,7 @@
       Returns a closure:
         (
           $completes-normally as xs:boolean,
-          $unreacable-statements as element()*
+          $unreachable-statements as element()*
         ).
   -->
   <xsl:template
@@ -602,7 +602,7 @@
       Returns a closure:
         (
           $completes-normally as xs:boolean,
-          $unreacable-statements as element()*
+          $unreachable-statements as element()*
         ).
   -->
   <xsl:template
@@ -713,7 +713,7 @@
       Returns a closure:
         (
           $completes-normally as xs:boolean,
-          $unreacable-statements as element()*
+          $unreachable-statements as element()*
         ).
   -->
   <xsl:template mode="p:collect-unreachable" match="break | continue"
@@ -727,7 +727,7 @@
       Returns a closure:
         (
           $completes-normally as xs:boolean,
-          $unreacable-statements as element()*
+          $unreachable-statements as element()*
         ).
   -->
   <xsl:template mode="p:collect-unreachable" match="return | throw"
@@ -752,7 +752,7 @@
       Returns a closure:
         (
           $completes-normally as xs:boolean,
-          $unreacable-statements as element()*
+          $unreachable-statements as element()*
         ).
   -->
   <xsl:template mode="p:collect-unreachable" match="synchronized" as="item()+">
@@ -786,7 +786,7 @@
       Returns a closure:
         (
           $completes-normally as xs:boolean,
-          $unreacable-statements as element()*
+          $unreachable-statements as element()*
         ).
   -->
   <xsl:template mode="p:collect-unreachable" match="try" as="item()+">
