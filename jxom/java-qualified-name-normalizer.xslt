@@ -86,8 +86,7 @@
         <xsl:sequence select="$unit"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:apply-templates mode="p:optimize-type-qualifiers"
-          select="$unit">
+        <xsl:apply-templates mode="p:optimize-type-qualifiers" select="$unit">
           <xsl:with-param name="import-names" tunnel="yes"
             select="$imports/type/xs:string(@name)"/>
           <xsl:with-param name="names-to-optimize" tunnel="yes"
@@ -173,7 +172,8 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:copy>
-          <xsl:sequence select="@* | comment | annotations"/>
+          <xsl:sequence select="@* | comment"/>
+          <xsl:apply-templates mode="#current" select="annotations"/>
 
           <xsl:variable name="import-list" as="xs:string*" select="
             $optimized-types,
@@ -196,7 +196,7 @@
           </imports>
 
           <xsl:apply-templates mode="#current"
-            select="* except (comment | imports)"/>
+            select="* except (comment | imports | annotations)"/>
         </xsl:copy>
       </xsl:otherwise>
     </xsl:choose>
