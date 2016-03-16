@@ -196,7 +196,7 @@
           </imports>
 
           <xsl:apply-templates mode="#current"
-            select="* except (comment | annotations | imports)"/>
+            select="* except (comment | imports)"/>
         </xsl:copy>
       </xsl:otherwise>
     </xsl:choose>
