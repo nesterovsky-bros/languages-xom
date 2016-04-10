@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  This stylesheet generates basic sql.
--->
+<!-- This stylesheet generates basic sql. -->
 <xsl:stylesheet version="2.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -30,6 +28,11 @@
 
     <xsl:apply-templates mode="t:get-sql-element" select="$parent/*"/>
   </xsl:function>
+
+  <!--
+    Mode "t:get-sql-element". No text.
+  -->
+  <xsl:template mode="t:get-sql-element" match="text()"/>
 
   <!--
     Mode "t:get-sql-element". Gets sql element.
@@ -1033,7 +1036,7 @@
     <xsl:apply-templates mode="t:get-over-clause" select="$over"/>
   </xsl:template>
 
-  <xsl:template name="t:get-over-clause" match="sql:over" as="item()*">
+  <xsl:template mode="t:get-over-clause" match="sql:over" as="item()*">
     <xsl:variable name="partition-by" as="element()?"
       select="sql:partition-by"/>
     <xsl:variable name="order-by" as="element()?"
@@ -1762,8 +1765,8 @@
   <xsl:template name="t:source-alias">
     <xsl:param name="source" as="element()" select="."/>
 
-    <xsl:variable name="alias" as="xs:string?" select="@alias"/>
-    <xsl:variable name="columns" as="element()*" select="sql:column"/>
+    <xsl:variable name="alias" as="xs:string?" select="$source/@alias"/>
+    <xsl:variable name="columns" as="element()*" select="$source/sql:column"/>
     
     <xsl:if test="$alias">
       <xsl:sequence select="' '"/>

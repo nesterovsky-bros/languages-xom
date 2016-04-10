@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  This stylesheet streams a sequence of tokens into text.
--->
+<!-- This stylesheet streams a sequence of tokens into text. -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:t="http://www.bphx.com/cobol"
@@ -71,8 +69,9 @@
   <xsl:function name="t:get-lines" as="xs:string*">
     <xsl:param name="tokens" as="item()*"/>
 
-    <xsl:sequence
-      select="t:get-lines($tokens, index-of($tokens, $t:new-line), 0, 0, ())"/>
+    <xsl:call-template name="t:get-lines">
+      <xsl:with-param name="tokens" select="$tokens"/>
+    </xsl:call-template>
   </xsl:function>
 
   <!--
@@ -81,15 +80,14 @@
       $line-breaks - a sequence of line breaks.
       $line-index - an index of current line (zero based).
       $indent - current indentation.
-      $result - collected result.
       Returns a sequence of line strings.
   -->
-  <xsl:function name="t:get-lines" as="xs:string*">
+  <xsl:template name="t:get-lines" as="xs:string*">
     <xsl:param name="tokens" as="item()*"/>
-    <xsl:param name="line-breaks" as="xs:integer*"/>
-    <xsl:param name="line-index" as="xs:integer"/>
-    <xsl:param name="indent" as="xs:integer"/>
-    <xsl:param name="result" as="xs:string*"/>
+    <xsl:param name="line-breaks" as="xs:integer*"
+      select="index-of($tokens, $t:new-line)"/>
+    <xsl:param name="line-index" as="xs:integer" select="0"/>
+    <xsl:param name="indent" as="xs:integer" select="0"/>
 
     <xsl:variable name="index" as="xs:integer?" select="
       if ($line-index = 0) then
@@ -108,19 +106,19 @@
       else
         subsequence($tokens, $index)"/>
 
-    <xsl:sequence select="
-      if (empty($line-break) and empty($line[. instance of xs:string])) then
-        $result
-      else
-        t:get-lines
-        (
-          $tokens,
-          $line-breaks,
-          $line-index + 1,
-          $indent + t:get-indentation($line),
-          ($result, t:format-line($line, $indent))
-        )"/>
-  </xsl:function>
+    <xsl:sequence select="t:format-line($line, $indent)"/>
+
+    <xsl:if 
+      test="exists($line-break) or exists($line[. instance of xs:string])">
+      <xsl:call-template name="t:get-lines">
+        <xsl:with-param name="tokens" select="$tokens"/>
+        <xsl:with-param name="line-breaks" select="$line-breaks"/>
+        <xsl:with-param name="line-index" select="$line-index + 1"/>
+        <xsl:with-param name="indent" 
+          select="$indent + t:get-indentation($line)"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
 
   <!--
     Gets subset of tokens for the token sequence.
@@ -269,26 +267,18 @@
 
             <xsl:choose>
               <xsl:when test="t:is-multiline($reformatted-tokens)">
-                <xsl:sequence select="
-                  t:get-lines
-                  (
-                    $reformatted-tokens,
-                    index-of($reformatted-tokens, $t:new-line),
-                    0,
-                    $indent,
-                    ()
-                  )"/>
+                <xsl:call-template name="t:get-lines">
+                  <xsl:with-param name="tokens" select="$reformatted-tokens"/>
+                  <xsl:with-param name="indent" select="$indent"/>
+                </xsl:call-template>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:sequence select="
-                  t:format-long-code-line
-                  (
-                    $indentation,
-                    $reformatted-tokens,
-                    true(),
-                    false(),
-                    ()
-                  )"/>
+                <xsl:call-template name="t:format-long-code-line">
+                  <xsl:with-param name="indentation" select="$indentation"/>
+                  <xsl:with-param name="tokens" select="$reformatted-tokens"/>
+                  <xsl:with-param name="leader" select="true()"/>
+                  <xsl:with-param name="continuation" select="false()"/>
+                </xsl:call-template>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:otherwise>
@@ -296,7 +286,9 @@
       </xsl:when>
       <xsl:when test="$type = $t:comment">
         <!-- Comment line. -->
-        <xsl:sequence select="t:format-comment($literals, ())"/>
+        <xsl:call-template name="t:format-comment">
+          <xsl:with-param name="literals" select="$literals"/>
+        </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
         <xsl:sequence select="
@@ -323,15 +315,13 @@
       $leader - true indicate leader line.
       $continuation - true in case of token continuation, and
         false otherwise.
-      $result - collected result.
       Returns formatted lines.
   -->
-  <xsl:function name="t:format-long-code-line" as="xs:string*">
+  <xsl:template name="t:format-long-code-line" as="xs:string*">
     <xsl:param name="indentation" as="xs:string?"/>
     <xsl:param name="tokens" as="item()*"/>
     <xsl:param name="leader" as="xs:boolean"/>
     <xsl:param name="continuation" as="xs:boolean"/>
-    <xsl:param name="result" as="xs:string*"/>
 
     <xsl:variable name="line-width" as="xs:integer" select="
       if ($continuation) then
@@ -367,7 +357,7 @@
           </xsl:analyze-string>
         </xsl:if>
       </xsl:variable>
-      
+
       <xsl:variable name="previous-line-before-last" as="xs:string" select="
         string-join($previous-string-tokens[position() lt last()], '')"/>
 
@@ -385,7 +375,7 @@
           concat($previous-line-before-last, ' ', $last-string-token)
         else
           t:right-trim(concat($previous-line-before-last, $last-string-token))"/>
-                    
+
       <xsl:variable name="line" as="xs:string"
         select="t:right-trim(substring($previous-line, 1, $line-width))"/>
       <xsl:variable name="line-continuation" as="xs:string"
@@ -408,10 +398,8 @@
         else
           $indentation"/>
 
-      <xsl:variable name="next-result" as="xs:string*" select="
-        if ($line) then
-        (
-          $result,
+      <xsl:if test="$line">
+        <xsl:sequence select="
           string-join
           (
             (
@@ -426,25 +414,19 @@
               $t:new-line-text
             ),
             ''
-          )
-        )
-        else
-          $result"/>
-
-      <xsl:sequence select="
-        if (empty($next-tokens)) then
-          $next-result
-        else
-          t:format-long-code-line
-          (
-            $next-indentation,
-            $next-tokens,
-            $leader and not($line),
-            $next-continuation,
-            $next-result
           )"/>
+      </xsl:if>
+
+      <xsl:if test="exists($next-tokens)">
+        <xsl:call-template name="t:format-long-code-line">
+          <xsl:with-param name="indentation" select="$next-indentation"/>
+          <xsl:with-param name="tokens" select="$next-tokens"/>
+          <xsl:with-param name="leader" select="$leader and not($line)"/>
+          <xsl:with-param name="continuation" select="$next-continuation"/>
+        </xsl:call-template>
+      </xsl:if>
     </xsl:if>
-  </xsl:function>
+  </xsl:template>
 
   <!--
     Gets a position of code line breaker.
@@ -537,15 +519,11 @@
 
   <!--
     Formats comment line.
-      $prefix - comment prefix.
       $literals - literal tokens.
-      $preferrable-width - preferrable width.
-      $result - collected result.
       Return comment lines.
   -->
-  <xsl:function name="t:format-comment" as="xs:string*">
+  <xsl:template name="t:format-comment" as="xs:string*">
     <xsl:param name="literals" as="xs:string*"/>
-    <xsl:param name="result" as="xs:string*"/>
 
     <xsl:variable name="line-width" as="xs:integer"
       select="$t:chars-per-line"/>
@@ -562,7 +540,7 @@
         select="substring($previous-line, 1, $line-width)"/>
       <xsl:variable name="line-continuation" as="xs:string" select="
         t:right-trim(substring($previous-line, $line-width + 1))"/>
-      
+
       <xsl:variable name="next-literals-base" as="xs:string*" select="
         (
           if ($line-continuation) then
@@ -582,8 +560,7 @@
         ],
         $next-literals-base"/>
 
-      <xsl:variable name="next-result" as="xs:string*" select="
-        $result,
+      <xsl:sequence select="
         concat
         (
           $t:marker-indent,
@@ -592,13 +569,13 @@
           $t:new-line-text
         )"/>
 
-      <xsl:sequence select="
-        if (empty($next-literals)) then
-          $next-result
-        else
-          t:format-comment($next-literals, $next-result)"/>
+      <xsl:if test="exists($next-literals)">
+        <xsl:call-template name="t:format-comment">
+          <xsl:with-param name="literals" select="$next-literals"/>
+        </xsl:call-template>  
+      </xsl:if>
     </xsl:if>
-  </xsl:function>
+  </xsl:template>
 
   <!--
     Gets a position of comment line breaker.
