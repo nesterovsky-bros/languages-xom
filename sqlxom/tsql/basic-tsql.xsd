@@ -115,6 +115,7 @@
       <xs:sequence>
         <xs:group ref="tsql:top-clause" minOccurs="0"/>
         <xs:group ref="sql:insert-clauses"/>
+        <xs:group ref="tsql:output-clause" minOccurs="0"/>
       </xs:sequence>
     </xs:group>
 
@@ -122,6 +123,7 @@
       <xs:sequence>
         <xs:group ref="tsql:top-clause" minOccurs="0"/>
         <xs:group ref="sql:update-clauses"/>
+        <xs:group ref="tsql:output-clause" minOccurs="0"/>
       </xs:sequence>
     </xs:group>
 
@@ -129,6 +131,7 @@
       <xs:sequence>
         <xs:group ref="tsql:top-clause" minOccurs="0"/>
         <xs:group ref="sql:delete-clauses"/>
+        <xs:group ref="tsql:output-clause" minOccurs="0"/>
       </xs:sequence>
     </xs:group>
 
@@ -145,7 +148,6 @@
           minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
     </xs:group>
-
 
     <xs:group name="source">
       <xs:choice>

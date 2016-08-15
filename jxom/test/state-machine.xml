@@ -381,7 +381,9 @@
             <initialize>
               <invoke name="A">
                 <meta>
-                  <type name="MyClass" arity="1"/>
+                  <type array="true">
+                    <type name="MyClass"/>
+                  </type>
                 </meta>
               </invoke>
             </initialize>

@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  This xml schema defines simplified schema of
-  the sql oracle statements used.
+  This xml schema defines simplified schema of the sql oracle statements used.
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns="http://www.bphx.com/basic-sql/2008-12-11/oracle"
@@ -29,6 +28,7 @@
         <xs:element ref="oracle:set"/>
         <xs:element ref="oracle:call"/>
         <xs:element ref="oracle:open"/>
+        <xs:element ref="oracle:open-for"/>
         <xs:element ref="oracle:close"/>
         <xs:element ref="oracle:fetch"/>
         <xs:element ref="oracle:savepoint"/>
@@ -49,6 +49,28 @@
         <xs:element ref="oracle:search-case"/>
       </xs:choice>
     </xs:group>
+
+    <xs:group name="insert-clauses">
+      <xs:sequence>
+        <xs:group ref="sql:insert-clauses"/>
+        <xs:group ref="oracle:returning-clause" minOccurs="0"/>
+      </xs:sequence>
+    </xs:group>
+
+    <xs:group name="update-clauses">
+      <xs:sequence>
+        <xs:group ref="sql:update-clauses"/>
+        <xs:group ref="oracle:returning-clause" minOccurs="0"/>
+      </xs:sequence>
+    </xs:group>
+
+    <xs:group name="delete-clauses">
+      <xs:sequence>
+        <xs:group ref="sql:delete-clauses"/>
+        <xs:group ref="oracle:returning-clause" minOccurs="0"/>
+      </xs:sequence>
+    </xs:group>
+
   </xs:redefine>
 
 </xs:schema>

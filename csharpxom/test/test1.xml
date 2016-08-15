@@ -24,20 +24,18 @@
 
   <using-namespace name="ConsoleApplication2.Test"/>
 
-  <attributes>
-    <attribute target="assembly">
-      <type name="CopyrightAttribute" namespace="System"/>
-      <arguments>
-        <string value="(C) 2009"/>
-      </arguments>
-    </attribute>
-    <attribute target="assembly">
-      <type name="TrademarkAttribute" namespace="System"/>
-      <arguments>
-        <string value="Nesterovsky bros"/>
-      </arguments>
-    </attribute>
-  </attributes>
+  <attribute target="assembly">
+    <type name="CopyrightAttribute" namespace="System"/>
+    <arguments>
+      <string value="(C) 2009"/>
+    </arguments>
+  </attribute>
+  <attribute target="assembly">
+    <type name="TrademarkAttribute" namespace="System"/>
+    <arguments>
+      <string value="Nesterovsky bros"/>
+    </arguments>
+  </attribute>
 
   <namespace name="My">
     <class access="public" name="A">
@@ -218,7 +216,8 @@
           </var>
           <var name="a">
             <initialize>
-              <new-array rank="1">
+              <new-array>
+                <type rank="1"/>
                 <initialize>
                   <item>
                     <var-ref name="0" name-ref="id-o1"/>
@@ -420,7 +419,9 @@
 
           <fixed>
             <var name="p">
-              <type name="int" pointer="1"/>
+              <type pointer="true">
+                <type name="int"/>
+              </type>
               <initialize>
                 <stackalloc>
                   <type name="int"/>
@@ -511,11 +512,9 @@
         <type name="int"/>
       </field>
       <field access="private" volatile="true" name="f2">
-        <attributes>
-          <attribute>
-            <type name="ObsoleteAttribute" namespace="System"/>
-          </attribute>
-        </attributes>
+        <attribute>
+          <type name="ObsoleteAttribute" namespace="System"/>
+        </attribute>
         <type name="int"/>
       </field>
 
@@ -646,11 +645,9 @@
         <type name="int"/>
       </field>
       <field access="private" volatile="true" name="f2">
-        <attributes>
-          <attribute>
-            <type name="ObsoleteAttribute" namespace="System"/>
-          </attribute>
-        </attributes>
+        <attribute>
+          <type name="ObsoleteAttribute" namespace="System"/>
+        </attribute>
         <type name="int"/>
       </field>
 
@@ -1078,7 +1075,9 @@
         <returns>
           <type name="Task" namespace="System.Threading.Tasks">
             <type-arguments>
-              <type name="byte" rank="1"/>
+              <type rank="1">
+                <type name="byte"/>
+              </type>
             </type-arguments>
           </type>
         </returns>

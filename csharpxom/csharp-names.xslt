@@ -120,7 +120,7 @@
     <xsl:variable name="components" as="xs:string*">
       <xsl:for-each select="$name">
         <xsl:analyze-string
-          regex="[\p{{L}}\d]+"
+          regex="[\p{{L}}]+|\d+"
           flags="imx"
           select=".">
           <xsl:matching-substring>

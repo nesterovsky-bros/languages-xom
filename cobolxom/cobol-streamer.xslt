@@ -106,10 +106,10 @@
       else
         subsequence($tokens, $index)"/>
 
-    <xsl:sequence select="t:format-line($line, $indent)"/>
+    <xsl:if
+      test="exists($line[. instance of xs:string]) or exists($line-break)">
+      <xsl:sequence select="t:format-line($line, $indent)"/>
 
-    <xsl:if 
-      test="exists($line-break) or exists($line[. instance of xs:string])">
       <xsl:call-template name="t:get-lines">
         <xsl:with-param name="tokens" select="$tokens"/>
         <xsl:with-param name="line-breaks" select="$line-breaks"/>
@@ -144,8 +144,16 @@
     <xsl:param name="tokens" as="item()*"/>
 
     <xsl:sequence select="
-      count(index-of($tokens, $t:indent)) -
-        count(index-of($tokens, $t:unindent))"/>
+      sum
+      (
+        for $token in $tokens[. instance of xs:QName] return
+          if ($token eq $t:indent) then
+            1
+          else if ($token eq $t:unindent) then
+            -1
+          else
+            ()
+      )"/>
   </xsl:function>
 
   <!--
@@ -183,57 +191,40 @@
       select="$tokens[not(. instance of xs:QName)]"/>
 
     <xsl:variable name="control-tokens" as="xs:QName*" select="
-      if (exists($literals)) then
-        subsequence
+      subsequence
+      (
+        $tokens,
+        1,
         (
-          $tokens,
-          1,
+          for $i in 1 to count($tokens) return
           (
-            for $i in 1 to count($tokens) return
-              if ($tokens[$i] instance of xs:QName) then
-                ()
-              else
-                $i - 1
-          )[1]
-        )
+            if ($tokens[$i] instance of xs:QName) then
+              ()
+            else
+              $i - 1
+          ),
+          count($tokens)
+        )[1]
+      )"/>
+
+    <xsl:variable name="line-indent" as="xs:integer?"
+      select="index-of($control-tokens, $t:line-indent)[last()]"/>
+    <xsl:variable name="next-tokens" as="xs:QName*"
+      select="subsequence($control-tokens, $line-indent + 1)"/>
+
+    <xsl:variable name="indent-value" as="xs:integer" select="
+      if (exists($line-indent)) then
+        count($next-tokens[. eq $t:indent])
       else
-        $tokens"/>
-
-    <xsl:variable name="indent-value" as="xs:integer">
-      <xsl:variable name="line-indent" as="xs:integer?"
-        select="index-of($control-tokens, $t:line-indent)[last()]"/>
-
-      <xsl:choose>
-        <xsl:when test="exists($line-indent)">
-          <xsl:variable name="next-tokens" as="xs:QName*"
-            select="subsequence($control-tokens, $line-indent + 1)"/>
-
-          <xsl:sequence select="count(index-of($next-tokens, $t:indent))"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:sequence select="
-            $indent +
-              count(index-of($control-tokens, $t:indent)) -
-              count(index-of($control-tokens, $t:unindent))"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+        $indent + t:get-indentation($control-tokens)"/>
 
     <xsl:variable name="indentation" as="xs:string?"
       select="t:get-indentation($indent-value, $literals[1])"/>
 
     <xsl:variable name="type" as="xs:QName?" select="
-      $control-tokens[. = ($t:noformat, $t:code, $t:comment)][last()]"/>
+      $control-tokens[. = ($t:noformat, $t:code, $t:comment)][1]"/>
 
     <xsl:choose>
-      <xsl:when test="$type = $t:noformat">
-        <xsl:sequence select="
-          string-join
-          (
-            ($t:marker-indent, ' ', $literals, $t:new-line-text),
-            ''
-          )"/>
-      </xsl:when>
       <xsl:when test="empty($type) or ($type = $t:code)">
         <!-- Code line. -->
         <xsl:variable name="line" as="xs:string"
@@ -283,6 +274,14 @@
             </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
+      </xsl:when>
+      <xsl:when test="$type = $t:noformat">
+        <xsl:sequence select="
+          string-join
+          (
+            ($t:marker-indent, ' ', $literals, $t:new-line-text),
+            ''
+          )"/>
       </xsl:when>
       <xsl:when test="$type = $t:comment">
         <!-- Comment line. -->

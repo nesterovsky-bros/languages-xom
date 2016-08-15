@@ -174,8 +174,6 @@
     <xsl:param name="class" as="element()"/>
 
     <xsl:variable name="name" as="xs:string" select="$class/@name"/>
-    <xsl:variable name="attributes" as="element()?"
-      select="$class/attributes"/>
     <xsl:variable name="type-parameters" as="element()?"
       select="$class/type-parameters"/>
     <xsl:variable name="base" as="element()*"
@@ -185,7 +183,7 @@
     <xsl:variable name="declarations" as="element()*"
       select="t:get-class-member-declaration-list($class)"/>
 
-    <xsl:sequence select="t:get-attributes($attributes)"/>
+    <xsl:sequence select="t:get-attributes($class)"/>
     <xsl:sequence select="t:get-modifiers($class)"/>
     <xsl:sequence select="'class'"/>
     <xsl:sequence select="' '"/>
@@ -238,8 +236,6 @@
     <xsl:param name="struct" as="element()"/>
 
     <xsl:variable name="name" as="xs:string" select="$struct/@name"/>
-    <xsl:variable name="attributes" as="element()?"
-      select="$struct/attributes"/>
     <xsl:variable name="type-parameters" as="element()?"
       select="$struct/type-parameters"/>
     <xsl:variable name="base" as="element()*"
@@ -249,7 +245,7 @@
     <xsl:variable name="declarations" as="element()*"
       select="t:get-struct-member-declaration-list($struct)"/>
 
-    <xsl:sequence select="t:get-attributes($attributes)"/>
+    <xsl:sequence select="t:get-attributes($struct)"/>
     <xsl:sequence select="t:get-modifiers($struct)"/>
     <xsl:sequence select="'struct'"/>
     <xsl:sequence select="' '"/>
@@ -302,8 +298,6 @@
     <xsl:param name="interface" as="element()"/>
 
     <xsl:variable name="name" as="xs:string" select="$interface/@name"/>
-    <xsl:variable name="attributes" as="element()?"
-      select="$interface/attributes"/>
     <xsl:variable name="type-parameters" as="element()?"
       select="$interface/type-parameters"/>
     <xsl:variable name="base" as="element()*"
@@ -313,7 +307,7 @@
     <xsl:variable name="declarations" as="element()*"
       select="t:get-interface-member-declaration-list($interface)"/>
 
-    <xsl:sequence select="t:get-attributes($attributes)"/>
+    <xsl:sequence select="t:get-attributes($interface)"/>
     <xsl:sequence select="t:get-modifiers($interface)"/>
     <xsl:sequence select="'interface'"/>
     <xsl:sequence select="' '"/>
@@ -366,14 +360,12 @@
     <xsl:param name="enum" as="element()"/>
 
     <xsl:variable name="name" as="xs:string" select="$enum/@name"/>
-    <xsl:variable name="attributes" as="element()?"
-      select="$enum/attributes"/>
     <xsl:variable name="base" as="element()?"
       select="$enum/base-class"/>
     <xsl:variable name="declarations" as="element()*"
       select="t:get-enum-member-declaration-list($enum)"/>
 
-    <xsl:sequence select="t:get-attributes($attributes)"/>
+    <xsl:sequence select="t:get-attributes($enum)"/>
     <xsl:sequence select="t:get-modifiers($enum)"/>
     <xsl:sequence select="'enum'"/>
     <xsl:sequence select="' '"/>
@@ -411,8 +403,6 @@
     <xsl:param name="delegate" as="element()"/>
 
     <xsl:variable name="name" as="xs:string" select="$delegate/@name"/>
-    <xsl:variable name="attributes" as="element()?"
-      select="$delegate/attributes"/>
     <xsl:variable name="return-type" as="element()?"
       select="$delegate/returns/type"/>
     <xsl:variable name="type-parameters" as="element()?"
@@ -422,7 +412,7 @@
     <xsl:variable name="constraints" as="element()*"
       select="$delegate/constraints"/>
 
-    <xsl:sequence select="t:get-attributes($attributes)"/>
+    <xsl:sequence select="t:get-attributes($delegate)"/>
     <xsl:sequence select="t:get-modifiers($delegate)"/>
     <xsl:sequence select="'delegate'"/>
     <xsl:sequence select="' '"/>
@@ -580,10 +570,9 @@
 
       <xsl:for-each select="$parameters">
         <xsl:variable name="name" as="xs:string" select="@name"/>
-        <xsl:variable name="attributes" as="element()?" select="attributes"/>
         <xsl:variable name="variance" as="xs:string?" select="@variance"/>
 
-        <xsl:sequence select="t:get-attributes($attributes)"/>
+        <xsl:sequence select="t:get-attributes(.)"/>
 
         <xsl:if test="$variance = ('in', 'out')">
           <xsl:sequence select="$variance"/>
@@ -596,7 +585,7 @@
           <xsl:sequence select="','"/>
 
           <xsl:sequence select="
-            if (exists($parameters/attributes)) then
+            if (exists($parameters/attribute)) then
               $t:new-line
             else
               ' '"/>
@@ -763,11 +752,10 @@
       <xsl:for-each select="$parameter">
         <xsl:variable name="name" as="xs:string" select="@name"/>
         <xsl:variable name="modifier" as="xs:string?" select="@modifier"/>
-        <xsl:variable name="attributes" as="element()?" select="attributes"/>
         <xsl:variable name="type" as="element()" select="type"/>
         <xsl:variable name="initializer" as="element()?" select="initialize"/>
 
-        <xsl:sequence select="t:get-attributes($attributes)"/>
+        <xsl:sequence select="t:get-attributes(.)"/>
 
         <xsl:if test="$modifier">
           <xsl:sequence select="$modifier"/>
@@ -796,7 +784,7 @@
     </xsl:variable>
 
     <xsl:sequence select="
-      t:reformat-tokens($tokens, 3, ' ', $t:new-line, false(), false())"/>
+      t:reformat-tokens($tokens, 4, ' ', $t:new-line, false(), false())"/>
   </xsl:function>
 
   <!-- Generates class member declarations. -->
@@ -818,7 +806,7 @@
         exists($next) and
         (
           exists($next/comment) or
-          exists($next/attributes) or
+          exists($next/attribute) or
           not(self::field and $next[self::field]) or
           (string(@access) != string($next/@access)) or
           (not(xs:boolean(@static)) != not(xs:boolean($next/@static)))
@@ -859,7 +847,7 @@
         exists($next) and
         (
           exists($next/comment) or
-          exists($next/attributes) or
+          exists($next/attribute) or
           not(self::field and $next[self::field]) or
           (string(@access) != string($next/@access)) or
           (not(xs:boolean(@static)) != not(xs:boolean($next/@static)))
@@ -900,7 +888,7 @@
         exists($next) and
         (
           exists($next/comment) or
-          exists($next/attributes) or
+          exists($next/attribute) or
           not(self::property and $next[self::property])
         )">
         <xsl:sequence select="$t:new-line"/>
@@ -939,7 +927,7 @@
         exists($next) and
         (
           exists($next/comment) or
-          exists($next/attributes) or
+          exists($next/attribute) or
           not(self::value and $next[self::value])
         )">
         <xsl:sequence select="$t:new-line"/>
@@ -983,11 +971,10 @@
     <xsl:variable name="readonly" as="xs:boolean?" select="@readonly"/>
     <xsl:variable name="const" as="xs:boolean?" select="@const"/>
     <xsl:variable name="volatile" as="xs:boolean?" select="@volatile"/>
-    <xsl:variable name="attributes" as="element()?" select="attributes"/>
     <xsl:variable name="type" as="element()" select="type"/>
     <xsl:variable name="initializer" as="element()?" select="initialize"/>
 
-    <xsl:sequence select="t:get-attributes($attributes)"/>
+    <xsl:sequence select="t:get-attributes(.)"/>
     <xsl:sequence select="t:get-modifiers(.)"/>
 
     <xsl:if test="exists($const)">
@@ -1024,11 +1011,10 @@
   <xsl:template mode="t:struct-member-declaration"
     match="fixed-size-field">
     <xsl:variable name="name" as="xs:string" select="@name"/>
-    <xsl:variable name="attributes" as="element()?" select="attributes"/>
     <xsl:variable name="type" as="element()" select="type"/>
     <xsl:variable name="size" as="element()" select="size"/>
 
-    <xsl:sequence select="t:get-attributes($attributes)"/>
+    <xsl:sequence select="t:get-attributes(.)"/>
     <xsl:sequence select="t:get-modifiers(.)"/>
     <xsl:sequence select="'fixed'"/>
     <xsl:sequence select="' '"/>
@@ -1049,7 +1035,6 @@
     t:interface-member-declaration"
     match="method">
     <xsl:variable name="name" as="xs:string" select="@name"/>
-    <xsl:variable name="attributes" as="element()?" select="attributes"/>
     <xsl:variable name="return-type" as="element()?" select="returns/type"/>
     <xsl:variable name="explicit-interface" as="element()?"
       select="explicit-interface/type"/>
@@ -1063,7 +1048,7 @@
       $block[xs:boolean(@expression) and (count(*) = 1)]/
         return/t:get-elements(.)"/>
 
-    <xsl:sequence select="t:get-attributes($attributes)"/>
+    <xsl:sequence select="t:get-attributes(.)"/>
     <xsl:sequence select="t:get-modifiers(.)"/>
 
     <xsl:choose>
@@ -1121,7 +1106,6 @@
     t:interface-member-declaration"
     match="property">
     <xsl:variable name="name" as="xs:string" select="@name"/>
-    <xsl:variable name="attributes" as="element()?" select="attributes"/>
     <xsl:variable name="type" as="element()" select="type"/>
     <xsl:variable name="explicit-interface" as="element()?"
       select="explicit-interface/type"/>
@@ -1140,7 +1124,7 @@
         )"/>
     </xsl:if>
 
-    <xsl:sequence select="t:get-attributes($attributes)"/>
+    <xsl:sequence select="t:get-attributes(.)"/>
     <xsl:sequence select="t:get-modifiers(.)"/>
     <xsl:sequence select="t:get-type($type)"/>
     <xsl:sequence select="' '"/>
@@ -1159,10 +1143,10 @@
     </xsl:if>
 
     <xsl:variable name="compact" as="xs:boolean"
-      select="empty(($getter, $setter)/(attributes, block))"/>
+      select="empty(($getter, $setter)/(attribute, block))"/>
     
     <xsl:variable name="expression" as="element()?" select="
-      $getter[not($setter) and not(attributes) and not(@access)]/
+      $getter[not($setter) and not(attribute) and not(@access)]/
         block[xs:boolean(@expression) and (count(*) = 1)]/
           return/t:get-elements(.)"/>
 
@@ -1191,11 +1175,9 @@
         <xsl:sequence select="$t:indent"/>
 
         <xsl:for-each select="$getter, $setter">
-          <xsl:variable name="accessor-attributes" as="element()?"
-            select="attributes"/>
           <xsl:variable name="accessor-body" as="element()?" select="block"/>
 
-          <xsl:sequence select="t:get-attributes($accessor-attributes)"/>
+          <xsl:sequence select="t:get-attributes(.)"/>
           <xsl:sequence select="t:get-modifiers(.)"/>
 
           <xsl:sequence select="
@@ -1247,7 +1229,6 @@
     t:interface-member-declaration"
     match="event">
     <xsl:variable name="name" as="xs:string" select="@name"/>
-    <xsl:variable name="attributes" as="element()?" select="attributes"/>
     <xsl:variable name="type" as="element()" select="type"/>
     <xsl:variable name="explicit-interface" as="element()?"
       select="explicit-interface/type"/>
@@ -1275,7 +1256,7 @@
         )"/>
     </xsl:if>
 
-    <xsl:sequence select="t:get-attributes($attributes)"/>
+    <xsl:sequence select="t:get-attributes(.)"/>
     <xsl:sequence select="t:get-modifiers(.)"/>
     <xsl:sequence select="'event'"/>
     <xsl:sequence select="' '"/>
@@ -1304,11 +1285,9 @@
         <xsl:sequence select="$t:indent"/>
 
         <xsl:for-each select="$add, $remove">
-          <xsl:variable name="accessor-attributes" as="element()?"
-            select="attributes"/>
           <xsl:variable name="accessor-body" as="element()?" select="block"/>
 
-          <xsl:sequence select="t:get-attributes($accessor-attributes)"/>
+          <xsl:sequence select="t:get-attributes(.)"/>
           <xsl:sequence select="t:get-modifiers(.)"/>
 
           <xsl:sequence select="
@@ -1347,7 +1326,6 @@
     match="operator">
     <xsl:variable name="name" as="xs:string?" select="@name"/>
     <xsl:variable name="implicit" as="xs:boolean?" select="@implicit"/>
-    <xsl:variable name="attributes" as="element()?" select="attributes"/>
     <xsl:variable name="return-type" as="element()" select="returns/type"/>
     <xsl:variable name="parameters" as="element()" select="parameters"/>
     <xsl:variable name="block" as="element()?" select="block"/>
@@ -1356,7 +1334,7 @@
       $block[xs:boolean(@expression) and (count(*) = 1)]/
         return/t:get-elements(.)"/>
 
-    <xsl:sequence select="t:get-attributes($attributes)"/>
+    <xsl:sequence select="t:get-attributes(.)"/>
     <xsl:sequence select="t:get-modifiers(.)"/>
 
     <xsl:if test="empty($name)">
@@ -1412,7 +1390,6 @@
     t:struct-member-declaration"
     match="constructor">
     <xsl:variable name="name" as="xs:string" select="@name"/>
-    <xsl:variable name="attributes" as="element()?" select="attributes"/>
     <xsl:variable name="parameters" as="element()?" select="parameters"/>
     <xsl:variable name="initializer" as="element()?" select="initialize"/>
     <xsl:variable name="block" as="element()?" select="block"/>
@@ -1421,7 +1398,7 @@
       $block[xs:boolean(@expression) and (count(*) = 1)]/
         return/t:get-elements(.)"/>
 
-    <xsl:sequence select="t:get-attributes($attributes)"/>
+    <xsl:sequence select="t:get-attributes(.)"/>
     <xsl:sequence select="t:get-modifiers(.)"/>
     <xsl:sequence select="$name"/>
     <xsl:sequence select="'('"/>
@@ -1467,14 +1444,13 @@
   <!-- destructor-declaration. -->
   <xsl:template mode="t:class-member-declaration" match="destructor">
     <xsl:variable name="name" as="xs:string" select="@name"/>
-    <xsl:variable name="attributes" as="element()?" select="attributes"/>
     <xsl:variable name="block" as="element()?" select="block"/>
 
     <xsl:variable name="expression" as="element()?" select="
       $block[xs:boolean(@expression) and (count(*) = 1)]/
         return/t:get-elements(.)"/>
 
-    <xsl:sequence select="t:get-attributes($attributes)"/>
+    <xsl:sequence select="t:get-attributes(.)"/>
     <xsl:sequence select="t:get-modifiers(.)"/>
     <xsl:sequence select="'~'"/>
     <xsl:sequence select="$name"/>
@@ -1504,10 +1480,9 @@
   <!-- enum-member-declaration. -->
   <xsl:template mode="t:enum-member-declaration" match="value">
     <xsl:variable name="name" as="xs:string" select="@name"/>
-    <xsl:variable name="attributes" as="element()?" select="attributes"/>
     <xsl:variable name="initializer" as="element()?" select="initialize"/>
 
-    <xsl:sequence select="t:get-attributes($attributes)"/>
+    <xsl:sequence select="t:get-attributes(.)"/>
     <xsl:sequence select="$name"/>
 
     <xsl:if test="exists($initializer)">

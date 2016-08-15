@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<unit xmlns="http://www.bphx.com/java-1.5/2008-02-07" package="com.nesterovskyBros.test">
+  <class name="Formatting" access="public">
+    <method name="run" access="public">
+      <block>
+        <var-decl name="callIn">
+          <type name="Import">
+            <type name="Isc10241GetEtgroupClients"/>
+          </type>
+          <initialize>
+            <new-object>
+              <type name="Import">
+                <type name="Isc10241GetEtgroupClients"/>
+              </type>
+            </new-object>
+          </initialize>
+        </var-decl>
+
+        <try>
+          <resource>
+            <var-decl name="program">
+              <type name="Abw0011ReadProcessInstance"/>
+              <initialize>
+                <new-object>
+                  <type name="Abw0011ReadProcessInstance"/>
+                  <arguments>
+                    <var name="context"/>
+                    <var name="in"/>
+                    <var name="out"/>
+                  </arguments>
+                </new-object>
+              </initialize>
+            </var-decl>
+          </resource>
+          <block>
+            <if>
+              <condition>
+                <not>
+                  <invoke name="trace">
+                    <instance>
+                      <var name="program"/>
+                    </instance>
+                    <arguments>
+                      <string value="execute"/>
+                      <var name="in"/>
+                      <var name="out"/>
+                    </arguments>
+                  </invoke>
+                </not>
+              </condition>
+              <then>
+                <expression>
+                  <invoke name="run">
+                    <instance>
+                      <var name="program"/>
+                    </instance>
+                  </invoke>
+                </expression>
+              </then>
+            </if>
+          </block>
+        </try>
+
+        <if>
+          <condition>
+            <invoke name="equal">
+              <arguments>
+                <invoke name="getFlag">
+                  <instance>
+                    <invoke name="getMonitorDebugFis2Workset">
+                      <instance>
+                        <field name="local"/>
+                      </instance>
+                    </invoke>
+                  </instance>
+                </invoke>
+
+                <string value="Y"/>
+              </arguments>
+            </invoke>
+          </condition>
+          <then>
+            <expression>
+              <invoke name="setLastChange">
+                <instance>
+                  <invoke name="getLogBwProcessInstance">
+                    <instance>
+                      <field name="local"/>
+                    </instance>
+                  </invoke>
+                </instance>
+                <arguments>
+                  <invoke name="getLastChange">
+                    <instance>
+                      <invoke name="getCurrent">
+                        <instance>
+                          <field name="local"/>
+                        </instance>
+                      </invoke>
+                    </instance>
+                  </invoke>
+                </arguments>
+              </invoke>
+            </expression>
+
+            <expression>
+              <invoke name="setType">
+                <instance>
+                  <invoke name="getLogBwWorkflowProcess">
+                    <instance>
+                      <field name="local"/>
+                    </instance>
+                  </invoke>
+                </instance>
+                <arguments>
+                  <invoke name="numberToString">
+                    <arguments>
+                      <invoke name="getIdNumber">
+                        <instance>
+                          <invoke name="getFilterBwWorkflowProcess">
+                            <instance>
+                              <field name="in"/>
+                            </instance>
+                          </invoke>
+                        </instance>
+                      </invoke>
+                      <int value="15"/>
+                    </arguments>
+                  </invoke>
+                </arguments>
+              </invoke>
+            </expression>
+
+            <if>
+              <condition>
+                <and>
+                  <and>
+                    <not>
+                      <invoke name="equal">
+                        <arguments>
+                          <invoke name="getName">
+                            <instance>
+                              <invoke name="getFilterBwBusinessObjectType">
+                                <instance>
+                                  <field name="in"/>
+                                </instance>
+                              </invoke>
+                            </instance>
+                          </invoke>
+                          <invoke name="getName">
+                            <instance>
+                              <invoke name="getMonitorDebugBwBusinessObjectType">
+                                <instance>
+                                  <field name="local"/>
+                                </instance>
+                              </invoke>
+                            </instance>
+                          </invoke>
+                        </arguments>
+                      </invoke>
+                    </not>
+                    <not>
+                      <invoke name="equal">
+                        <arguments>
+                          <invoke name="getName">
+                            <instance>
+                              <invoke name="getFilterBwBusinessObjectType">
+                                <instance>
+                                  <field name="in"/>
+                                </instance>
+                              </invoke>
+                            </instance>
+                          </invoke>
+
+                          <string value=""/>
+                        </arguments>
+                      </invoke>
+                    </not>
+                  </and>
+                  <not>
+                    <invoke name="equal">
+                      <arguments>
+                        <invoke name="getName">
+                          <instance>
+                            <invoke name="getMonitorDebugBwBusinessObjectType">
+                              <instance>
+                                <field name="local"/>
+                              </instance>
+                            </invoke>
+                          </instance>
+                        </invoke>
+
+                        <string value=""/>
+                      </arguments>
+                    </invoke>
+                  </not>
+                </and>
+              </condition>
+              <then>
+                <return/>
+              </then>
+            </if>
+          </then>
+        </if>
+      </block>
+    </method>
+  </class>
+</unit>

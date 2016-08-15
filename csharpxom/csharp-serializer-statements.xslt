@@ -796,10 +796,16 @@
 
     <xsl:choose>
       <xsl:when test="exists($var)">
+        <xsl:variable name="comments" as="item()*" select="t:get-comments(.)"/>
         <xsl:variable name="name" as="xs:string" select="$var/@name"/>
         <xsl:variable name="type" as="element()?" select="$var/type"/>
         <xsl:variable name="initializer" as="element()"
           select="$var/initialize"/>
+
+        <xsl:if test="exists($comments)">
+          <xsl:sequence select="$t:new-line"/>
+          <xsl:sequence select="$comments"/>
+        </xsl:if>
 
         <xsl:choose>
           <xsl:when test="exists($type)">
@@ -819,6 +825,13 @@
         <xsl:sequence select="t:get-variable-initializer($initializer)"/>
       </xsl:when>
       <xsl:otherwise>
+        <xsl:variable name="comments" as="item()*" select="t:get-comments(.)"/>
+
+        <xsl:if test="exists($comments)">
+          <xsl:sequence select="$t:new-line"/>
+          <xsl:sequence select="$comments"/>
+        </xsl:if>
+
         <xsl:sequence select="t:get-expression(t:get-elements($resource))"/>
       </xsl:otherwise>
     </xsl:choose>

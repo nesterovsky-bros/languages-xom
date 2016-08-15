@@ -1172,16 +1172,20 @@
 
   <!-- Mode "t:expression". array-creation-expression. -->
   <xsl:template mode="t:expression" match="new-array">
-    <xsl:variable name="type" as="element()?" select="type"/>
+    <xsl:variable name="type" as="element()" select="type"/>
     <xsl:variable name="initializer" as="element()?" select="initialize"/>
     <xsl:variable name="expressions" as="element()*"
       select="t:get-elements(.) except ($type, $initializer)"/>
 
-    <xsl:variable name="ranks" as="xs:integer*" select="
-      for $item in tokenize(@rank, '\s') return
-        xs:integer($item)"/>
+    <xsl:variable name="closure" as="item()+"
+      select="t:get-type-with-ranks($type, ())"/>
+    <xsl:variable name="element-type" as="element()?"
+      select="$closure[. instance of element()]"/>
+    <xsl:variable name="ranks" as="xs:integer+"
+      select="$closure[not(. instance of element())]"/>
 
-    <xsl:if test="empty($type) and empty($ranks) and empty($expressions)">
+    <xsl:if 
+      test="empty($element-type) and empty($ranks) and empty($expressions)">
       <xsl:sequence select="
         error
         (
@@ -1193,9 +1197,9 @@
 
     <xsl:sequence select="'new'"/>
 
-    <xsl:if test="exists($type)">
+    <xsl:if test="exists($element-type)">
       <xsl:sequence select="' '"/>
-      <xsl:sequence select="t:get-type($type)"/>
+      <xsl:sequence select="t:get-type($element-type)"/>
     </xsl:if>
 
     <xsl:if test="exists($expressions)">
@@ -1227,11 +1231,7 @@
       </xsl:if>
 
       <xsl:sequence select="'['"/>
-
-      <xsl:sequence select="
-        for $i in 1 to $rank - 1 return
-          ','"/>
-
+      <xsl:sequence select="for $i in 1 to $rank - 1 return ','"/>
       <xsl:sequence select="']'"/>
     </xsl:for-each>
 

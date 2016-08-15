@@ -26,6 +26,8 @@
     <xsl:variable name="tokens" as="item()*"
       select="t:get-sql-statement-tokens(*)"/>
 
+    <!--<xsl:message select="$tokens"/>-->
+
     <xsl:sequence select="
       string-join
       (

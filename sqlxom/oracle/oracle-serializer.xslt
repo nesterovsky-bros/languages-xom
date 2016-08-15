@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  This stylesheet generates basic sql.
--->
+<!-- This stylesheet generates basic sql. -->
 <xsl:stylesheet version="2.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -484,6 +482,39 @@
     <keyword name="RECORD"/>
     <keyword name="SUBTYPE"/>
   </xsl:variable>
+
+  <!-- output clause. -->
+  <xsl:template priority="2" match="*[oracle:returning]" mode="
+    t:insert-footer-extensions
+    t:delete-footer-extensions
+    t:update-footer-extensions">
+
+    <xsl:variable name="returning" as="element()" select="oracle:returning"/>
+    <xsl:variable name="columns" as="element()+" select="$returning/sql:column"/>
+    <xsl:variable name="into" as="element()" select="$returning/sql:into"/>
+
+    <xsl:sequence select="$t:new-line"/>
+    <xsl:sequence select="'returning'"/>
+    <xsl:sequence select="' '"/>
+
+    <xsl:sequence select="$t:indent"/>
+
+    <xsl:for-each select="$columns">
+      <xsl:sequence select="$t:new-line"/>
+      <xsl:apply-templates mode="t:expression-tokens"
+        select="t:get-sql-element(.)"/>
+
+      <xsl:if test="position() != last()">
+        <xsl:sequence select="','"/>
+      </xsl:if>
+    </xsl:for-each>
+
+    <xsl:call-template name="t:generate-into-clause">
+      <xsl:with-param name="into" select="$into"/>
+    </xsl:call-template>
+
+    <xsl:sequence select="$t:unindent"/>
+  </xsl:template>
 
   <!--
     Mode "t:get-sql-element". Gets sql element.
@@ -1089,6 +1120,28 @@
   </xsl:template>
 
   <!--
+    Mode "t:statement-tokens". open-for statement.
+  -->
+  <xsl:template mode="t:statement-tokens" match="oracle:open-for">
+    <xsl:variable name="name" as="xs:string" select="@name"/>
+    <xsl:variable name="select" as="element()" select="t:get-select(.)"/>
+
+    <xsl:call-template name="t:generate-label"/>
+    <xsl:sequence select="'open'"/>
+    <xsl:sequence select="' '"/>
+    <xsl:sequence select="$name"/>
+    <xsl:sequence select="' '"/>
+    <xsl:sequence select="'for'"/>
+    <xsl:sequence select="' '"/>
+    <xsl:sequence select="$t:new-line"/>
+    <xsl:sequence select="$t:indent"/>
+    <xsl:apply-templates mode="t:statement-tokens" select="$select"/>
+    <xsl:sequence select="$t:unindent"/>
+    <xsl:sequence select="';'"/>
+    <xsl:sequence select="$t:new-line"/>
+  </xsl:template>
+
+  <!--
     Mode "t:statement-tokens". close statement.
   -->
   <xsl:template mode="t:statement-tokens" match="oracle:close">
@@ -1389,9 +1442,9 @@
         </xsl:for-each>
       </xsl:when>
       <xsl:otherwise>
+        <!--<xsl:sequence select="$t:new-line"/>
         <xsl:sequence select="$t:new-line"/>
-        <xsl:sequence select="$t:new-line"/>
-        <xsl:sequence select="$t:indent"/>
+        <xsl:sequence select="$t:indent"/>-->
 
         <xsl:for-each select="$arguments">
           <xsl:apply-templates mode="t:expression-tokens" select="."/>
@@ -1402,8 +1455,8 @@
           </xsl:if>
         </xsl:for-each>
 
-        <xsl:sequence select="$t:new-line"/>
-        <xsl:sequence select="$t:unindent"/>
+        <!--<xsl:sequence select="$t:new-line"/>
+        <xsl:sequence select="$t:unindent"/>-->
       </xsl:otherwise>
     </xsl:choose>
 

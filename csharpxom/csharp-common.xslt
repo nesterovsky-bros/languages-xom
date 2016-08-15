@@ -37,6 +37,30 @@
   </xsl:function>
 
   <!--
+    Returns elements rooted under the single document, copying 
+    content if required.
+      $elements - elements to check.
+      Returns elements rooted under the single document.
+  -->
+  <xsl:function name="t:get-rooted-elements" as="element()+">
+    <xsl:param name="elements" as="element()+"/>
+
+    <xsl:choose>
+      <xsl:when
+        test="($elements/root())[last() = 1][. instance of document-node()]">
+        <xsl:sequence select="$elements"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="document">
+          <xsl:sequence select="$elements"/>
+        </xsl:variable>
+
+        <xsl:sequence select="$document/*"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
+
+  <!--
     Get elements in a scope.
       $scope - a scope to get elements from comments and meta are not counted.
       Returns elements in a scope.
@@ -162,6 +186,26 @@
   </xsl:template>
 
   <!--
+    Gets a closure: ($type as element()?, $rank as xs:integer+).
+      $type - a type.
+      $ranks - current ranks.
+  -->
+  <xsl:function name="t:get-type-with-ranks" as="item()*">
+    <xsl:param name="type" as="element()?"/>
+    <xsl:param name="ranks" as="xs:integer*"/>
+  
+    <xsl:choose>
+      <xsl:when test="exists($type/@rank)">
+        <xsl:sequence 
+          select="t:get-type-with-ranks($type/type, ($ranks, $type/@rank))"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="$type, $ranks"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
+
+  <!--
     Makes type nullable.
       $type - a type to make nullable.
       Returns nullable type.
@@ -225,16 +269,16 @@
     <xsl:variable name="container-type" as="element()?" select="$type/type"/>
     <xsl:variable name="type-arguments" as="element()?"
       select="$type/type-arguments"/>
-    <xsl:variable name="pointer" as="xs:integer?" select="$type/@pointer"/>
-
-    <xsl:variable name="ranks" as="xs:integer*" select="
-      for $item in tokenize($type/@rank, '\s', 'm') return
-        xs:integer($item)"/>
+    <xsl:variable name="pointer" as="xs:boolean?" select="$type/@pointer"/>
+    <xsl:variable name="rank" as="xs:integer?" select="$type/@rank"/>
 
     <xsl:variable name="elements" as="xs:string+">
       <xsl:if test="exists($container-type)">
         <xsl:sequence select="t:get-type-qualified-name($container-type)"/>
-        <xsl:sequence select="'.'"/>
+
+        <xsl:if test="not($pointer) and not($rank > 0)">
+          <xsl:sequence select="'.'"/>
+        </xsl:if>
       </xsl:if>
 
       <xsl:if test="$qualifier">
@@ -267,23 +311,13 @@
       </xsl:if>
 
       <xsl:choose>
-        <xsl:when test="exists($ranks)">
-          <xsl:for-each select="$ranks">
-            <xsl:variable name="rank" as="xs:integer" select="."/>
-
-            <xsl:sequence select="'['"/>
-
-            <xsl:sequence select="
-              for $i in 1 to $rank - 1 return
-                ','"/>
-
-            <xsl:sequence select="']'"/>
-          </xsl:for-each>
+        <xsl:when test="exists($rank)">
+          <xsl:sequence select="'['"/>
+          <xsl:sequence select="for $i in 1 to $rank - 1 return ','"/>
+          <xsl:sequence select="']'"/>
         </xsl:when>
         <xsl:when test="$pointer">
-          <xsl:sequence select="
-            for $i in 1 to $pointer return
-              '*'"/>
+          <xsl:sequence select="'*'"/>
         </xsl:when>
       </xsl:choose>
     </xsl:variable>

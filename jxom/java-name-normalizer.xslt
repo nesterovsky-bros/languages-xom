@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  This stylesheet normalizes names.
--->
+<!--This stylesheet normalizes names. -->
 <xsl:stylesheet version="2.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:t="http://www.bphx.com/jxom"
   xmlns:p="http://www.bphx.com/jxom/private/java-name-normalizer"
   xmlns="http://www.bphx.com/java-1.5/2008-02-07"
-  xmlns:java="http://www.bphx.com/java-1.5/2008-02-07"                
+  xmlns:java="http://www.bphx.com/java-1.5/2008-02-07"
   xpath-default-namespace="http://www.bphx.com/java-1.5/2008-02-07"
   exclude-result-prefixes="xs t p java">
 
@@ -76,8 +74,8 @@
       (
         $scope/descendant-or-self::java:*
         [
-          (p:supports-name-id(.) and exists(@name-id)) or
-          (p:supports-label-id(.) and exists(@label-id))
+          (exists(@name-id) and p:supports-name-id(.)) or
+          (exists(@label-id) and p:supports-label-id(.))
         ]
       )"/>
   </xsl:function>
@@ -121,6 +119,7 @@
           [
             self::scope,
             self::resource[parent::try],
+            self::members,
             self::class-members,
             self::interface-members,
             self::annotation-members,
@@ -250,37 +249,21 @@
     <xsl:param name="label-ids" tunnel="yes" as="xs:string*"/>
     <xsl:param name="label-names" tunnel="yes" as="xs:string*"/>
 
-    <xsl:variable name="id-value" as="xs:string?" select="@name-id"/>
-    <xsl:variable name="ref-value" as="xs:string?" select="@name-ref"/>
-
-    <xsl:variable name="id" as="xs:string?" select="
-      if (p:supports-name-id(.) and exists($id-value)) then
-        $id-value
-      else if (p:supports-name-ref(.) and exists($ref-value)) then
-        $ref-value
-      else
-        ()"/>
-
     <xsl:variable name="new-scope" as="element()*" select="
-      p:get-elements-in-scope(.)[p:supports-name-id(.)] except $scope"/>
+      p:get-elements-in-scope(.) except $scope"/>
+    <xsl:variable name="name-id" as="xs:string?" select="@name-id"/>
+    <xsl:variable name="name-ref" as="xs:string?" select="@name-ref"/>
+    <xsl:variable name="label-id" as="xs:string?" select="@label-id"/>
+    <xsl:variable name="label-ref" as="xs:string?" select="@label-ref"/>
 
     <xsl:copy>
-      <xsl:sequence select="
-        @* except
-          (
-            @name,
-            @name-id,
-            @name-ref,
-            @label,
-            @destination-label,
-            @label-id,
-            @label-ref
-          )"/>
+      <xsl:sequence
+        select="@* except (@name-id, @name-ref, @label-id, @label-ref)"/>
 
       <xsl:choose>
-        <xsl:when test="exists($id)">
+        <xsl:when test="exists($name-id) and p:supports-name-id(.)">
           <xsl:variable name="index" as="xs:integer?"
-            select="p:index-of-id($scope-ids, $id)"/>
+            select="p:index-of-id($scope-ids, $name-id)"/>
 
           <xsl:choose>
             <xsl:when test="exists($index)">
@@ -290,50 +273,45 @@
               <xsl:attribute name="name" select="$name"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:sequence select="@name, @name-id, @name-ref"/>
+              <xsl:sequence select="@name-id"/>
             </xsl:otherwise>
           </xsl:choose>
+        </xsl:when>
+        <xsl:when test="exists($name-ref) and p:supports-name-ref(.)">
+          <xsl:variable name="index" as="xs:integer?"
+            select="p:index-of-id($scope-ids, $name-ref)"/>
+
+          <xsl:choose>
+            <xsl:when test="exists($index)">
+              <xsl:variable name="name" as="xs:string"
+                select="$scope-names[$index]"/>
+
+              <xsl:attribute name="name" select="$name"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:sequence select="@name-ref"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:when test="exists($label-id) and p:supports-label-id(.)">
+          <xsl:variable name="index" as="xs:integer"
+            select="p:index-of-id($label-ids, $label-id)"/>
+          <xsl:variable name="name" as="xs:string"
+            select="$label-names[$index]"/>
+
+          <xsl:attribute name="label" select="$name"/>
+        </xsl:when>
+        <xsl:when test="exists($label-ref) and p:supports-label-ref(.)">
+          <xsl:variable name="index" as="xs:integer"
+            select="p:index-of-id($label-ids, $label-ref)"/>
+          <xsl:variable name="name" as="xs:string"
+            select="$label-names[$index]"/>
+
+          <xsl:attribute name="destination-label" select="$name"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:sequence select="@name"/>
+          <xsl:sequence select="@label-id, @label-ref"/>
         </xsl:otherwise>
-      </xsl:choose>
-
-      <xsl:choose>
-        <xsl:when test="p:supports-label-id(.)">
-          <xsl:variable name="label-id" as="xs:string?" select="@label-id"/>
-
-          <xsl:choose>
-            <xsl:when test="exists($label-id)">
-              <xsl:variable name="index" as="xs:integer"
-                select="p:index-of-id($label-ids, $label-id)"/>
-              <xsl:variable name="name" as="xs:string"
-                select="$label-names[$index]"/>
-
-               <xsl:attribute name="label" select="$name"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:sequence select="@label"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:when test="p:supports-label-ref(.)">
-          <xsl:variable name="label-ref" as="xs:string?" select="@label-ref"/>
-
-          <xsl:choose>
-            <xsl:when test="exists($label-ref)">
-              <xsl:variable name="index" as="xs:integer"
-                select="p:index-of-id($label-ids, $label-ref)"/>
-              <xsl:variable name="name" as="xs:string"
-                select="$label-names[$index]"/>
-
-              <xsl:attribute name="destination-label" select="$name"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:sequence select="@destination-label"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
       </xsl:choose>
 
       <xsl:variable name="new-scope-names" as="xs:string*" select="
@@ -410,14 +388,19 @@
     <xsl:param name="id" as="xs:string?"/>
 
     <xsl:sequence select="
-      index-of
       (
+        index-of($ids-list, $id),
+        index-of
         (
-          for $ids in $ids-list return
-            contains($ids, $id) and
-            contains(concat(' ', $ids, ' '), concat(' ', $id, ' '))
-        ),
-        true()
+          (
+            for 
+              $id2 in concat(' ', $id, ' '),
+              $ids in $ids-list 
+            return
+              contains(concat(' ', $ids, ' '), $id2)
+          ),
+          true()
+        )
       )[1]"/>
   </xsl:function>
 

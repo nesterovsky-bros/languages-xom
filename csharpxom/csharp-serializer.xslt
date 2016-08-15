@@ -26,6 +26,7 @@
     <declaration name="using-namespace"/>
     <declaration name="using-static"/>
     <declaration name="attributes"/>
+    <declaration name="attribute"/>
     <declaration name="namespace"/>
     <declaration name="class"/>
     <declaration name="struct"/>
@@ -228,7 +229,17 @@
 
   <!-- Generates global-attributes. -->
   <xsl:template mode="t:unit-declaration" match="attributes">
-    <xsl:sequence select="t:get-attributes(.)"/>
+    <xsl:message>
+      <xsl:text>An attribute element is deprecated:</xsl:text>
+      <xsl:sequence select="."/>
+    </xsl:message>
+
+    <xsl:sequence select="attribute/t:get-attributes(.)"/>
+  </xsl:template>
+
+  <!-- Generates global-attributes. -->
+  <xsl:template mode="t:unit-declaration" match="attribute">
+    <xsl:sequence select="t:get-attribute(.)"/>
   </xsl:template>
 
   <!-- Generates namespace-declaration. -->
@@ -254,13 +265,26 @@
 
   <!--
     Gets a sequence of tokens for attributes.
-      $attributes - an attributes.
+      $element - an attribute container.
       Returns a sequence of tokens.
   -->
   <xsl:function name="t:get-attributes" as="item()*">
-    <xsl:param name="attributes" as="element()?"/>
-
-    <xsl:sequence select="$attributes/attribute/t:get-attribute(.)"/>
+    <xsl:param name="element" as="element()"/>
+    
+    <xsl:variable name="deprecated-attributes" as="element()?" 
+      select="$element/attributes"/>
+    
+    <xsl:if test="$deprecated-attributes">
+      <xsl:message>
+        <xsl:text>An attribute element is deprecated:</xsl:text>
+        <xsl:sequence select="$deprecated-attributes"/>
+      </xsl:message>
+    
+      <xsl:sequence 
+        select="$deprecated-attributes/attribute/t:get-attribute(.)"/>
+    </xsl:if>
+    
+    <xsl:sequence select="$element/attribute/t:get-attribute(.)"/>
   </xsl:function>
 
   <!--
@@ -359,135 +383,106 @@
 
     <xsl:variable name="nullable" as="xs:boolean"
       select="t:is-nullable-type($type)"/>
-
-    <xsl:variable name="unwrapped-type" as="element()" select="
-      if ($nullable) then
-        $type/type-arguments/type
-      else
-        $type"/>
-
-    <xsl:variable name="qualifier" as="xs:string?"
-      select="$unwrapped-type/@qualifier"/>
-    <xsl:variable name="namespace" as="xs:string?"
-      select="$unwrapped-type/@namespace"/>
-    <xsl:variable name="name" as="xs:string"
-      select="$unwrapped-type/@name"/>
-    <xsl:variable name="container-type" as="element()?"
-      select="$unwrapped-type/type"/>
-    <xsl:variable name="type-arguments" as="element()?"
-      select="$unwrapped-type/type-arguments"/>
-    <xsl:variable name="pointer" as="xs:integer?"
-      select="$unwrapped-type/@pointer"/>
-    <xsl:variable name="ranks" as="xs:integer*" select="
-      for $item in tokenize($unwrapped-type/@rank, '\s', 'm') return
-        xs:integer($item)"/>
-
-    <xsl:if test="exists($container-type) and ($qualifier or $namespace)">
-      <xsl:sequence select="
-        error
-        (
-          xs:QName('nested-type-with-namespace-or-qualifier'),
-          'Nested type cannot have a namespace or type qualifier.',
-          $type
-        )"/>
-    </xsl:if>
-
-    <xsl:if test="$container and ($nullable or $pointer or exists($ranks))">
-      <xsl:sequence select="
-        error
-        (
-          xs:QName('invalid-container-type'),
-          'Container type cannot be nullable or a pointer or an array.',
-          $type
-        )"/>
-    </xsl:if>
-
-    <xsl:if test="exists($container-type)">
-      <xsl:sequence select="t:get-type($container-type, false(), true())"/>
-      <xsl:sequence select="'.'"/>
-    </xsl:if>
-
-    <xsl:if test="$qualifier">
-      <xsl:sequence select="$qualifier"/>
-      <xsl:sequence select="'::'"/>
-    </xsl:if>
-
-    <xsl:if test="$namespace">
-      <xsl:sequence select="t:tokenize($namespace)"/>
-      <xsl:sequence select="'.'"/>
-    </xsl:if>
-
+    <xsl:variable name="qualifier" as="xs:string?" select="$type/@qualifier"/>
+    <xsl:variable name="namespace" as="xs:string?" select="$type/@namespace"/>
+    <xsl:variable name="name" as="xs:string?" select="$type/@name"/>
+    <xsl:variable name="container-type" as="element()?" select="$type/type"/>
+    <xsl:variable name="type-arguments" as="element()?" 
+      select="$type/type-arguments"/>
+    <xsl:variable name="pointer" as="xs:boolean?" select="$type/@pointer"/>
+    <xsl:variable name="rank" as="xs:integer?" select="$type/@rank"/>
+    
     <xsl:choose>
-      <xsl:when test="
-        $attribute and
-        not($namespace) and
-        not(xs:boolean($unwrapped-type/@remove-attribute-suffix)) and
-        ends-with($name, 'Attribute') and
-        (string-length($name) > 9)">
-        <xsl:sequence
-          select="substring($name, 1, string-length($name) - 9)"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:sequence select="$name"/>
-      </xsl:otherwise>
-    </xsl:choose>
-
-    <xsl:if test="exists($type-arguments)">
-      <xsl:sequence select="t:get-type-argument-list($type-arguments/type)"/>
-    </xsl:if>
-
-    <xsl:choose>
-      <xsl:when test="exists($ranks)">
-        <xsl:if test="$nullable or $pointer">
-          <xsl:sequence select="
-            error
-            (
-              xs:QName('type-array-nullable-or-pointer'),
-              'no nullable or pointer specifier are compatible to array  type.',
-              $type
-            )"/>
-        </xsl:if>
-
-        <xsl:for-each select="$ranks">
-          <xsl:variable name="rank" as="xs:integer" select="."/>
-
-          <xsl:if test="$rank lt 1">
-            <xsl:sequence select="
-              error
-              (
-                xs:QName('type-array-positive-rank'),
-                'array type rank must be a positive integer value.',
-                $type
-              )"/>
-          </xsl:if>
-
-          <xsl:sequence select="'['"/>
-
-          <xsl:sequence select="
-            for $i in 1 to $rank - 1 return
-              ','"/>
-
-          <xsl:sequence select="']'"/>
-        </xsl:for-each>
-      </xsl:when>
       <xsl:when test="$nullable">
-        <xsl:if test="$pointer">
+        <xsl:if test="$container or $pointer or ($rank > 0)">
           <xsl:sequence select="
             error
             (
-              xs:QName('type-nullable-pointer-mutually-exclusive'),
-              'nullable and pointer specifiers are mutually exclusive in type.',
+              xs:QName('invalid-nullable-type'),
+              'Invalid attribute over nullable type.',
               $type
             )"/>
         </xsl:if>
-
+      
+        <xsl:sequence 
+          select="t:get-type($type/type-arguments/type, false(), true())"/>
         <xsl:sequence select="'?'"/>
       </xsl:when>
-      <xsl:when test="$pointer">
-        <xsl:sequence select="
-          for $i in 1 to $pointer return
-            '*'"/>
+      <xsl:when test="exists($name)">
+        <xsl:if test="$pointer or ($rank > 0)">
+          <xsl:sequence select="
+            error
+            (
+              xs:QName('name-with-pointer-or-rank'),
+              'Name, pointer, and rank are mutually exclusive.',
+              $type
+            )"/>
+        </xsl:if>
+
+        <xsl:if test="exists($container-type)">
+          <xsl:sequence select="t:get-type($container-type, false(), true())"/>
+          <xsl:sequence select="'.'"/>
+        </xsl:if>
+
+        <xsl:if test="$qualifier">
+          <xsl:sequence select="$qualifier"/>
+          <xsl:sequence select="'::'"/>
+        </xsl:if>
+
+        <xsl:if test="$namespace">
+          <xsl:sequence select="t:tokenize($namespace)"/>
+          <xsl:sequence select="'.'"/>
+        </xsl:if>
+
+        <xsl:choose>
+          <xsl:when test="
+            $attribute and
+            not($namespace) and
+            not(xs:boolean($type/@remove-attribute-suffix)) and
+            ends-with($name, 'Attribute') and
+            (string-length($name) > 9)">
+            <xsl:sequence
+              select="substring($name, 1, string-length($name) - 9)"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:sequence select="$name"/>
+          </xsl:otherwise>
+        </xsl:choose>
+
+        <xsl:if test="exists($type-arguments)">
+          <xsl:sequence 
+            select="t:get-type-argument-list($type-arguments/type)"/>
+        </xsl:if>
       </xsl:when>
+      <xsl:when test="$pointer">
+        <xsl:if test="$rank > 1">
+          <xsl:sequence select="
+            error
+            (
+              xs:QName('pointer-with-rank'),
+              'Pointer and rank are mutually exclusive.',
+              $type
+            )"/>
+        </xsl:if>
+
+        <xsl:sequence select="t:get-type($container-type, false(), true())"/>
+        <xsl:sequence select="'*'"/>
+      </xsl:when>
+      <xsl:when test="$rank >= 1">
+        <xsl:sequence select="t:get-type($container-type, false(), true())"/>
+        <xsl:sequence select="'['"/>
+        <xsl:sequence select="for $i in 1 to $rank - 1 return ','"/>
+        <xsl:sequence select="']'"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="
+          error
+          (
+            xs:QName('invalid-type'),
+            'Invalid type.',
+            $type
+          )"/>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
 

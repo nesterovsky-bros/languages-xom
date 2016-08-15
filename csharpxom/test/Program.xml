@@ -15,7 +15,9 @@
         <method static="true" name="Main">
           <parameters>
             <parameter name="args">
-              <type name="string" rank="1"/>
+              <type rank="1">
+                <type name="string"/>
+              </type>
             </parameter>
           </parameters>
           <block>

@@ -199,9 +199,7 @@
       else
         $type"/>
 
-    <xsl:if test="
-      not(xs:boolean($unwrapped-type/@pointer)) and
-      empty($unwrapped-type/@rank)">
+    <xsl:if test="not(xs:boolean($unwrapped-type/@pointer))">
       <xsl:apply-templates mode="t:get-primitive-type-name"
         select="$unwrapped-type"/>
     </xsl:if>
@@ -237,13 +235,41 @@
       )
     ]">
 
-    <xsl:variable name="rank" as="xs:integer?" select="@rank"/>
-    
-    <xsl:sequence select="
-      if ($rank) then
-        concat(@name, '_', $rank)
-      else
-        @name"/>
+    <xsl:sequence select="@name"/>
+  </xsl:template>
+
+  <!--
+    Mode "t:get-primitive-type-name". Gets primitive type name.
+  -->
+  <xsl:template mode="t:get-primitive-type-name" as="xs:string" match="
+    type[xs:integer(@rank) = 1]/
+      type
+      [
+        not(@namespace) and
+        (
+          @name =
+            (
+              'bool',
+              'byte',
+              'char',
+              'decimal',
+              'double',
+              'float',
+              'int',
+              'long',
+              'object',
+              'sbyte',
+              'short',
+              'string',
+              'uint',
+              'ulong',
+              'ushort',
+              'void'
+            )
+        )
+      ]">
+
+    <xsl:sequence select="concat(@name, '_1')"/>
   </xsl:template>
 
   <!--
@@ -761,23 +787,13 @@
 
   <!-- Mode "t:get-type-of". new-array. -->
   <xsl:template mode="t:get-type-of" match="new-array">
-    <xsl:variable name="type" as="element()?" select="type"/>
-    <xsl:variable name="rank" as="xs:string?" select="@rank"/>
+    <xsl:variable name="type" as="element()" select="type"/>
+    <xsl:variable name="closure" as="item()*"
+      select="t:get-type-with-ranks($type, ())"/>
+    <xsl:variable name="element-type" as="element()?"
+      select="$closure[. instance of element()]"/>
 
-    <xsl:if test="exists($type)">
-      <xsl:choose>
-        <xsl:when test="$rank">
-          <type>
-            <xsl:sequence select="$type/(@* except @rank)"/>
-            <xsl:attribute name="rank" select="$type/@rank, $rank"/>
-            <xsl:sequence select="$type/*"/>
-          </type>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:sequence select="$type"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>
+    <xsl:sequence select="$type[$element-type]"/>
   </xsl:template>
 
   <!-- Mode "t:get-type-of". typeof, default, cast, as. -->
@@ -866,20 +882,7 @@
       <xsl:apply-templates mode="#current" select="$value"/>
     </xsl:variable>
 
-    <xsl:if test="exists($type)">
-      <xsl:variable name="pointer" as="xs:integer?" select="$type/@pointer"/>
-
-      <xsl:if test="$pointer > 0">
-        <type>
-          <xsl:sequence select="$type/(@* except @pointer)"/>
-
-          <xsl:if test="$pointer > 1">
-            <xsl:attribute name="pointer" select="$pointer - 1"/>
-          </xsl:if>
-          <xsl:sequence select="*"/>
-        </type>
-      </xsl:if>
-    </xsl:if>
+    <xsl:sequence select="$type[xs:boolean(@pointer)]/type"/>
   </xsl:template>
 
   <!-- Mode "t:get-type-of". addressof. -->
@@ -891,19 +894,9 @@
       <xsl:apply-templates mode="#current" select="$value"/>
     </xsl:variable>
 
-    <xsl:variable name="pointer" as="xs:integer?" select="$type/@pointer"/>
-
     <xsl:if test="exists($type)">
-      <type>
-        <xsl:sequence select="$type/(@* except @pointer)"/>
-
-        <xsl:attribute name="pointer" select="
-          if ($pointer) then
-            $pointer + 1
-          else
-            1"/>
-
-        <xsl:sequence select="*"/>
+      <type pointer="true">
+        <xsl:sequence select="$type"/>
       </type>
     </xsl:if>
   </xsl:template>

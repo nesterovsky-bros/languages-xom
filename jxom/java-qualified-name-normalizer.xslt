@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  This stylesheet provides utility functions over jxom.
--->
+<!-- This stylesheet provides utility functions over jxom. -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:t="http://www.bphx.com/jxom"
@@ -153,7 +151,7 @@
     <xsl:variable name="optimized-types" as="element()*">
       <xsl:for-each select="./(* except imports)//type[p:is-unit-element(.)]">
         <xsl:variable name="package" as="xs:string?" select="@package"/>
-        <xsl:variable name="name" as="xs:string" select="@name"/>
+        <xsl:variable name="name" as="xs:string?" select="@name"/>
 
         <xsl:if test="
           exists($package) and
@@ -173,7 +171,8 @@
       <xsl:otherwise>
         <xsl:copy>
           <xsl:sequence select="@* | comment"/>
-          <xsl:apply-templates mode="#current" select="annotations"/>
+          <xsl:apply-templates mode="#current" 
+            select="annotations | annotation"/>
 
           <xsl:variable name="import-list" as="xs:string*" select="
             $optimized-types,
@@ -196,7 +195,7 @@
           </imports>
 
           <xsl:apply-templates mode="#current"
-            select="* except (comment | imports | annotations)"/>
+            select="* except (comment | imports | annotations | annotation)"/>
         </xsl:copy>
       </xsl:otherwise>
     </xsl:choose>

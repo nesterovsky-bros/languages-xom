@@ -113,7 +113,7 @@
 
   <xsl:template match="*" mode="t:get-var-or-host"/>
 
-  <xsl:template match="sql:host-expression" mode="t:get-var-or-host">
+  <xsl:template match="sql:host-expression | sql:var" mode="t:get-var-or-host">
     <xsl:sequence select="."/>
   </xsl:template>
 
@@ -442,7 +442,7 @@
     </xsl:for-each>
 
     <xsl:sequence select="$t:unindent"/>
-
+    
     <xsl:if test="exists($where)">
       <xsl:sequence select="$t:new-line"/>
       <xsl:sequence select="'where'"/>
@@ -628,21 +628,19 @@
     <xsl:variable name="source" as="element()"
       select="t:get-table-sources(.)"/>
     <xsl:variable name="values" as="element()" select="t:get-select(.)"/>
-                  
-    <xsl:call-template name="t:generate-cte"/>
-
-    <xsl:sequence select="'insert'"/>
-    <xsl:sequence select="' '"/>
-    <xsl:apply-templates mode="t:insert-header-extensions" select="."/>
-    <xsl:sequence select="'into'"/>
 
     <xsl:variable name="source-tokens" as="item()*">
       <xsl:apply-templates mode="t:table-source" select="$source"/>
     </xsl:variable>
 
+    <xsl:call-template name="t:generate-cte"/>
+    <xsl:sequence select="'insert'"/>
     <xsl:sequence select="' '"/>
-
+    <xsl:apply-templates mode="t:insert-header-extensions" select="."/>
+    <xsl:sequence select="'into'"/>
+    <xsl:sequence select="' '"/>
     <xsl:sequence select="$source-tokens"/>
+    <xsl:apply-templates mode="t:insert-values-extensions" select="."/>
     <xsl:sequence select="$t:new-line"/>
     <xsl:apply-templates mode="t:statement-tokens" select="$values"/>
     <xsl:apply-templates mode="t:insert-footer-extensions" select="."/>
@@ -687,6 +685,8 @@
     </xsl:for-each>
 
     <xsl:sequence select="$t:unindent"/>
+
+    <xsl:apply-templates mode="t:update-where-extensions" select="."/>
 
     <xsl:if test="exists($where)">
       <xsl:sequence select="$t:new-line"/>
@@ -747,13 +747,20 @@
       <xsl:apply-templates mode="t:table-source" select="$source"/>
     </xsl:variable>
 
-    <xsl:sequence select="
-      if (t:is-multiline($source-tokens)) then
-        $t:new-line
-      else
-        ' '"/>
-
-    <xsl:sequence select="$source-tokens"/>
+    <xsl:choose>
+      <xsl:when test="t:is-multiline($source-tokens)">
+        <xsl:sequence select="$t:new-line"/>
+        <xsl:sequence select="$t:indent"/>
+        <xsl:sequence select="$source-tokens"/>
+        <xsl:sequence select="$t:unindent"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="' '"/>
+        <xsl:sequence select="$source-tokens"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    
+    <xsl:apply-templates mode="t:delete-where-extensions" select="."/>
 
     <xsl:if test="exists($where)">
       <xsl:sequence select="$t:new-line"/>
@@ -1341,7 +1348,7 @@
   -->
   <xsl:template mode="t:expression-tokens" match="sql:field">
     <xsl:variable name="source-tokens" as="item()*">
-      <xsl:apply-templates mode="t:source-ref"/> 
+      <xsl:apply-templates mode="t:source-ref" select="t:get-sql-element(.)"/> 
     </xsl:variable>
   
     <xsl:if test="exists($source-tokens)">
@@ -1773,26 +1780,45 @@
       <xsl:sequence select="t:quote-name($alias)"/>
     </xsl:if>
 
-    <xsl:if test="$columns">
-      <xsl:sequence select="'('"/>
-      <xsl:sequence select="$t:new-line"/>
-      <xsl:sequence select="$t:indent"/>
-      
-      <xsl:for-each select="$columns">
-        <xsl:variable name="name" as="xs:string" select="@name"/>
+    <xsl:choose>
+      <xsl:when test="count($columns) gt 3">
+        <xsl:sequence select="$t:new-line"/>
+        <xsl:sequence select="'('"/>
+        <xsl:sequence select="$t:new-line"/>
+        <xsl:sequence select="$t:indent"/>
 
-        <xsl:if test="position() > 1">
-          <xsl:sequence select="','"/>
-          <xsl:sequence select="$t:new-line"/>
-        </xsl:if>
+        <xsl:for-each select="$columns">
+          <xsl:variable name="name" as="xs:string" select="@name"/>
 
-        <xsl:sequence select="$name"/>
-      </xsl:for-each>
+          <xsl:if test="position() > 1">
+            <xsl:sequence select="','"/>
+            <xsl:sequence select="$t:new-line"/>
+          </xsl:if>
 
-      <xsl:sequence select="$t:new-line"/>
-      <xsl:sequence select="$t:unindent"/>
-      <xsl:sequence select="')'"/>
-    </xsl:if>
+          <xsl:sequence select="$name"/>
+        </xsl:for-each>
+
+        <xsl:sequence select="$t:new-line"/>
+        <xsl:sequence select="$t:unindent"/>
+        <xsl:sequence select="')'"/>
+      </xsl:when>
+      <xsl:when test="$columns">
+        <xsl:sequence select="'('"/>
+
+        <xsl:for-each select="$columns">
+          <xsl:variable name="name" as="xs:string" select="@name"/>
+
+          <xsl:if test="position() > 1">
+            <xsl:sequence select="','"/>
+            <xsl:sequence select="$t:new-line"/>
+          </xsl:if>
+
+          <xsl:sequence select="$name"/>
+        </xsl:for-each>
+
+        <xsl:sequence select="')'"/>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
   <!-- Mode "t:table-source". Generates table source. -->
@@ -1989,7 +2015,7 @@
 
     <xsl:choose>
       <xsl:when test="
-        matches($value, '^[A-Za-z_][A-Za-z0-9_]*$') and
+        matches($value, '^[A-Z_][A-Z0-9_]*$', 'i') and
         not($t:keywords/key('t:keyword', $value))">
         <xsl:sequence select="$value"/>
       </xsl:when>
@@ -2004,10 +2030,13 @@
     t:select-header-extensions
     t:select-footer-extensions
     t:insert-header-extensions
+    t:insert-values-extensions
     t:insert-footer-extensions
     t:update-header-extensions
+    t:update-where-extensions
     t:update-footer-extensions
     t:delete-header-extensions
+    t:delete-where-extensions
     t:delete-footer-extensions"/>
 
 </xsl:stylesheet>

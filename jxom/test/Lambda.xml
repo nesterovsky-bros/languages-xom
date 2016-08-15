@@ -92,9 +92,11 @@ public class Calculator {
     </method>
 
     <method static="true" access="public" name="main">
-      <parameters vararg="true">
-        <parameter name="args">
-          <type name="String" arity="1"/>
+      <parameters>
+        <parameter name="args" vararg="true">
+          <type array="true">
+            <type name="String"/>
+          </type>
         </parameter>
       </parameters>
       <block>

@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  This stylesheet generates sql statement text.
--->
+<!-- This stylesheet generates sql statement text. -->
 <xsl:stylesheet version="2.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:t="http://www.bphx.com/public/sql"
-  xmlns:p="http://www.bphx.com/private/tsql/sql-generator"
+  xmlns:p="http://www.bphx.com/private/db2/sql-generator"
   xmlns:sql="http://www.bphx.com/basic-sql/2008-12-11"
-  xmlns:tsql="http://www.bphx.com/basic-sql/2008-12-11/tsql"
+  xmlns:oracle="http://www.bphx.com/basic-sql/2008-12-11/oracle"
   exclude-result-prefixes="t p xs">
 
-  <xsl:include href="tsql-serializer.xslt"/>
+  <xsl:include href="oracle-serializer.xslt"/>
 
   <xsl:include href="../sql-streamer.xslt"/>
   <xsl:include href="../sql-serializer.xslt"/>

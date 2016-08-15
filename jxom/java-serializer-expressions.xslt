@@ -133,9 +133,8 @@
 
         <xsl:if test="position() != last()">
           <xsl:sequence select="','"/>
+          <xsl:sequence select="$t:terminator"/>
         </xsl:if>
-
-        <xsl:sequence select="$t:terminator"/>
       </xsl:for-each>
     </xsl:variable>
 
@@ -484,9 +483,8 @@
 
             <xsl:if test="position() != last()">
               <xsl:sequence select="','"/>
+              <xsl:sequence select="$t:terminator"/>
             </xsl:if>
-
-            <xsl:sequence select="$t:terminator"/>
           </xsl:for-each>
         </xsl:variable>
 
@@ -868,7 +866,7 @@
     Mode "t:expression". cast.
   -->
   <xsl:template mode="t:expression" match="cast">
-    <xsl:variable name="type" as="element()" select="type"/>
+    <xsl:variable name="types" as="element()+" select="type"/>
     <xsl:variable name="value" as="element()" select="value"/>
 
     <xsl:variable name="precedence" as="xs:integer"
@@ -895,7 +893,17 @@
       select="t:get-expression($expression)"/>
 
     <xsl:sequence select="'('"/>
-    <xsl:sequence select="t:get-type($type)"/>
+    
+    <xsl:for-each select="$types">
+      <xsl:if test="position() gt 1">
+        <xsl:sequence select="' '"/>
+        <xsl:sequence select="'&amp;'"/>
+        <xsl:sequence select="' '"/>
+      </xsl:if>
+    
+      <xsl:sequence select="t:get-type(.)"/>
+    </xsl:for-each>
+    
     <xsl:sequence select="')'"/>
     <xsl:sequence select="$tokens"/>
   </xsl:template>
@@ -904,6 +912,13 @@
     Mode "t:expression". this.
   -->
   <xsl:template mode="t:expression" match="this">
+    <xsl:variable name="type" as="element()?" select="type"/>
+      
+    <xsl:if test="$type">
+      <xsl:sequence select="t:get-type(.)"/>
+      <xsl:sequence select="'.'"/>
+    </xsl:if>
+
     <xsl:sequence select="'this'"/>
   </xsl:template>
 
@@ -911,35 +926,6 @@
     Mode "t:expression". super.
   -->
   <xsl:template mode="t:expression" match="super">
-    <xsl:sequence select="'super'"/>
-  </xsl:template>
-
-  <!--
-    Mode "t:expression". outer-this.
-  -->
-  <xsl:template mode="t:expression" match="outer-this">
-    <xsl:variable name="type" as="element()" select="type"/>
-
-    <xsl:if test="parent::construct">
-      <xsl:sequence select="'this'"/>
-      <xsl:sequence select="'.'"/>
-    </xsl:if>
-
-    <xsl:sequence select="t:get-type($type)"/>
-    <xsl:sequence select="'.'"/>
-    <xsl:sequence select="'this'"/>
-  </xsl:template>
-
-  <!--
-    Mode "t:expression". outer-super.
-  -->
-  <xsl:template mode="t:expression" match="outer-super">
-    <xsl:variable name="type" as="element()" select="type"/>
-
-    <xsl:sequence select="'this'"/>
-    <xsl:sequence select="'.'"/>
-    <xsl:sequence select="t:get-type($type)"/>
-    <xsl:sequence select="'.'"/>
     <xsl:sequence select="'super'"/>
   </xsl:template>
 
@@ -1054,24 +1040,7 @@
     Mode "t:expression". class-of.
   -->
   <xsl:template mode="t:expression" match="class-of">
-    <xsl:variable name="type" as="element()">
-      <xsl:variable name="outer-type" as="element()?" select="outer-type"/>
-      <xsl:variable name="type2" as="element()?" select="type"/>
-
-      <xsl:choose>
-        <xsl:when test="exists($type2) = exists($outer-type)">
-          <xsl:sequence select="error(xs:QName('outer-type'))"/>
-        </xsl:when>
-        <xsl:when test="exists($type2)">
-          <xsl:sequence select="$type2"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:sequence select="$outer-type/type"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
-    <xsl:sequence select="t:get-type($type)"/>
+    <xsl:sequence select="t:get-type(type)"/>
     <xsl:sequence select="'.'"/>
     <xsl:sequence select="'class'"/>
   </xsl:template>
@@ -1437,13 +1406,39 @@
     Mode "t:expression". construct.
   -->
   <xsl:template mode="t:expression" match="construct">
+    <xsl:variable name="super" as="element()?" select="super"/>
+    <xsl:variable name="expression" as="element()?" 
+      select="t:get-java-element($super)"/>
+    <xsl:variable name="arguments" as="element()?" select="arguments"/>
+
     <xsl:variable name="tokens" as="item()*">
-      <xsl:variable name="instance" as="element()"
-        select="this | super | outer-this | outer-super"/>
+      <xsl:if test="$super">
+        <xsl:choose>
+          <xsl:when test="$expression[self::type]">
+            <xsl:sequence select="t:get-type($expression)"/>
+            <xsl:sequence select="'.'"/>
+          </xsl:when>
+          <xsl:when test="$expression">
+            <xsl:sequence select="t:get-expression($expression)"/>
+            <xsl:sequence select="'.'"/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:if>
+      
+      <xsl:sequence select="t:get-generic-type-list(.)"/>
 
-      <xsl:sequence select="t:get-expression($instance)"/>
-
-      <xsl:variable name="arguments" as="element()?" select="arguments"/>
+      <xsl:choose>
+        <xsl:when test="$super">
+          <xsl:sequence select="'super'"/>
+        </xsl:when>
+        <xsl:when test="this">
+          <xsl:sequence select="'this'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:sequence
+            select="error(xs:QName('invalid-construct'), t:get-path(.))"/>
+        </xsl:otherwise>
+      </xsl:choose>
 
       <xsl:sequence select="'('"/>
 
@@ -1463,7 +1458,7 @@
   -->
   <xsl:template mode="t:expression" match="new-object">
     <xsl:variable name="type" as="element()" select="type"/>
-    <xsl:variable name="instance" as="element()?" select="outer-instance"/>
+    <xsl:variable name="instance" as="element()?" select="instance"/>
     <xsl:variable name="declaration" as="element()?" select="declaration"/>
 
     <xsl:variable name="new-tokens" as="item()*">
@@ -1538,17 +1533,22 @@
         <xsl:sequence select="error(xs:QName('invalid-new-array'))"/>
       </xsl:when>
       <xsl:when test="$array">
-        <xsl:sequence select="t:get-type($type, ())"/>
+        <xsl:sequence select="t:get-type($type)"/>
         <xsl:sequence select="t:get-array-initializer($array)"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:sequence select="t:get-type($type, 0)"/>
-
-        <xsl:variable name="arity" as="xs:integer" select="$type/@arity"/>
+        <xsl:variable name="closure" as="item()+" 
+          select="t:get-type-with-arity($type, 0)"/>
+        <xsl:variable name="element-type" as="element()" 
+          select="$closure[. instance of element()]"/>
+        <xsl:variable name="arity" as="xs:integer" 
+          select="$closure[not(. instance of element())]"/>
         <xsl:variable name="dimension-expressions" as="element()+"
           select="t:get-java-element($dimensions)"/>
         <xsl:variable name="count" as="xs:integer"
           select="count($dimension-expressions)"/>
+
+        <xsl:sequence select="t:get-type($element-type)"/>
 
         <xsl:if test="$count > $arity">
           <xsl:sequence select="error(xs:QName('invalid-new-array'))"/>

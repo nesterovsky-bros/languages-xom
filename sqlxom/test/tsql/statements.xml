@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tsql:block
+  xmlns:tsql="http://www.bphx.com/basic-sql/2008-12-11/tsql"
+  xmlns:sql="http://www.bphx.com/basic-sql/2008-12-11">
+
+  <sql:delete>
+    <sql:table schema="Sales" name="ShoppingCartItem"/>
+    <tsql:output>
+      <sql:column wildcard="true" alias="deleted"/>
+    </tsql:output>
+  </sql:delete>
+
+  <sql:delete>
+    <tsql:top>
+      <sql:number value="1"/>
+    </tsql:top>
+    <sql:table schema="dbo" name="DatabaseLog">
+      <tsql:with>
+        <tsql:read-past/>
+      </tsql:with>
+    </sql:table>
+    <sql:where>
+      <sql:eq>
+        <sql:field name="DatabaseLogID"/>
+        <sql:number value="7"/>
+      </sql:eq>
+    </sql:where>
+    <tsql:output>
+      <sql:column wildcard="true" alias="deleted"/>
+    </tsql:output>
+  </sql:delete>
+
+  <sql:insert>
+    <sql:table name="ScrapReason" schema="Production"/>
+    <sql:values>
+      <sql:string value="Operator error"/>
+      <sql:function name="getdate"/>
+    </sql:values>
+    <tsql:output>
+      <sql:column>
+        <sql:field name="ScrapReasonID">
+          <sql:source alias="inserted"/>
+        </sql:field>
+      </sql:column>
+      <sql:column>
+        <sql:field name="Name">
+          <sql:source alias="inserted"/>
+        </sql:field>
+      </sql:column>
+      <sql:column>
+        <sql:field name="ModifiedDate">
+          <sql:source alias="inserted"/>
+        </sql:field>
+      </sql:column>
+      <tsql:table-var>
+        <sql:var name="MyTableVar"/>
+      </tsql:table-var>
+    </tsql:output>
+  </sql:insert>
+
+  <sql:update>
+    <tsql:top>
+      <sql:number value="10"/>
+    </tsql:top>
+    <sql:table name="Employee" schema="HumanResources"/>
+    <sql:set>
+      <sql:field name="VacationHours"/>
+      <sql:mul>
+        <sql:field name="VacationHours"/>
+        <sql:number value="1.25"/>
+      </sql:mul>
+    </sql:set>
+    <sql:set>
+      <sql:field name="ModifiedDate"/>
+      <sql:function name="getdate"/>
+    </sql:set>
+    <tsql:output>
+      <sql:column>
+        <sql:field name="BusinessEntityID">
+          <sql:source alias="inserted"/>
+        </sql:field>
+      </sql:column>
+      <sql:column>
+        <sql:field name="VacationHours">
+          <sql:source alias="deleted"/>
+        </sql:field>
+      </sql:column>
+      <sql:column>
+        <sql:field name="VacationHours">
+          <sql:source alias="inserted"/>
+        </sql:field>
+      </sql:column>
+      <sql:column>
+        <sql:field name="ModifiedDate">
+          <sql:source alias="inserted"/>
+        </sql:field>
+      </sql:column>
+      <tsql:table-var>
+        <sql:var name="MyTableVar"/>
+      </tsql:table-var>
+    </tsql:output>
+  </sql:update>
+
+  <sql:select>
+    <sql:column>
+      <sql:field name="EMPNO"/>
+    </sql:column>
+    <sql:column>
+      <sql:field name="HIRETYPE"/>
+    </sql:column>
+    <sql:column>
+      <sql:field name="HIREDATE"/>
+    </sql:column>
+    <sql:from>
+      <sql:table name="EMPSAMP">
+        <tsql:with>
+          <tsql:read-committed/>
+        </tsql:with>
+      </sql:table>
+    </sql:from>
+  </sql:select>
+
+</tsql:block>

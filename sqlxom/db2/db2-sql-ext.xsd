@@ -50,11 +50,63 @@
     </xs:sequence>
   </xs:group>
 
+  <xs:group name="isolation-clause">
+    <xs:sequence>
+      <xs:element name="isolation" type="isolation-clause"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="skip-locked-data">
+    <xs:sequence>
+      <xs:element name="skip-locked-data" type="skip-locked-data"/>
+    </xs:sequence>
+  </xs:group>
+
+  <!-- Table sources. -->
+  <xs:group name="source">
+    <xs:choice>
+      <xs:element name="final-table" type="final-table-source"/>
+      <xs:element name="old-table" type="old-table-source"/>
+    </xs:choice>
+  </xs:group>
+
   <xs:complexType name="fetch-first-clause">
     <xs:complexContent>
       <xs:extension base="sql:sql-element">
         <xs:attribute name="rows" type="xs:integer" use="required"/>
       </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="isolation-clause">
+    <xs:complexContent>
+      <xs:extension base="sql:sql-element">
+        <xs:attribute name="type" type="isolation-type" use="required"/>
+        <xs:attribute name="lock" type="lock-type" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="isolation-type">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="repeatable-read"/>
+      <xs:enumeration value="read-stability"/>
+      <xs:enumeration value="cursor-stability"/>
+      <xs:enumeration value="uncommitted-read"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="lock-type">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="exclusive"/>
+      <xs:enumeration value="update"/>
+      <xs:enumeration value="share"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="skip-locked-data">
+    <xs:complexContent>
+      <xs:extension base="sql:sql-element"/>
     </xs:complexContent>
   </xs:complexType>
 
@@ -298,6 +350,29 @@
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="direction" type="parameter-direction"
           use="optional" default="in"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Table sources -->
+  <xs:complexType name="final-table-source">
+    <xs:complexContent>
+      <xs:extension base="sql:source">
+        <xs:choice>
+          <xs:element ref="sql:insert"/>
+          <xs:element ref="sql:update"/>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="old-table-source">
+    <xs:complexContent>
+      <xs:extension base="sql:source">
+        <xs:choice>
+          <xs:element ref="sql:update"/>
+          <xs:element ref="sql:delete"/>
+        </xs:choice>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

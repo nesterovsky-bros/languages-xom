@@ -22,6 +22,9 @@
         Lambda Expressions - http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html
         Method References - http://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html
         Default Methods - http://docs.oracle.com/javase/tutorial/java/IandI/defaultmethods.html
+        
+     Java 8 grammar is defined at:
+     https://docs.oracle.com/javase/specs/jls/se8/html/jls-19.html
     </xs:documentation>
   </xs:annotation>
 
@@ -111,6 +114,7 @@
         This is a commented code.
       -->
       <xs:element ref="unit"/>
+      <xs:element name="members" type="classDeclarationScope"/>
       <xs:element ref="class-members"/>
       <xs:element ref="interface-members"/>
       <xs:element ref="annotation-members"/>
@@ -164,7 +168,7 @@
             <xs:complexType>
               <xs:sequence>
                 <xs:element name="import" type="importDeclaration"
-                  minOccurs="1" maxOccurs="unbounded"/>
+                  minOccurs="0" maxOccurs="unbounded"/>
               </xs:sequence>
             </xs:complexType>
           </xs:element>
@@ -250,7 +254,7 @@
   <xs:complexType name="snippetDeclaration">
     <xs:complexContent>
       <xs:extension base="java-element">
-        <xs:attribute name="value" type="xs:string"/>
+        <xs:attribute name="value" type="xs:string" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -258,7 +262,7 @@
   <xs:complexType name="snippetMember">
     <xs:complexContent>
       <xs:extension base="java-element">
-        <xs:attribute name="value" type="xs:string"/>
+        <xs:attribute name="value" type="xs:string" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -266,7 +270,7 @@
   <xs:complexType name="snippetStatement">
     <xs:complexContent>
       <xs:extension base="java-element">
-        <xs:attribute name="value" type="xs:string"/>
+        <xs:attribute name="value" type="xs:string" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -274,7 +278,7 @@
   <xs:complexType name="snippetExpression">
     <xs:complexContent>
       <xs:extension base="expression">
-        <xs:attribute name="value" type="xs:string"/>
+        <xs:attribute name="value" type="xs:string" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -491,7 +495,6 @@
     <xs:complexContent>
       <xs:extension base="java-element">
         <xs:sequence>
-
           <xs:group ref="annotations"/>
           <xs:element name="arguments" type="arguments"
             minOccurs="0" maxOccurs="1"/>
@@ -516,7 +519,7 @@
     </xs:sequence>
   </xs:group>
 
-  <xs:element name="types">
+  <xs:element name="type-arguments">
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="java-element">
@@ -537,7 +540,7 @@
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
-      <xs:element ref="types" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="type-arguments" minOccurs="0" maxOccurs="1"/>
     </xs:sequence>
   </xs:group>
 
@@ -587,10 +590,12 @@
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
+      <xs:element name="members" type="classDeclarationScope"/>
       <xs:element ref="class-members"/>
       <xs:element name="snippet-member" type="snippetMember"/>
       <xs:element ref="class-snippet-member"/>
       <xs:element ref="class-initializer"/>
+      <xs:element name="initializer" type="classInitializer"/>
       <xs:element name="method" type="methodDeclaration"/>
       <xs:element ref="class-method"/>
       <xs:element ref="constructor"/>
@@ -689,9 +694,7 @@
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="java-element">
-        <xs:sequence>
-          <xs:group ref="annotations"/>
-        </xs:sequence>
+        <xs:group ref="annotations"/>
         <xs:attribute name="name" type="Identifier" use="required"/>
         <xs:attributeGroup ref="name-id"/>
         <xs:attributeGroup ref="modifiers"/>
@@ -760,7 +763,7 @@
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
-      <xs:element ref="interface-members"/>
+      <xs:element name="members" type="interfaceDeclarationScope"/>
       <xs:element name="snippet-member" type="snippetMember"/>
       <xs:element ref="interface-snippet-member"/>
       <xs:element name="method" type="interfaceMethod"/>
@@ -785,10 +788,7 @@
   <xs:complexType name="interfaceMemberDeclaration" abstract="true">
     <xs:complexContent>
       <xs:extension base="java-element">
-        <xs:sequence>
-
-          <xs:group ref="annotations"/>
-        </xs:sequence>
+        <xs:group ref="annotations"/>
         <xs:attribute name="name" type="Identifier" use="required"/>
         <xs:attributeGroup ref="name-id"/>
         <xs:attributeGroup ref="modifiers"/>
@@ -856,23 +856,11 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:element name="annotations" type="annotations"/>
-
   <xs:group name="annotations">
     <xs:sequence>
-      <xs:element ref="annotations" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="annotation" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:group>
-
-  <xs:complexType name="annotations">
-    <xs:complexContent>
-      <xs:extension base="java-element">
-        <xs:sequence>
-          <xs:element ref="annotation" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
 
   <xs:element name="initialize" type="initialize"/>
 
@@ -979,10 +967,15 @@
         |	primitiveType ('[' ']')*
         ;
       </xs:documentation>
+      <xs:documentation xml:space="preserve">
+        Note that @name and @array are mutually exclusive.        
+      </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="java-element">
         <xs:sequence>
+          <xs:group ref="annotations"/>
+
           <xs:element name="argument" type="typeArgument"
             minOccurs="0" maxOccurs="unbounded">
             <xs:annotation>
@@ -1013,14 +1006,8 @@
           </xs:simpleType>
         </xs:attribute>
         <xs:attributeGroup ref="name-id"/>
-        <xs:attribute name="arity" type="xs:int" default="0" use="optional">
-          <xs:annotation>
-            <xs:documentation xml:space="preserve">
-              Defines array's arity. 
-              Default 0, which means a scalar value.
-            </xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
+        <xs:attribute name="array" type="xs:boolean" 
+          default="false" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1069,6 +1056,7 @@
     <xs:complexContent>
       <xs:extension base="java-element">
         <xs:sequence>
+          <xs:group ref="annotations"/>
           <xs:element ref="type" minOccurs="0" maxOccurs="1"/>
         </xs:sequence>
         <xs:attribute name="match" type="typeArgumentMatch"
@@ -1126,8 +1114,6 @@
           <xs:element name="parameter" type="formalParameter"
             minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
-        <xs:attribute name="vararg" type="xs:boolean"
-          default="false" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1142,6 +1128,10 @@
         <xs:attribute name="name" type="Identifier" use="required"/>
         <xs:attributeGroup ref="name-id"/>
         <xs:attribute name="final" type="xs:boolean"
+          default="false" use="optional"/>
+        <xs:attribute name="vararg" type="xs:boolean"
+          default="false" use="optional"/>
+        <xs:attribute name="this" type="xs:boolean"
           default="false" use="optional"/>
       </xs:extension>
     </xs:complexContent>
@@ -1196,8 +1186,6 @@
           <xs:element name="parameter" type="lambda-parameter"
             minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
-        <xs:attribute name="vararg" type="xs:boolean"
-          default="false" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1212,6 +1200,10 @@
         <xs:attribute name="name" type="Identifier" use="required"/>
         <xs:attributeGroup ref="name-id"/>
         <xs:attribute name="final" type="xs:boolean"
+          default="false" use="optional"/>
+        <xs:attribute name="vararg" type="xs:boolean"
+          default="false" use="optional"/>
+        <xs:attribute name="this" type="xs:boolean"
           default="false" use="optional"/>
       </xs:extension>
     </xs:complexContent>
@@ -1439,6 +1431,7 @@
       </xs:documentation>
     </xs:annotation>
     <xs:choice>
+      <xs:element name="members" type="annotationDeclarationScope"/>
       <xs:element ref="annotation-members"/>
       <xs:group ref="typeDeclaration"/>
       <xs:element name="snippet-member" type="snippetMember"/>
@@ -1460,6 +1453,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  
   <xs:complexType name="annotationMethodDeclaration">
     <xs:annotation>
       <xs:documentation xml:space="preserve">
@@ -2178,44 +2172,30 @@
     <xs:complexContent>
       <xs:extension base="expression">
         <xs:sequence>
-          <xs:element ref="type"/>
+          <xs:element ref="type" minOccurs="1" maxOccurs="unbounded"/>
           <xs:element name="value" type="unary-expression"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="outer-type-expression">
-    <xs:annotation>
-      <xs:documentation xml:space="preserve">
-        'this' ('.' Identifier)*
-      </xs:documentation>
-    </xs:annotation>
+  <xs:complexType name="this-expression">
     <xs:complexContent>
       <xs:extension base="expression">
         <xs:sequence>
-          <xs:element type="type" name="type" minOccurs="0" maxOccurs="1"/>
+          <xs:element type="type" name="type" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="outer-this-expression">
+  <xs:complexType name="construct-super-expression">
     <xs:complexContent>
       <xs:extension base="expression">
-        <xs:sequence>
+        <xs:choice>
           <xs:element type="type" name="type"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="outer-super-expression">
-    <xs:complexContent>
-      <xs:extension base="expression">
-        <xs:sequence>
-          <xs:element type="type" name="type"/>
-        </xs:sequence>
+          <xs:group ref="expression"/>
+        </xs:choice>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -2225,7 +2205,6 @@
       <xs:extension base="expression">
         <xs:choice>
           <xs:element ref="type"/>
-          <xs:element name="outer-type" type="outer-type-expression"/>
         </xs:choice>
       </xs:extension>
     </xs:complexContent>
@@ -2246,9 +2225,7 @@
           <xs:group ref="typeList"/>
           <xs:choice>
             <xs:element name="this" type="expression"/>
-            <xs:element name="super" type="expression"/>
-            <xs:element name="outer-this" type="outer-this-expression"/>
-            <xs:element name="outer-super" type="outer-super-expression"/>
+            <xs:element name="super" type="construct-super-expression"/>
           </xs:choice>
           <xs:element name="arguments" type="arguments"
             minOccurs="0" maxOccurs="1"/>
@@ -2371,7 +2348,7 @@
           <xs:element ref="type"/>
           <xs:element name="arguments" type="arguments"
             minOccurs="0" maxOccurs="1"/>
-          <xs:element name="outer-instance" type="unary-expression"
+          <xs:element name="instance" type="unary-expression"
             minOccurs="0" maxOccurs="1"/>
           <xs:element name="declaration" minOccurs="0" maxOccurs="1">
             <xs:complexType>
@@ -2562,9 +2539,8 @@
   <xs:element name="new-object" type="new-object-expression"/>
   <xs:element name="class-of" type="class-of-expression"/>
   <xs:element name="construct" type="constructor-expression"/>
-  <xs:element name="this" type="expression"/>
+  <xs:element name="this" type="this-expression"/>
   <xs:element name="super" type="expression"/>
-  <xs:element name="outer-this" type="outer-this-expression"/>
   <xs:element name="var" type="variable-reference-expression"/>
   <xs:element name="field" type="field-reference-expression"/>
   <xs:element name="static-field" type="static-field-reference-expression"/>
@@ -2808,7 +2784,6 @@
       <xs:element ref="construct"/>
       <xs:element ref="this"/>
       <xs:element ref="super"/>
-      <xs:element ref="outer-this"/>
       <xs:element ref="var"/>
       <xs:element ref="field"/>
       <xs:element ref="static-field"/>

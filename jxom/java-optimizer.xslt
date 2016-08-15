@@ -62,6 +62,30 @@
       )"/>
   </xsl:function>
 
+  <!--
+    Returns elements rooted under the single document, copying 
+    content if required.
+      $elements - elements to check.
+      Returns elements rooted under the single document.
+  -->
+  <xsl:function name="t:get-rooted-elements" as="element()+">
+    <xsl:param name="elements" as="element()+"/>
+
+    <xsl:choose>
+      <xsl:when 
+        test="($elements/root())[last() = 1][. instance of document-node()]">
+        <xsl:sequence select="$elements"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="document">
+          <xsl:sequence select="$elements"/>
+        </xsl:variable>
+
+        <xsl:sequence select="$document/*"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
+
   <!-- 
     Splits id list into into a sequence of ids.
       $value - a value to split.
@@ -120,7 +144,7 @@
     <xsl:variable name="components" as="xs:string*">
       <xsl:for-each select="$name">
         <xsl:analyze-string
-          regex="[\p{{L}}\d]+"
+          regex="[\p{{L}}]+|\d+"
           flags="imx"
           select=".">
           <xsl:matching-substring>
@@ -299,6 +323,25 @@
   <xsl:variable name="t:one" as="element()">
     <int value="0"/>
   </xsl:variable>
+  
+  <!--
+    Gets a closure: ($type as element()?, $arity as xs:integer).
+      $type - a type.
+      $arity - current arity.
+  -->
+  <xsl:function name="t:get-type-with-arity" as="item()+">
+    <xsl:param name="type" as="element()?"/>
+    <xsl:param name="arity" as="xs:integer"/>
+  
+    <xsl:choose>
+      <xsl:when test="xs:boolean($type/@array)">
+        <xsl:sequence select="t:get-type-with-arity($type/type, $arity + 1)"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="$type, $arity"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
 
   <!--
     Checks whether two types are the same.
@@ -350,13 +393,35 @@
       empty(@package) or (@package = 'java.lang')
     ]">
 
-    <xsl:variable name="arity" as="xs:integer?" select="@arity"/>
-    
-    <xsl:sequence select="
-      if ($arity) then 
-        concat(@name, '_', $arity)
-      else
-        @name"/>
+    <xsl:sequence select="@name"/>
+  </xsl:template>
+
+  <!--
+    Mode "p:get-primitive-type-name". Gets primitive type name.
+  -->
+  <xsl:template mode="t:get-primitive-type-name" as="xs:string" match="
+    type[xs:boolean(@array)]/
+      type
+      [
+        @name =
+          (
+            'Object',
+            'String',
+            'char',    'Character',
+            'boolean', 'Boolean',
+            'byte',    'Byte',
+            'short',   'Short',
+            'int',     'Integer',
+            'long',    'Long',
+            'float',   'Float',
+            'double',  'Double'
+          )
+      ]
+      [
+        empty(@package) or (@package = 'java.lang')
+      ]">
+
+    <xsl:sequence select="concat(@name, '_1')"/>
   </xsl:template>
 
   <!--
@@ -1022,6 +1087,14 @@
     <xsl:sequence select="exists(t:get-complex-expressions($element))"/>
   </xsl:function>
 
+  <!-- Complex type name. -->
+  <xsl:variable name="p:complex-type-name" as="xs:string"
+    select="$t:complex-type/@name"/>
+
+  <!-- Complex type package. -->
+  <xsl:variable name="p:complex-type-package" as="xs:string"
+    select="$t:complex-type/@package"/>
+
   <!--
     Gets complex subexpressions within expression.
       $element - an element to get complex subexpressions for.
@@ -1033,8 +1106,8 @@
     <xsl:sequence select="
       $element//type
       [
-        (@name = $t:complex-type/@name) and 
-        (@package = $t:complex-type/@package)
+        (@name = $p:complex-type-name) and 
+        (@package = $p:complex-type-package)
       ]
       [
         every $item in ancestor-or-self::*[not($element >> .)] satisfies

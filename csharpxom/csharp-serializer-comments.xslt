@@ -105,7 +105,8 @@
       select="$scope/(node() except (meta, comment))"/>
 
     <xsl:variable name="attributes" as="attribute()*" select="$scope/@*"/>
-    <xsl:variable name="type-attributes" as="element()*" select="$scope/meta/attribute"/>
+    <xsl:variable name="type-attributes" as="element()*" 
+      select="$scope/meta/attribute"/>
 
     <xsl:variable name="empty-content" as="xs:boolean" select="
       empty($content) or

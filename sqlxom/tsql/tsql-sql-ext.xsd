@@ -1,7 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<!--
-  This xml schema defines simplified schema of the tsql statements.
--->
+<!-- This xml schema defines simplified schema of the tsql statements. -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns="http://www.bphx.com/basic-sql/2008-12-11/tsql"
   xmlns:tsql="http://www.bphx.com/basic-sql/2008-12-11/tsql"
@@ -51,6 +49,12 @@
     </xs:sequence>
   </xs:group>
 
+  <xs:group name="output-clause">
+    <xs:sequence>
+      <xs:element name="output" type="output-clause"/>
+    </xs:sequence>
+  </xs:group>
+
   <xs:simpleType name="join-hint">
     <xs:restriction base="xs:string">
       <xs:enumeration value="loop"/>
@@ -59,7 +63,7 @@
       <xs:enumeration value="remote"/>
     </xs:restriction>
   </xs:simpleType>
-  
+
   <xs:attributeGroup name="join-attributes">
     <xs:attribute name="hint" type="join-hint"/>
   </xs:attributeGroup>
@@ -72,12 +76,12 @@
 
   <!-- Table sources. -->
   <xs:group name="source">
-    <xs:sequence>
+    <xs:choice>
       <xs:element name="table-var" type="table-var-source"/>
       <xs:element name="execute-source" type="execute-source"/>
-    </xs:sequence>    
+    </xs:choice>
   </xs:group>
-  
+
   <xs:group name="update-set-clause">
     <xs:choice>
       <xs:element ref="set-var"/>
@@ -96,7 +100,7 @@
       <xs:element name="no-lock" type="table-hint-clause"/>
       <xs:element name="no-wait" type="table-hint-clause"/>
       <xs:element name="page-lock" type="table-hint-clause"/>
-      <xs:element name="read-commited" type="table-hint-clause"/>
+      <xs:element name="read-committed" type="table-hint-clause"/>
       <xs:element name="read-committed-lock" type="table-hint-clause"/>
       <xs:element name="read-past" type="table-hint-clause"/>
       <xs:element name="read-uncommitted" type="table-hint-clause"/>
@@ -160,6 +164,17 @@
     </xs:complexContent>
   </xs:complexType>
 
+  <xs:complexType name="output-clause">
+    <xs:complexContent>
+      <xs:extension base="sql:sql-element">
+        <xs:sequence>
+          <xs:group ref="sql:select-column-clause" maxOccurs="unbounded"/>
+          <xs:group ref="source" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <!-- Statements. -->
   <xs:element name="label" type="label-statement"/>
   <xs:element name="block" type="block-statement"/>
@@ -199,7 +214,7 @@
   <xs:element name="set-numeric-roundabort" type="set-option-statement"/>
   <xs:element name="set-offsets" type="set-option-statement"/>
   <xs:element name="set-parseonly" type="set-option-statement"/>
-  <xs:element name="set-query-governor-cost-limit" 
+  <xs:element name="set-query-governor-cost-limit"
     type="set-option-statement"/>
   <xs:element name="set-quoted-identifier" type="set-option-statement"/>
   <xs:element name="set-remote-proc-transactions" type="set-option-statement"/>
@@ -340,7 +355,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-          
+
   <xs:complexType name="query-hint-max-recursion-clause">
     <xs:complexContent>
       <xs:extension base="query-hint-clause">
@@ -773,7 +788,7 @@ DEALLOCATE { { [ GLOBAL ] cursor_name } | @cursor_variable_name }
   </xs:complexType>
 
   <!-- Statements -->
-  
+
   <xs:complexType name="set-option-statement">
     <xs:complexContent>
       <xs:extension base="sql:statement">
@@ -781,7 +796,7 @@ DEALLOCATE { { [ GLOBAL ] cursor_name } | @cursor_variable_name }
           <xs:choice>
             <xs:element name="on" type="sql:sql-element"/>
             <xs:element name="off" type="sql:sql-element"/>
-            
+
             <xs:element name="low" type="sql:sql-element"/>
             <xs:element name="normal" type="sql:sql-element"/>
             <xs:element name="high" type="sql:sql-element"/>

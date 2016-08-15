@@ -535,7 +535,7 @@
   <xs:complexType name="expression-list">
     <xs:complexContent>
       <xs:extension base="expression">
-        <xs:group ref="expression" maxOccurs="unbounded"/>
+        <xs:group ref="expression" minOccurs="0" maxOccurs="unbounded"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

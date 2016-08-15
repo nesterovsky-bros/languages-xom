@@ -825,14 +825,15 @@ type-argument:
 
 type-parameter:
   identifier
-        
+        </xs:documentation>
+        <xs:documentation xml:space="preserve">
+          Note that @name, @pointer, and @rank are mutually exclusive.        
         </xs:documentation>
       </xs:annotation>
       <xs:complexContent>
         <xs:extension base="type-name">
-          <xs:attribute name="pointer" type="xs:integer"
-            default="0" use="optional"/>
-          <xs:attribute name="rank" use="optional">
+          <xs:attribute name="pointer" type="xs:boolean" use="optional"/>
+          <xs:attribute name="rank" use="optional" type="xs:positiveInteger">
             <xs:annotation>
               <xs:documentation xml:space="preserve">
                 If specified, defines an array type.
@@ -840,9 +841,6 @@ type-parameter:
                 Each number defines a dimension of a specified rank.
               </xs:documentation>
             </xs:annotation>
-            <xs:simpleType>
-              <xs:list itemType="xs:positiveInteger"/>
-            </xs:simpleType>
           </xs:attribute>
           <xs:attribute name="struct" type="xs:boolean" use="optional">
             <xs:annotation>
@@ -1772,7 +1770,7 @@ rank-specifier:
       <xs:complexContent>
         <xs:extension base="expression">
           <xs:sequence>
-            <xs:element ref="type" minOccurs="0"/>
+            <xs:element ref="type" minOccurs="1"/>
             <xs:group ref="expression-list" minOccurs="0"/>
             <xs:element name="initialize" minOccurs="0">
               <xs:complexType>
@@ -1784,11 +1782,6 @@ rank-specifier:
               </xs:complexType>
             </xs:element>
           </xs:sequence>
-          <xs:attribute name="rank" use="optional">
-            <xs:simpleType>
-              <xs:list itemType="xs:positiveInteger"/>
-            </xs:simpleType>
-          </xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -6438,20 +6431,9 @@ attribute-target-specifier:
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
-      <xs:element ref="attributes"/>
+      <xs:group ref="attribute-list"/>
     </xs:sequence>
   </xs:group>
-
-  <xs:element name="attributes">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="base-element">
-          <xs:group ref="attribute-list" maxOccurs="unbounded"/>
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
-
   <xs:simpleType name="attribute-target">
     <xs:annotation>
       <xs:documentation xml:space="preserve">

@@ -26,14 +26,18 @@ public class Test
 
   <class name="Test" access="public">
     <method static="true" access="public" name="main">
-      <parameters vararg="true">
-        <parameter name="args">
-          <type name="String" arity="1"/>
+      <parameters>
+        <parameter name="args" vararg="true">
+          <type array="true">
+            <type name="String"/>
+          </type>
         </parameter>
       </parameters>
       <block>
         <var-decl name="stringArray">
-          <type name="String" arity="1"/>
+          <type array="true">
+            <type name="String"/>
+          </type>
           <initialize>
             <array>
               <string value="Barbara"/>

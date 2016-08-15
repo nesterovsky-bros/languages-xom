@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-  This xml schema defines simplified schema of
-  the sql oracle statements used.
+  This xml schema defines simplified schema of the sql oracle statements used.
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns="http://www.bphx.com/basic-sql/2008-12-11/oracle"
@@ -28,6 +27,7 @@
   <xs:element name="set" type="set-var-statement"/>
   <xs:element name="call" type="call-statement"/>
   <xs:element name="open" type="open-statement"/>
+  <xs:element name="open-for" type="open-for-statement"/>
   <xs:element name="close" type="close-statement"/>
   <xs:element name="fetch" type="fetch-statement"/>
   <xs:element name="savepoint" type="savepoint-statement"/>
@@ -45,6 +45,12 @@
 
   <xs:element name="simple-case" type="simple-case-expression"/>
   <xs:element name="search-case" type="search-case-expression"/>
+
+  <xs:group name="returning-clause">
+    <xs:sequence>
+      <xs:element name="returning" type="returning-clause"/>
+    </xs:sequence>
+  </xs:group>
 
   <xs:complexType name="labeled-statement">
     <xs:complexContent>
@@ -104,7 +110,7 @@
         <xs:sequence>
           <xs:element name="parameter" type="declare-var"
             minOccurs="0" maxOccurs="unbounded"/>
-          <xs:group ref="sql:subquery"/>
+          <xs:group ref="sql:query"/>
         </xs:sequence>
         <xs:attribute name="name" type="xs:string" use="required"/>
       </xs:extension>
@@ -242,6 +248,15 @@
     </xs:complexContent>
   </xs:complexType>
 
+  <xs:complexType name="open-for-statement">
+    <xs:complexContent>
+      <xs:extension base="labeled-statement">
+        <xs:group ref="sql:query"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="close-statement">
     <xs:complexContent>
       <xs:extension base="labeled-statement">
@@ -361,6 +376,19 @@
     </xs:complexContent>
   </xs:complexType>
 
+  <xs:complexType name="returning-clause">
+    <xs:complexContent>
+      <xs:extension base="sql:sql-element">
+        <xs:sequence>
+          <xs:group ref="sql:select-column-clause" maxOccurs="unbounded"/>
+          <xs:element ref="sql:into"/>
+        </xs:sequence>
+        <xs:attribute name="bulk-collect" type="xs:boolean" 
+          use="optional" default="false"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
   <!-- Parameters. -->
   <xs:simpleType name="parameter-direction">
     <xs:restriction base="xs:string">

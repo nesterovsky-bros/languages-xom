@@ -99,10 +99,10 @@
       else
         subsequence($tokens, $index)"/>
 
-    <xsl:sequence select="t:format-line($line, $indent)"/>
+    <xsl:if
+      test="exists($line[. instance of xs:string]) or exists($line-break)">
+      <xsl:sequence select="t:format-line($line, $indent)"/>
 
-    <xsl:if 
-      test="exists($line-break) or exists($line[. instance of xs:string])">
       <xsl:call-template name="t:get-lines">
         <xsl:with-param name="tokens" select="$tokens"/>
         <xsl:with-param name="line-breaks" select="$line-breaks"/>
@@ -136,12 +136,23 @@
   <xsl:function name="t:get-indentation" as="xs:integer">
     <xsl:param name="tokens" as="item()*"/>
 
+    <xsl:variable name="controls" as="xs:QName*" 
+      select="$tokens[. instance of xs:QName]"/>
+
     <xsl:sequence select="
-      if (exists(index-of($tokens, $t:line-indent))) then
+      if ($controls = $t:line-indent) then
         0
       else
-        count(index-of($tokens, $t:indent)) -
-          count(index-of($tokens, $t:unindent))"/>
+        sum
+        (
+          for $token in $controls return
+            if ($token eq $t:indent) then
+              1
+            else if ($token eq $t:unindent) then
+              -1
+            else
+              ()
+        )"/>
   </xsl:function>
 
   <!--
@@ -156,39 +167,34 @@
 
     <xsl:variable name="literals" as="xs:string*"
       select="$tokens[not(. instance of xs:QName)]"/>
+
     <xsl:variable name="control-tokens" as="xs:QName*" select="
-      if (exists($literals)) then
-        subsequence
+      subsequence
+      (
+        $tokens,
+        1,
         (
-          $tokens,
-          1,
+          for $i in 1 to count($tokens) return
           (
-            for $i in 1 to count($tokens) return
-              if ($tokens[$i] instance of xs:QName) then () else $i - 1
-          )[1]
-        )
+            if ($tokens[$i] instance of xs:QName) then
+              ()
+            else
+              $i - 1
+          ),
+          count($tokens)
+        )[1]
+      )"/>
+
+    <xsl:variable name="line-indent" as="xs:integer?"
+      select="index-of($control-tokens, $t:line-indent)[last()]"/>
+    <xsl:variable name="next-tokens" as="xs:QName*"
+      select="subsequence($control-tokens, $line-indent + 1)"/>
+
+    <xsl:variable name="indent-value" as="xs:integer" select="
+      if (exists($line-indent)) then
+        count($next-tokens[. eq $t:indent])
       else
-        $tokens"/>
-
-    <xsl:variable name="indent-value" as="xs:integer">
-      <xsl:variable name="line-indent" as="xs:integer?"
-        select="index-of($control-tokens, $t:line-indent)[last()]"/>
-
-      <xsl:choose>
-        <xsl:when test="exists($line-indent)">
-          <xsl:variable name="next-tokens" as="xs:QName*"
-            select="subsequence($control-tokens, $line-indent + 1)"/>
-
-          <xsl:sequence select="count(index-of($next-tokens, $t:indent))"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:sequence select="
-            $indent +
-              count(index-of($control-tokens, $t:indent)) -
-              count(index-of($control-tokens, $t:unindent))"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+        $indent + t:get-indentation($control-tokens)"/>
 
     <xsl:variable name="indentation" as="xs:string" select="
       string-join

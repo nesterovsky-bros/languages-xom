@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  This stylesheet generates basic sql.
--->
+<!-- This stylesheet generates basic sql. -->
 <xsl:stylesheet version="2.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -820,6 +818,69 @@
       <xsl:sequence select="' '"/>
       <xsl:sequence select="'ties'"/>
     </xsl:if>
+
+    <xsl:sequence select="' '"/>
+  </xsl:template>
+
+  <!-- output clause. -->
+  <xsl:template priority="2" match="*[tsql:output]" mode="
+    t:insert-values-extensions
+    t:delete-where-extensions
+    t:update-where-extensions">
+
+    <xsl:variable name="output" as="element()" select="tsql:output"/>
+    <xsl:variable name="columns" as="element()+" select="$output/sql:column"/>
+    <xsl:variable name="source" as="element()?"
+      select="t:get-table-sources($output)"/>
+
+    <xsl:sequence select="$t:new-line"/>
+    <xsl:sequence select="'output'"/>
+    <xsl:sequence select="' '"/>
+
+    <xsl:sequence select="$t:indent"/>
+
+    <xsl:for-each select="$columns">
+      <xsl:variable name="wildcard" as="xs:boolean?" select="@wildcard"/>
+      <xsl:variable name="alias" as="xs:string" select="string(@alias)"/>
+
+      <xsl:sequence select="$t:new-line"/>
+
+      <xsl:choose>
+        <xsl:when test="$wildcard">
+          <xsl:if test="$alias">
+            <xsl:sequence select="t:quote-name($alias)"/>
+            <xsl:sequence select="'.'"/>
+          </xsl:if>
+
+          <xsl:sequence select="'*'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="expression" as="element()"
+            select="t:get-sql-element(.)"/>
+
+          <xsl:apply-templates mode="t:expression-tokens"
+            select="$expression"/>
+          
+          <xsl:if test="$alias">
+            <xsl:sequence select="' '"/>
+            <xsl:sequence select="t:quote-name($alias)"/>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+
+      <xsl:if test="position() != last()">
+        <xsl:sequence select="','"/>
+      </xsl:if>
+    </xsl:for-each>
+
+    <xsl:if test="$source">
+      <xsl:sequence select="$t:new-line"/>
+      <xsl:sequence select="'into'"/>
+      <xsl:sequence select="' '"/>
+      <xsl:apply-templates mode="t:table-source" select="$source"/>
+    </xsl:if>
+
+    <xsl:sequence select="$t:unindent"/>
   </xsl:template>
 
   <!--
@@ -1012,7 +1073,7 @@
     <xsl:next-match/>
 
     <xsl:if test="exists($tokens)">
-      <xsl:sequence select="$t:new-line"/>
+      <xsl:sequence select="' '"/>
       <xsl:sequence select="'with'"/>
       <xsl:sequence select="'('"/>
       <xsl:sequence select="subsequence($tokens, 3)"/>
@@ -3174,7 +3235,7 @@
 
     <xsl:choose>
       <xsl:when test="
-        matches($value, '^[A-Za-z_][A-Za-z0-9_]*$') and
+        matches($value, '^[A-Z_$][A-Z0-9_$]*$', 'i') and
         not($t:keywords/key('t:keyword', $value))">
         <xsl:sequence select="$value"/>
       </xsl:when>

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  This stylesheet introduces a support for a complex expressions.
--->
+<!-- This stylesheet introduces a support for a complex expressions. -->
 <xsl:stylesheet version="2.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -71,8 +69,10 @@
         (
           (
             ancestor::class-method |
+            ancestor::method |
             ancestor::constructor | 
-            ancestor::class-initializer
+            ancestor::class-initializer |
+            ancestor::lambda
           )
           [
             . >> $expression
@@ -589,7 +589,8 @@
 
             <xsl:copy>
               <xsl:sequence select="@*"/>
-              <xsl:sequence select="comment | meta | annotations | type"/>
+              <xsl:sequence 
+                select="comment | meta | annotations | annotation | type"/>
 
               <xsl:sequence select="$refactored-initialize"/>
             </xsl:copy>
@@ -761,7 +762,7 @@
 
       <var-decl>
         <xsl:sequence select="$var-decl/@*"/>
-        <xsl:sequence select="$var-decl/annotations"/>
+        <xsl:sequence select="$var-decl/(annotations | annotation)"/>
         <xsl:sequence select="$type"/>
 
         <initialize>

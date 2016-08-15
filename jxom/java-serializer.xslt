@@ -37,42 +37,31 @@
       <xsl:sequence select="$t:new-line"/>
     </xsl:if>
 
-    <xsl:variable name="imports" as="element()?" select="$unit/imports"/>
+    <xsl:variable name="imports" as="element()*">
+      <xsl:perform-sort select="$unit/imports/import">
+        <xsl:sort select="xs:boolean(@static) = true()"/>
+        <xsl:sort 
+          select="not(starts-with(t:get-import-package(.), 'java'))"/>
+        <xsl:sort select="string-join(t:get-import-type(.), '.')"/>
+        <xsl:sort select="xs:string(@name)"/>
+      </xsl:perform-sort>
+    </xsl:variable>
 
-    <xsl:if test="$imports">
-      <xsl:variable name="imports" as="element()+">
-        <xsl:perform-sort select="$imports/import">
-          <xsl:sort select="xs:boolean(@static) = true()"/>
-          <xsl:sort 
-            select="not(starts-with(t:get-import-package(.), 'java'))"/>
-          <xsl:sort select="string-join(t:get-import-type(.), '.')"/>
-          <xsl:sort select="xs:string(@name)"/>
-        </xsl:perform-sort>
-      </xsl:variable>
+    <xsl:for-each select="$imports">
+      <xsl:variable name="next" as="element()?"
+        select="subsequence($imports, position() + 1, 1)"/>
+      <xsl:sequence select="t:get-import(.)"/>
 
-      <xsl:for-each select="$imports">
-        <xsl:variable name="position" as="xs:integer" select="position()"/>
-
-        <xsl:if test="$position != 1">
-          <xsl:variable name="static" as="xs:boolean"
-            select="xs:boolean(@static) = true()"/>
-          <xsl:variable name="previous" as="element()?"
-            select="$imports[$position - 1]"/>
-          <xsl:variable name="previous-static" as="xs:boolean"
-            select="$previous/xs:boolean(@static) = true()"/>
-
-          <xsl:if test="
-            ($static != $previous-static) or
-            (t:get-import-package(.) != t:get-import-package($previous))">
-            <xsl:sequence select="$t:new-line"/>
-          </xsl:if>
-        </xsl:if>
-
-        <xsl:sequence select="t:get-import(.)"/>
-      </xsl:for-each>
-
-      <xsl:sequence select="$t:new-line"/>
-    </xsl:if>
+      <xsl:if test="
+        not($next) or
+        (
+          (xs:boolean(@static) = true()) != 
+            ($next/xs:boolean(@static) = true())
+        ) or
+        (t:get-import-package(.) != t:get-import-package($next))">
+        <xsl:sequence select="$t:new-line"/>
+      </xsl:if>
+    </xsl:for-each>
 
     <xsl:variable name="type-declarations" as="element()*"
       select="t:get-type-declarations($unit)"/>
@@ -130,8 +119,20 @@
     <xsl:param name="element" as="element()"/>
     <xsl:param name="inline" as="xs:boolean"/>
 
-    <xsl:sequence 
-      select="t:get-annotation($element/annotations/annotation, $inline)"/>
+    <xsl:variable name="deprecated-annotations" as="element()?" 
+      select="$element/annotations"/>
+
+    <xsl:if test="$deprecated-annotations">
+      <xsl:message>
+        <xsl:text>Deprecated annotations element at: </xsl:text>
+        <xsl:value-of select="t:get-path($deprecated-annotations)"/>
+      </xsl:message>
+      
+      <xsl:sequence 
+        select="t:get-annotation($deprecated-annotations/annotation, $inline)"/>
+    </xsl:if>
+
+    <xsl:sequence select="t:get-annotation($element/annotation, $inline)"/>
   </xsl:function>
 
   <!--
@@ -424,7 +425,8 @@
         ($position > 1) and
         (
           comment or
-          self::class-members or $previous/self::class-members or
+          self::class-members or self::members or 
+          $previous/self::class-members or $previous/self::members or
           not
           (
             (self::field or self::class-field) and
@@ -457,7 +459,8 @@
         constructor |
         field |
         class-field |
-        class-members
+        class-members |
+        members
       ) |
       t:get-type-declarations($element)"/>
   </xsl:function>
@@ -608,7 +611,8 @@
         ($position > 1) and
         (
           comment or
-          self::interface-members or $previous/self::interface-members or
+          self::interface-members or self::members or 
+          $previous/self::interface-members or $previous/self::members or
           self::method/block or self::interface-method/block or
           $previous/self::method/block or $previous/self::interface-method/block or
           not
@@ -643,7 +647,8 @@
         interface-method |
         field |
         interface-field |
-        interface-members
+        interface-members |
+        members
       ) |
       t:get-type-declarations($element)"/>
   </xsl:function>
@@ -708,7 +713,8 @@
         annotation-method |
         field |
         annotation-field |
-        annotation-members
+        annotation-members |
+        members
       ) |
       t:get-type-declarations($element)"/>
   </xsl:function>
@@ -864,78 +870,84 @@
   <xsl:function name="t:get-type" as="item()*">
     <xsl:param name="type" as="element()"/>
 
-    <xsl:sequence select="t:get-type($type, ())"/>
-  </xsl:function>
-
-  <!--
-    Gets type name for the type element.
-      $type - a type element.
-      $arity-override - defines arity override.
-      Returns type name as sequence of tokens.
-  -->
-  <xsl:function name="t:get-type" as="item()*">
-    <xsl:param name="type" as="element()"/>
-    <xsl:param name="arity-override" as="xs:integer?"/>
-
     <xsl:variable name="package" as="xs:string?" select="$type/@package"/>
-    <xsl:variable name="name" as="xs:string" select="$type/@name"/>
+    <xsl:variable name="name" as="xs:string?" select="$type/@name"/>
     <xsl:variable name="container" as="element()?" select="$type/type"/>
     <xsl:variable name="arguments" as="element()*" select="$type/argument"/>
-
-    <xsl:variable name="arity" as="xs:integer?" select="
-      if (exists($arity-override)) then
-        $arity-override
-      else
-        $type/@arity"/>
-
-    <xsl:if test="$arity lt 0">
-      <xsl:sequence select="error(xs:QName('invalid-type-arity'))"/>
-    </xsl:if>
+    <xsl:variable name="array" as="xs:boolean?" select="$type/@array"/>
+    
+    <xsl:sequence select="t:get-annotations($type, true())"/>
 
     <xsl:choose>
-      <xsl:when test="$container">
-        <xsl:sequence select="t:get-type($container, 0)"/>
-        <xsl:sequence select="'.'"/>
-      </xsl:when>
-      <xsl:when test="exists($package)">
-        <xsl:sequence select="t:tokenize($package)"/>
-        <xsl:sequence select="'.'"/>
-      </xsl:when>
-    </xsl:choose>
-
-    <xsl:sequence select="$name"/>
-
-    <xsl:if test="$arguments">
-      <xsl:sequence select="'&lt;'"/>
-
-      <xsl:choose>
-        <xsl:when test="
-          (count($arguments) = 1) and 
-          empty($arguments/type) and 
-          empty($arguments/@match)">
-          <!-- Diamond syntax. -->
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:for-each select="$arguments">
-            <xsl:sequence select="t:get-type-argument(.)"/>
-
-            <xsl:if test="position() != last()">
-              <xsl:sequence select="','"/>
-              <xsl:sequence select="' '"/>
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:otherwise>
-      </xsl:choose>
-
-      <xsl:sequence select="'>'"/>
-    </xsl:if>
-
-    <xsl:if test="exists($arity)">
-      <xsl:for-each select="1 to $arity">
+      <xsl:when test="$array">
+        <xsl:if test="
+          $name or 
+          empty($container) or 
+          exists($package) or 
+          exists($arguments)">
+          <xsl:sequence select="
+            error
+            (
+              xs:QName('array-type'),
+              'Invalid array type.',
+              $type
+            )"/>
+        </xsl:if>
+      
+      
+        <xsl:sequence select="t:get-type($container)"/>
         <xsl:sequence select="'['"/>
         <xsl:sequence select="']'"/>
-      </xsl:for-each>
-    </xsl:if>
+      </xsl:when>
+      <xsl:when test="$name">
+        <xsl:choose>
+          <xsl:when test="$container">
+            <xsl:sequence select="t:get-type($container)"/>
+            <xsl:sequence select="'.'"/>
+          </xsl:when>
+          <xsl:when test="exists($package)">
+            <xsl:sequence select="t:tokenize($package)"/>
+            <xsl:sequence select="'.'"/>
+          </xsl:when>
+        </xsl:choose>
+    
+        <xsl:sequence select="$name"/>
+    
+        <xsl:if test="$arguments">
+          <xsl:sequence select="'&lt;'"/>
+    
+          <xsl:choose>
+            <xsl:when test="
+              (count($arguments) = 1) and 
+              empty($arguments/type) and 
+              empty($arguments/@match)">
+              <!-- Diamond syntax. -->
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:for-each select="$arguments">
+                <xsl:sequence select="t:get-type-argument(.)"/>
+    
+                <xsl:if test="position() != last()">
+                  <xsl:sequence select="','"/>
+                  <xsl:sequence select="' '"/>
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
+    
+          <xsl:sequence select="'>'"/>
+        </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="
+          error
+          (
+            xs:QName('type-name'),
+            'Invalid type name.',
+            $type
+          )"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:function>
 
   <!--
@@ -948,6 +960,8 @@
 
     <xsl:variable name="type" as="element()?" select="$argument/type"/>
     <xsl:variable name="match" as="xs:string?" select="$argument/@match"/>
+
+    <xsl:sequence select="t:get-annotations($argument, false())"/>
 
     <xsl:choose>
       <xsl:when test="not($match) or $match = 'precise'">
@@ -1039,7 +1053,8 @@
   <!--
     Mode "interfaceBodyDeclaration". Interface declaration scope.
   -->
-  <xsl:template mode="t:interfaceBodyDeclaration" match="interface-members">
+  <xsl:template mode="t:interfaceBodyDeclaration" 
+    match="interface-members | members">
     <xsl:variable name="comments" as="item()*" select="t:get-comments(.)"/>
 
     <xsl:if test="exists($comments)">
@@ -1178,7 +1193,7 @@
     Mode "annotationTypeElementDeclaration". Annotation members.
   -->
   <xsl:template mode="t:annotationTypeElementDeclaration"
-    match="annotation-members">
+    match="annotation-members | members">
     <xsl:variable name="comments" as="item()*" select="t:get-comments(.)"/>
 
     <xsl:if test="exists($comments)">
@@ -1237,7 +1252,8 @@
   <!--
     Mode "t:classBodyDeclaration". Class declaration members.
   -->
-  <xsl:template mode="t:classBodyDeclaration" match="class-members">
+  <xsl:template mode="t:classBodyDeclaration" 
+    match="class-members | members">
     <xsl:variable name="comments" as="item()*" select="t:get-comments(.)"/>
 
     <xsl:if test="exists($comments)">
@@ -1274,7 +1290,8 @@
   <!--
     Mode "t:classBodyDeclaration". Class initializer.
   -->
-  <xsl:template mode="t:classBodyDeclaration" match="class-initializer">
+  <xsl:template mode="t:classBodyDeclaration" 
+    match="class-initializer | initializer">
     <xsl:variable name="static" as="xs:boolean?" select="@static"/>
 
     <xsl:sequence select="t:get-comments(.)"/>
@@ -1447,8 +1464,6 @@
 
     <xsl:variable name="parameters" as="element()?"
       select="$element/parameters"/>
-    <xsl:variable name="vararg" as="xs:boolean?"
-      select="$parameters/@vararg"/>
     <xsl:variable name="formal-parameters" as="element()*"
       select="$parameters/parameter"/>
 
@@ -1456,6 +1471,8 @@
       <xsl:for-each select="$formal-parameters">
         <xsl:variable name="name" as="xs:string" select="@name"/>
         <xsl:variable name="final" as="xs:boolean?" select="@final"/>
+        <xsl:variable name="vararg" as="xs:boolean?" select="@vararg"/>
+        <xsl:variable name="this" as="xs:boolean?" select="@this"/>
         <xsl:variable name="type" as="element()" select="type"/>
 
         <xsl:sequence select="t:get-annotations(., true())"/>
@@ -1467,10 +1484,7 @@
 
         <xsl:choose>
           <xsl:when test="(position() = last()) and $vararg">
-            <xsl:variable name="arity" as="xs:integer"
-              select="$type/@arity"/>
-
-            <xsl:sequence select="t:get-type($type, $arity - 1)"/>
+            <xsl:sequence select="t:get-type($type[xs:boolean(@array)]/type)"/>
             <xsl:sequence select="'...'"/>
           </xsl:when>
           <xsl:otherwise>
@@ -1480,6 +1494,11 @@
 
         <xsl:sequence select="' '"/>
         <xsl:sequence select="$name"/>
+        
+        <xsl:if test="(position() = 1) and $this">
+          <xsl:sequence select="'.'"/>
+          <xsl:sequence select="'this'"/>
+        </xsl:if>
 
         <xsl:if test="position() != last()">
           <xsl:sequence select="','"/>
@@ -1490,7 +1509,7 @@
     </xsl:variable>
 
     <xsl:sequence select="
-      t:reformat-tokens($tokens, 3, ' ', $t:new-line, false(), false())"/>
+      t:reformat-tokens($tokens, 4, ' ', $t:new-line, false(), false())"/>
   </xsl:function>
 
   <!--
@@ -1641,7 +1660,7 @@
     Generates comment for "class-members" element.
       $doc - true for documentation comment, and false otherwise.
   -->
-  <xsl:template mode="t:get-comment" match="class-members">
+  <xsl:template mode="t:get-comment" match="class-members | members">
     <xsl:param name="doc" as="xs:boolean"/>
 
     <xsl:sequence select="

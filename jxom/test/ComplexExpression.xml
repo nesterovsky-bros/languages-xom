@@ -407,14 +407,18 @@
             <initialize>
               <static-invoke name="get">
                 <meta>
-                  <type name="int" arity="1"/>
+                  <type array="true">
+                    <type name="int"/>
+                  </type>
                 </meta>
                 <type name="Supplier" package="com.nesterovskyBros"/>
                 <arguments>
                   <lambda>
                     <block>
                       <var-decl name="foreach7">
-                        <type name="int" arity="1"/>
+                        <type array="true">
+                          <type name="int"/>
+                        </type>
                       </var-decl>
 
                       <return>

@@ -2,7 +2,7 @@
 <db2:scope
   xmlns:db2="http://www.bphx.com/basic-sql/2008-12-11/db2"
   xmlns:sql="http://www.bphx.com/basic-sql/2008-12-11">
-
+  
   <sql:select>
     <sql:with>
       <sql:source alias="T">
@@ -49,4 +49,54 @@
 
     <db2:fetch-first rows="10"/>
   </sql:select>
+
+
+  <sql:select>
+    <sql:column>
+      <sql:field name="EMPNO"/>
+    </sql:column>
+    <sql:column>
+      <sql:field name="HIRETYPE"/>
+    </sql:column>
+    <sql:column>
+      <sql:field name="HIREDATE"/>
+    </sql:column>
+    <sql:from>
+      <db2:final-table>
+        <sql:insert>
+          <sql:table name="EMPSAMP">
+            <sql:column name="NAME"/>
+            <sql:column name="SALARY"/>
+            <sql:column name="DEPTNO"/>
+            <sql:column name="LEVEL"/>
+          </sql:table>
+          <sql:values>
+            <sql:string value="Mary Smith"/>
+            <sql:number value="35000.00"/>
+            <sql:number value="11"/>
+            <sql:string value="Associate"/>
+          </sql:values>
+        </sql:insert>
+      </db2:final-table>
+    </sql:from>
+  </sql:select>
+
+  <sql:select>
+    <sql:column>
+      <sql:field name="EMPNO"/>
+    </sql:column>
+    <sql:column>
+      <sql:field name="HIRETYPE"/>
+    </sql:column>
+    <sql:column>
+      <sql:field name="HIREDATE"/>
+    </sql:column>
+    <sql:from>
+      <sql:table name="EMPSAMP"/>
+    </sql:from>
+    <db2:fetch-first rows="100"/>
+    <db2:isolation type="read-stability" lock="share"/>
+    <db2:skip-locked-data/>
+  </sql:select>
+
 </db2:scope>

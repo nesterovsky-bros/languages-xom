@@ -219,24 +219,22 @@
       <block>
         <class name="StateMachine">
           <xsl:if test="$generate-suppress-warnings">
-            <annotations>
-              <annotation>
-                <type name="SuppressWarnings"/>
-                <parameter>
-                  <xsl:choose>
-                    <xsl:when test="$serializable-state-machine">
-                      <annotation-array>
-                        <string value="serial"/>
-                        <string value="unchecked"/>
-                      </annotation-array>
-                    </xsl:when>
-                    <xsl:otherwise>
+            <annotation>
+              <type name="SuppressWarnings"/>
+              <parameter>
+                <xsl:choose>
+                  <xsl:when test="$serializable-state-machine">
+                    <annotation-array>
+                      <string value="serial"/>
                       <string value="unchecked"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </parameter>
-              </annotation>
-            </annotations>
+                    </annotation-array>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <string value="unchecked"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </parameter>
+            </annotation>
           </xsl:if>
           
           <implements>
@@ -617,9 +615,9 @@
             <xsl:otherwise>
               <return>
                 <invoke name="error">
-                  <types>
+                  <type-arguments>
                     <type name="Exception"/>
-                  </types>
+                  </type-arguments>
                   <instance>
                     <this/>
                   </instance>
@@ -1676,8 +1674,8 @@
     <xsl:variable name="collection-type" as="element()?" select="
       t:get-type-of(t:get-java-element($var-decl/initialize), false())"/>
     <xsl:variable name="block" as="element()" select="block"/>
-    <xsl:variable name="is-array" as="xs:boolean"
-      select="$collection-type/xs:integer(@arity) > 0"/>
+    <xsl:variable name="is-array" as="xs:boolean?"
+      select="xs:boolean($collection-type/@array)"/>
 
     <xsl:choose>
       <xsl:when test="$is-array">

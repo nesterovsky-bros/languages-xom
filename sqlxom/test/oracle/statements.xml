@@ -40,4 +40,69 @@
       <sql:table name="T"/>
     </sql:from>
   </sql:select>
+
+  <sql:delete>
+    <sql:table name="employees_temp"/>
+    <sql:where>
+      <sql:eq>
+        <sql:field name="employee_id"/>
+        <sql:number value="299"/>
+      </sql:eq>
+    </sql:where>
+    <oracle:returning>
+      <sql:column>
+        <sql:field name="first_name"/>
+      </sql:column>
+      <sql:column>
+        <sql:field name="last_name"/>
+      </sql:column>
+      <sql:into>
+        <sql:var name="emp_first_name"/>
+        <sql:var name="emp_last_name"/>
+      </sql:into>
+    </oracle:returning>
+  </sql:delete>
+
+  <oracle:block>
+    <oracle:declare-var name="TEST">
+      <sql:type name="SYS_REFCURSOR"/>
+    </oracle:declare-var>
+
+    <oracle:declare-var name="c1">
+      <sql:type name="number"/>
+    </oracle:declare-var>
+
+    <sql:insert>
+      <sql:table name="TEST">
+        <sql:column name="C2"/>
+      </sql:table>
+      <sql:values>
+        <sql:string value="10"/>
+      </sql:values>
+      <oracle:returning>
+        <sql:column>
+          <sql:field name="C1"/>
+        </sql:column>
+        <sql:into>
+          <sql:var name="c1"/>
+        </sql:into>
+      </oracle:returning>
+    </sql:insert>
+
+    <oracle:open-for name="TEST">
+      <sql:select>
+        <sql:column>
+          <sql:var name="c1"/>
+        </sql:column>
+        <sql:from>
+          <sql:table name="dual"/>
+        </sql:from>
+      </sql:select>
+    </oracle:open-for>
+
+    <oracle:call name="DBMS_SQL.RETURN_RESULT">
+      <sql:var name="TEST"/>
+    </oracle:call>
+  </oracle:block>
+  
 </oracle:block>

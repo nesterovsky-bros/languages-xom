@@ -582,10 +582,16 @@
       <xsl:sequence select="'('"/>
 
       <xsl:for-each select="$vars">
+        <xsl:variable name="comments" as="item()*" select="t:get-comments(.)"/>
         <xsl:variable name="name" as="xs:string" select="@name"/>
         <xsl:variable name="final" as="xs:boolean?" select="@final"/>
         <xsl:variable name="initializer" as="item()+"
             select="t:get-initializer(., true())"/>
+
+        <xsl:if test="exists($comments)">
+          <xsl:sequence select="$t:new-line"/>
+          <xsl:sequence select="$comments"/>
+        </xsl:if>
 
         <xsl:if test="$final">
           <xsl:sequence select="'final'"/>

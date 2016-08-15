@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  This stylesheet generates basic sql.
--->
+<!-- This stylesheet generates basic sql. -->
 <xsl:stylesheet version="2.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -333,6 +331,38 @@
   </xsl:variable>
 
   <!--
+    Mode "t:get-table-sources". Gets table sources for the element.
+  -->
+  <xsl:template mode="t:get-table-sources"
+    match="db2:final-table | db2:old-table">
+    <xsl:sequence select="."/>
+  </xsl:template>
+
+  <!-- Mode "t:table-source". final|old table. -->
+  <xsl:template mode="t:table-source" match="db2:final-table | db2:old-table">
+    <xsl:sequence select="
+      if (self::db2:final-table) then
+        'final'
+      else
+        'old'"/>
+    
+    <xsl:sequence select="' '"/>
+    <xsl:sequence select="'table'"/>
+    <xsl:sequence select="$t:new-line"/>
+    <xsl:sequence select="'('"/>
+    <xsl:sequence select="$t:new-line"/>
+    <xsl:sequence select="$t:indent"/>
+
+    <xsl:apply-templates mode="t:statement-tokens" 
+      select="sql:insert | sql:update | sql:delete"/>
+
+    <xsl:sequence select="$t:unindent"/>
+    <xsl:sequence select="$t:new-line"/>
+    <xsl:sequence select="')'"/>
+    <xsl:call-template name="t:source-alias"/>
+  </xsl:template>
+
+  <!--
     Mode "t:get-sql-element". Gets sql element.
   -->
   <xsl:template mode="t:get-sql-element" match="db2:*">
@@ -374,6 +404,95 @@
 
     <xsl:sequence select="' '"/>
     <xsl:sequence select="'only'"/>
+  </xsl:template>
+
+  <!--
+    Mode "t:statement-tokens". Select statement.
+  -->
+  <xsl:template mode="t:select-footer-extensions" priority="3"
+    match="sql:select[db2:isolation]">
+    
+    <xsl:next-match/>
+
+    <xsl:variable name="isolation" as="element()" select="db2:isolation"/>
+    <xsl:variable name="type" as="xs:string" select="$isolation/@type"/>
+    <xsl:variable name="lock" as="xs:string?" select="$isolation/@lock"/>
+
+    <xsl:sequence select="$t:new-line"/>
+    <xsl:sequence select="'with'"/>
+    <xsl:sequence select="' '"/>
+
+    <xsl:choose>
+      <xsl:when test="$type = 'repeatable-read'">
+        <xsl:sequence select="'RR'"/>
+      </xsl:when>
+      <xsl:when test="$type = 'read-stability'">
+        <xsl:sequence select="'RS'"/>
+      </xsl:when>
+      <xsl:when test="$type = 'cursor-stability'">
+        <xsl:sequence select="'CS'"/>
+      </xsl:when>
+      <xsl:when test="$type = 'uncommitted-read'">
+        <xsl:sequence select="'UR'"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="
+          error
+          (
+            xs:QName('t:error'),
+            concat('Invalid isolation type ', $type, '.')
+          )"/>
+      </xsl:otherwise>
+    </xsl:choose>
+
+    <xsl:if test="exists($lock)">
+      <xsl:sequence select="' '"/>
+      <xsl:sequence select="'use'"/>
+      <xsl:sequence select="' '"/>
+      <xsl:sequence select="'and'"/>
+      <xsl:sequence select="' '"/>
+      <xsl:sequence select="'keep'"/>
+      <xsl:sequence select="' '"/>
+
+      <xsl:choose>
+        <xsl:when test="$lock = 'exclusive'">
+          <xsl:sequence select="'exclusive'"/>
+        </xsl:when>
+        <xsl:when test="$lock = 'update'">
+          <xsl:sequence select="'update'"/>
+        </xsl:when>
+        <xsl:when test="$lock = 'share'">
+          <xsl:sequence select="'share'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:sequence select="
+            error
+            (
+              xs:QName('t:error'),
+              concat('Invalid lock type', $lock, '.')
+            )"/>
+        </xsl:otherwise>
+      </xsl:choose>
+
+      <xsl:sequence select="' '"/>
+      <xsl:sequence select="'locks'"/>
+    </xsl:if>
+  </xsl:template>
+
+  <!--
+    Mode "t:statement-tokens". Select statement.
+  -->
+  <xsl:template mode="t:select-footer-extensions" priority="4"
+    match="sql:select[db2:skip-locked-data]">
+
+    <xsl:next-match/>
+
+    <xsl:sequence select="$t:new-line"/>
+    <xsl:sequence select="'skip'"/>
+    <xsl:sequence select="' '"/>
+    <xsl:sequence select="'locked'"/>
+    <xsl:sequence select="' '"/>
+    <xsl:sequence select="'data'"/>
   </xsl:template>
 
   <!--
