@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  This stylesheet optimizes (removes) dead code.
--->
+<!-- This stylesheet optimizes (removes) dead code. -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:t="http://www.bphx.com/jxom"
@@ -578,7 +576,7 @@
           else
             (@destination-label = $label) and empty(@label-ref)
         )[exists($label)] or
-        p:is-break-of($statement, .)
+        p:is-continue-of($statement, .)
       ]"/>
 
     <xsl:variable name="is-true-condition" as="xs:boolean"
@@ -635,7 +633,7 @@
     <xsl:variable name="update-closure" as="item()*">
       <xsl:apply-templates mode="#current" select="$update"/>
     </xsl:variable>
-
+    
     <xsl:variable name="update-unreachable" as="element()*"
       select="$update-closure[. instance of element()]"/>
 
@@ -670,7 +668,7 @@
           else
             (@destination-label = $label) and empty(@label-ref)
         )[exists($label)] or
-        p:is-break-of($statement, .)
+        p:is-continue-of($statement, .)
       ]"/>
 
     <xsl:sequence select="
@@ -928,6 +926,30 @@
         self::comment,
         self::meta,
         self::switch,
+        self::for,
+        self::for-each,
+        self::while,
+        self::do-while
+      ][1] is $statement"/>
+  </xsl:function>
+
+  <!--
+    Tests if a specified continue is closest inner statement of
+    a specified statement.
+      $statement - a scope statement.
+      $continue - a continue statement.
+      Returns true if a specified continue is closest inner statement of
+      a specified statement.
+  -->
+  <xsl:function name="p:is-continue-of" as="xs:boolean">
+    <xsl:param name="statement" as="element()"/>
+    <xsl:param name="continue" as="element()"/>
+
+    <xsl:sequence select="
+      $continue/ancestor::*
+      [
+        self::comment,
+        self::meta,
         self::for,
         self::for-each,
         self::while,
