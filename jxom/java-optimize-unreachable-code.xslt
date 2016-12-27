@@ -36,7 +36,8 @@
     following is true:
       The contained statement can complete normally.
       There is a reachable break statement that exits the labeled statement.
-      The contained statement is reachable iff the labeled statement is reachable.
+      The contained statement is reachable iff the labeled statement 
+      is reachable.
 
     7. An expression statement can complete normally iff it is reachable.
     The if statement, whether or not it has an else part, is handled in an
@@ -135,7 +136,11 @@
     <xsl:param name="statement" as="element()"/>
 
     <xsl:variable name="closure" as="item()+">
-      <xsl:apply-templates mode="p:collect-unreachable" select="$statement"/>
+      <xsl:apply-templates mode="p:collect-unreachable" select="$statement">
+        <xsl:with-param name="break-and-continue" tunnel="yes" select="
+          p:get-descendant-statements($statement)
+            [self::break or self::continue]"/>
+      </xsl:apply-templates>
     </xsl:variable>
 
     <xsl:variable name="unreachable" as="element()*"
@@ -176,6 +181,59 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
+
+  <!-- 
+    Tests whether the statement in breaked.
+      $statement a stetement to test (defaults to context element).
+      $break-and-continue a sequence of break and continue statements in scope.
+      Returns a sequence of closures: 
+        (break and continue statement, target statement).
+  -->
+  <xsl:template name="get-breaks-and-targets" as="element()*">
+    <xsl:param name="statement" as="element()" select="."/>
+    <xsl:param name="break-and-continue" tunnel="yes" as="element()*"/>
+
+    <xsl:sequence select="
+      for 
+        $item in $break-and-continue[$statement intersect ancestor::*],
+        $target in
+          exactly-one
+          (
+            if (exists($item/@label-ref)) then
+              $item/ancestor::*[@label-id = $item/@label-ref]
+            else if (exists($item/@destination-ref)) then
+              $item/ancestor::*[@label = $item/@destination-ref]
+            else if ($item/self::break) then
+              $item/ancestor::*
+              [
+                self::comment,
+                self::meta,
+                self::switch,
+                self::for,
+                self::for-each,
+                self::while,
+                self::do-while
+              ][1]          
+            else
+              $item/ancestor::*
+              [
+                self::comment,
+                self::meta,
+                self::for,
+                self::for-each,
+                self::while,
+                self::do-while
+              ][1]
+          ) intersect
+            (
+              if ($item/self::break) then
+                $statement/ancestor-or-self::*
+              else
+                $statement/ancestor::*            
+            )
+      return
+        ($item, $target)"/>
+  </xsl:template>
 
   <!--
     Collects unreachable statements.
@@ -252,7 +310,7 @@
     Implements Rule 2.
       $statements - block statements.
       $index - current index.
-      $unreachable - collected unreachable statemetns.
+      $unreachable - collected unreachable statements.
       Returns a closure:
         (
           $completes-normally as xs:boolean,
@@ -325,16 +383,16 @@
     match="*[@label]"
     as="item()+">
 
-    <xsl:variable name="label" as="xs:string" select="@label"/>
-    <xsl:variable name="label-id" as="xs:string?" select="@label-id"/>
+    <xsl:variable name="statement" as="element()" select="."/>
+
+    <xsl:variable name="breaks-and-targets" as="element()*">
+      <xsl:call-template name="get-breaks-and-targets"/>
+    </xsl:variable>
 
     <xsl:variable name="breaks" as="element()*" select="
-      p:get-descendant-statements(.)[self::break]
+      $breaks-and-targets
       [
-        if (exists($label-id)) then
-          @label-ref = $label-id
-        else
-          (@destination-label = $label) and empty(@label-ref)
+        subsequence($breaks-and-targets, position() + 1, 1) is $statement
       ]"/>
 
     <xsl:variable name="closure" as="item()+">
@@ -444,11 +502,14 @@
     <xsl:variable name="case-unreachable" as="element()*"
       select="$case-closure[not(. instance of xs:boolean)]"/>
 
+    <xsl:variable name="breaks-and-targets" as="element()*">
+      <xsl:call-template name="get-breaks-and-targets"/>
+    </xsl:variable>
+
     <xsl:variable name="breaks" as="element()*" select="
-      $case/block/p:get-descendant-statements(.)[self::break]
+      $breaks-and-targets
       [
-        empty(@destination-label) and
-        p:is-break-of($statement, .)
+        subsequence($breaks-and-targets, position() + 1, 1) is $statement
       ]"/>
 
     <xsl:sequence select="
@@ -496,12 +557,12 @@
     <xsl:variable name="block-unreachable" as="element()*"
       select="subsequence($block-closure, 2)"/>
 
-    <xsl:variable name="breaks" as="element()*" select="
-      p:get-descendant-statements($block)[self::break]
-      [
-        empty(@destination-label) and
-        p:is-break-of($statement, .)
-      ]"/>
+    <xsl:variable name="breaks-and-targets" as="element()*">
+      <xsl:call-template name="get-breaks-and-targets"/>
+    </xsl:variable>
+
+    <xsl:variable name="breaks" as="element()*"
+      select="$breaks-and-targets[self::break or self::continue]"/>
 
     <xsl:choose>
       <xsl:when test="t:is-boolean-false-expression($condition)">
@@ -554,29 +615,18 @@
     <xsl:variable name="block-unreachable" as="element()*"
       select="subsequence($block-closure, 2)"/>
 
-    <xsl:variable name="label" as="xs:string?" select="@label"/>
-    <xsl:variable name="label-id" as="xs:string?" select="@label-id"/>
+    <xsl:variable name="breaks-and-targets" as="element()*">
+      <xsl:call-template name="get-breaks-and-targets"/>
+    </xsl:variable>
 
-    <xsl:variable name="descendant-statements" as="element()*"
-      select="p:get-descendant-statements($block)"/>
-    
-    <xsl:variable name="breaks" as="element()*" select="
-      $descendant-statements[self::break]
-      [
-        empty(@destination-label) and
-        p:is-break-of($statement, .)
-      ]"/>
+    <xsl:variable name="breaks" as="element()*"
+      select="$breaks-and-targets[self::break or self::continue]"/>
 
     <xsl:variable name="continue" as="element()*" select="
-      $descendant-statements[self::continue]
+      $breaks-and-targets
       [
-        (
-          if (exists($label-id)) then
-            @label-ref = $label-id
-          else
-            (@destination-label = $label) and empty(@label-ref)
-        )[exists($label)] or
-        p:is-continue-of($statement, .)
+        self::continue and
+        (subsequence($breaks-and-targets, position() + 1, 1) is $statement)
       ]"/>
 
     <xsl:variable name="is-true-condition" as="xs:boolean"
@@ -633,7 +683,7 @@
     <xsl:variable name="update-closure" as="item()*">
       <xsl:apply-templates mode="#current" select="$update"/>
     </xsl:variable>
-    
+
     <xsl:variable name="update-unreachable" as="element()*"
       select="$update-closure[. instance of element()]"/>
 
@@ -646,29 +696,18 @@
     <xsl:variable name="block-unreachable" as="element()*"
       select="subsequence($block-closure, 2)"/>
 
-    <xsl:variable name="label" as="xs:string?" select="@label"/>
-    <xsl:variable name="label-id" as="xs:string?" select="@label-id"/>
+    <xsl:variable name="breaks-and-targets" as="element()*">
+      <xsl:call-template name="get-breaks-and-targets"/>
+    </xsl:variable>
 
-    <xsl:variable name="descendant-statements" as="element()*"
-      select="p:get-descendant-statements($block)"/>
-    
-    <xsl:variable name="breaks" as="element()*" select="
-      $descendant-statements[self::break]
-      [
-        empty(@destination-label) and
-        p:is-break-of($statement, .)
-      ]"/>
+    <xsl:variable name="breaks" as="element()*"
+      select="$breaks-and-targets[self::break or self::continue]"/>
 
     <xsl:variable name="continue" as="element()*" select="
-      $descendant-statements[self::continue]
+      $breaks-and-targets
       [
-        (
-          if (exists($label-id)) then
-            @label-ref = $label-id
-          else
-            (@destination-label = $label) and empty(@label-ref)
-        )[exists($label)] or
-        p:is-continue-of($statement, .)
+        self::continue and
+        (subsequence($breaks-and-targets, position() + 1, 1) is $statement)
       ]"/>
 
     <xsl:sequence select="
@@ -677,10 +716,10 @@
 
     <xsl:sequence select="$initialize-unreachable"/>
     <xsl:sequence select="$condition-unreachable"/>
-    
-    <xsl:variable name="false-condition" as="xs:boolean" 
+
+    <xsl:variable name="false-condition" as="xs:boolean"
       select="($condition/t:is-boolean-false-expression(.), false())[1]"/>
-    
+
     <xsl:choose>
       <xsl:when test="
         $false-condition or
@@ -819,9 +858,6 @@
     <xsl:variable name="finally-unreachable" as="element()*"
       select="subsequence($finally-closure, 2)"/>
 
-    <xsl:variable name="block-statements" as="element()*"
-      select="p:get-descendant-statements($block)"/>
-
     <xsl:choose>
       <xsl:when test="
         empty(p:get-child-statements($block)) and
@@ -829,7 +865,6 @@
         <xsl:sequence select="true()"/>
         <xsl:sequence select="
           ., 
-          $block-statements, 
           $catch/p:get-descendant-statements(.)"/>
       </xsl:when>
       <xsl:otherwise>
@@ -906,55 +941,6 @@
         .,
         p:get-descendant-statements(.)
       )"/>
-  </xsl:function>
-
-  <!--
-    Tests if a specified break is closest inner statement of
-    a specified statement.
-      $statement - a scope statement.
-      $break - a break statement.
-      Returns true if a specified break is closest inner statement of
-      a specified statement.
-  -->
-  <xsl:function name="p:is-break-of" as="xs:boolean">
-    <xsl:param name="statement" as="element()"/>
-    <xsl:param name="break" as="element()"/>
-
-    <xsl:sequence select="
-      $break/ancestor::*
-      [
-        self::comment,
-        self::meta,
-        self::switch,
-        self::for,
-        self::for-each,
-        self::while,
-        self::do-while
-      ][1] is $statement"/>
-  </xsl:function>
-
-  <!--
-    Tests if a specified continue is closest inner statement of
-    a specified statement.
-      $statement - a scope statement.
-      $continue - a continue statement.
-      Returns true if a specified continue is closest inner statement of
-      a specified statement.
-  -->
-  <xsl:function name="p:is-continue-of" as="xs:boolean">
-    <xsl:param name="statement" as="element()"/>
-    <xsl:param name="continue" as="element()"/>
-
-    <xsl:sequence select="
-      $continue/ancestor::*
-      [
-        self::comment,
-        self::meta,
-        self::for,
-        self::for-each,
-        self::while,
-        self::do-while
-      ][1] is $statement"/>
   </xsl:function>
 
   <!--
