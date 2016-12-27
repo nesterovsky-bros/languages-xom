@@ -130,17 +130,18 @@
   <!--
     Collects unreachable statements for a statement.
       $statement - a statement to collect unreachable statements for.
+      $break-and-continue break and continue statements in scope.
+        By default the value is collected from $statement.
       Returns an optional sequence of unreachable statements.
   -->
   <xsl:template name="t:collect-unreachable-statements" as="element()*">
     <xsl:param name="statement" as="element()"/>
+    <xsl:param name="break-and-continue" tunnel="yes" as="element()*" select="
+      p:get-descendant-statements($statement)
+        [self::break or self::continue]"/>
 
     <xsl:variable name="closure" as="item()+">
-      <xsl:apply-templates mode="p:collect-unreachable" select="$statement">
-        <xsl:with-param name="break-and-continue" tunnel="yes" select="
-          p:get-descendant-statements($statement)
-            [self::break or self::continue]"/>
-      </xsl:apply-templates>
+      <xsl:apply-templates mode="p:collect-unreachable" select="$statement"/>
     </xsl:variable>
 
     <xsl:variable name="unreachable" as="element()*"
@@ -161,9 +162,15 @@
     <xsl:param name="remove" as="xs:boolean"/>
     <xsl:param name="comment" as="xs:string?"/>
 
+    <xsl:variable name="break-and-continue" as="element()*" select="
+      p:get-descendant-statements($scope)
+        [self::break or self::continue]"/>
+
     <xsl:variable name="unreachable-statements" as="element()*">
       <xsl:call-template name="t:collect-unreachable-statements">
         <xsl:with-param name="statement" select="$scope"/>
+        <xsl:with-param name="break-and-continue" tunnel="yes"
+          select="$break-and-continue"/>
       </xsl:call-template>
     </xsl:variable>
 
@@ -175,6 +182,9 @@
         <xsl:apply-templates mode="p:optimize-unreachable-code" select="$scope">
           <xsl:with-param name="unreachable-statements" tunnel="yes"
             select="$unreachable-statements"/>
+          <xsl:with-param name="break-and-continue" tunnel="yes" select="
+            ($break-and-continue except $unreachable-statements)
+              [@destination-ref or @label-ref]"/>
           <xsl:with-param name="remove" tunnel="yes" select="$remove"/>
           <xsl:with-param name="comment" tunnel="yes" select="$comment"/>
         </xsl:apply-templates>
@@ -185,7 +195,7 @@
   <!-- 
     Tests whether the statement in breaked.
       $statement a stetement to test (defaults to context element).
-      $break-and-continue a sequence of break and continue statements in scope.
+      $break-and-continue break and continue statements in scope.
       Returns a sequence of closures: 
         (break and continue statement, target statement).
   -->
@@ -956,12 +966,15 @@
     Mode "p:optimize-unreachable-code".
     Optimizes unreachable code.
       $unreachable-statements - a list of unreachable statements.
+      $break-and-continue - a list of reachable labeled break and 
+        continue statements.
       $remove - true to remove unreachable code, and false to comment it out.
       $comment - an optional comment text to put near unreachable code.
       Returns optimized element.
   -->
   <xsl:template mode="p:optimize-unreachable-code" match="*">
     <xsl:param name="unreachable-statements" tunnel="yes" as="element()+"/>
+    <xsl:param name="break-and-continue" tunnel="yes" as="element()*"/>
     <xsl:param name="remove" tunnel="yes" as="xs:boolean"/>
     <xsl:param name="comment" tunnel="yes" as="xs:string?"/>
 
@@ -970,7 +983,25 @@
     <xsl:choose>
       <xsl:when test="exists(. except $unreachable-statements)">
         <xsl:copy>
-          <xsl:sequence select="@*"/>
+          <xsl:choose>
+            <xsl:when test="
+              $statement/@label and 
+              $break-and-continue
+              [
+                if (exists(@label-ref)) then
+                  $statement/@label-id = @label-ref
+                else if (exists(@destination-ref)) then
+                  $statement/@label = @destination-ref
+                else
+                  ()
+              ]">
+              <xsl:sequence select="@*"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:sequence select="@* except (@label, @label-id)"/>
+            </xsl:otherwise>
+          </xsl:choose>
+
           <xsl:apply-templates mode="p:optimize-unreachable-code"
             select="node()"/>
         </xsl:copy>
